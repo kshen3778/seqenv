@@ -11,5 +11,6 @@ setup(
         author_email     = 'umer.ijaz@glasgow.ac.uk',
         classifiers      = ['Topic :: Scientific/Engineering :: Bio-Informatics'],
         packages         = ['seqenv'],
+        scripts          = ['seqenv/seqenv'],
         install_requires = ['biopython'],
     )
