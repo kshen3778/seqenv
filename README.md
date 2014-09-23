@@ -6,6 +6,19 @@ To install `seqenv` onto your server, use the python package manager:
 
     $ pip install seqenv
 
+### Usage
+Once that is done, you can start processing FASTA files from the command line. For using the default parameters you can just type:
+
+    $ seqenv --in sequences.fasta
+
+We will then assume that you have inputed 16S sequences. To modify the database or use different type of sequence type:
+
+    $ seqenv --in sequences.fasta --seqtype nuc --db nt
+
+To modify the minimum identity in the similarity search, use the following:
+
+    $ seqenv --in sequences.fasta --identity 97
+
 ### Acknowledgments
 
 `SEQenv` was conceived and developed in the following hackathons supported by European Union's Earth System Science and Environmental Management ES1103 COST Action ("[Microbial ecology & the earth system: collaborating for insight and success with the new generation of sequencing tools](http://www.cost.eu/domains_actions/essem/Actions/ES1103)"):
