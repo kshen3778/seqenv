@@ -12,5 +12,5 @@ setup(
         classifiers      = ['Topic :: Scientific/Engineering :: Bio-Informatics'],
         packages         = ['seqenv'],
         scripts          = ['seqenv/seqenv'],
-        install_requires = ['biopython'],
+        install_requires = ['biopython', 'sh'],
     )
