@@ -72,7 +72,7 @@ class FASTA(FilePath):
 
     def rename_sequences(self, new_fasta, mapping):
         """Given a new file path, will rename all sequences in the
-        original fasta file using the mapping dictionary."""
+        current fasta file using the mapping dictionary also provided."""
         assert isinstance(new_fasta, FASTA)
         new_fasta.create()
         for seq in self.input_file:

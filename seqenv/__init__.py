@@ -31,16 +31,26 @@ class Analysis(object):
 
     * `num_threads`: The number of threads. Default to the number of cores on the
                      current machine.
+
+    * Sequence similarity search filtering options:
+        - min_identity: Defaults to 0.97
+        - e_value: Defaults to 0.0001
+        - max_targets: Defaults to 10
+        - min_coverage: Defaults to 0.97
     """
 
-    def __init__(self,
-                 input_file,
-                 abundances = None,
-                 N = 1000,
-                 seq_type = 'nucl',
-                 search_algo = 'blast',
-                 search_db = 'nt',
-                 num_threads = None):
+    def __init__(self, input_file,
+                 abundances   = None,
+                 N            = 1000,
+                 seq_type     = 'nucl',
+                 search_algo  = 'blast',
+                 search_db    = 'nt',
+                 num_threads  = None,
+                 min_identity = 0.97,
+                 e_value      = 0.0001,
+                 max_targets  = 10,
+                 min_coverage = 0.97,
+                 ):
         # Base parameters #
         self.input_file = FASTA(input_file)
         self.abundances = abundances
@@ -52,6 +62,11 @@ class Analysis(object):
         # Number of cores to use #
         if num_threads is None: self.num_threads = multiprocessing.cpu_count()
         else: self.num_threads = num_threads
+        # Hit filtering parameters #
+        self.min_identity = min_identity
+        self.e_value      = e_value
+        self.max_targets  = max_targets
+        self.min_coverage = min_coverage
 
     def run(self):
         pass
@@ -79,38 +94,72 @@ class Analysis(object):
         if not self.abundances: return self.renamed_fasta
         only_top_fasta = FASTA(self.input_file.prefix_path + '_top.fasta')
         if only_top_fasta.exists: return only_top_fasta
+        print "Using: " + self.renamed_fasta
         print "STEP 1B: Get the top %i sequences (in terms of their abundances)." % self.N
         #TODO
         return only_top_fasta
+
+    @property
+    def filtering(self):
+        """Return a dictionary with the filtering options for the sequence similarity
+        search."""
+        return {
+            'min_identity': self.min_identity,
+            'e_value':      self.e_value,
+            'max_targets':  self.max_targets,
+            'min_coverage': self.min_coverage,
+        }
 
     @property_cached
     def search(self):
         """The similarity search object with all the relevant parameters."""
         return ParallelSeqSearch(input_fasta = self.only_top_sequences,
-                                 seq_type = self.seq_type,
-                                 algorithm = self.search_algo,
-                                 database = self.search_db,
-                                 num_threads = self.num_threads,)
+                                 seq_type    = self.seq_type,
+                                 algorithm   = self.search_algo,
+                                 database    = self.search_db,
+                                 num_threads = self.num_threads,
+                                 filtering   = self.filtering)
 
-    @property
+    @property_cached
     def search_results(self):
-        """For every sequence, search against a database and return the best hits."""
-        return search.run()
+        """For every sequence, search against a database and return the best hits
+        after filtering."""
+        # Check that it was run #
+        if not self.search.out_path.exists:
+            print "Using: " + self.only_top_sequences
+            print "STEP 2: BLAST against the '%s' database" % self.search_db
+            self.search.run()
+            print "STEP 3: Filter out bad hits"
+            self.search.filter()
+        # Parse the results #
+        return self.search.results
 
     @property
     def ncbi_results(self):
         """Using the search results, for every hit download the relevant information from
         NCBI (e.g. abstract text)."""
-        pass
+        if not somefile.exists:
+            print "Using %i results from the similarity search" % len(search_results)
+            print "STEP 4: Download data from NCBI."
+        else:
+            return somestuff
 
     @property
     def tagger_results(self):
         """Using the NCBI results, for every piece of text, run the tagger on it."""
-        pass
+        if not somefile.exists:
+            print "Using %i results from the NCBI data" % len(ncbi_results)
+            print "STEP 5: Run the text mining tagger on the NCBI data."
+        else:
+            return somestuff
 
     def generate_freq_tables(self):
         """Generate the frequencies tables..."""
-        pass
+        if not somefile.exists:
+            print "Using %i results from the text mining results" % len(tagger_results)
+            print "STEP 6: Generating main output."
+        else:
+            print "Final results already exist !"
 
     def generate_dot_files(self):
         """Generate the dot files for visualization in GraphViz..."""

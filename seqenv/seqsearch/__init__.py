@@ -5,6 +5,7 @@ import multiprocessing
 from seqenv.seqsearch.blast import BLASTquery
 from seqenv.seqsearch.usearch import USEARCHquery
 from seqenv.common.cache import property_cached
+from seqenv.common.autopaths import FilePath
 
 # Third party modules #
 
@@ -13,10 +14,7 @@ class SeqSearch(object):
     """A sequence similarity search. Could use different algorithms such
     as BLAST, USEARCH, BLAT etc.
 
-    Can also operates by chopping in the input up into smaller pieces and running the
-    algorithm on each piece separately, finally joining the outputs.
-
-    Input: - List of sequences
+    Input: - List of sequences in a FASTA file
            - The type of the sequences
            - A database to search against
            - The type of algorithm to use
@@ -26,15 +24,9 @@ class SeqSearch(object):
              * BLAST supported:   - Minimum identity
                                   - E value
                                   - Maximum targets
+                                  - Minimum query coverage (via manual output format)
              * USEARCH supported: - ?
-             * General: Minimum query coverage
     Output: - Sorted list of identifiers in the database (object with significance value and identity attached)
-
-    Other ideas:
-    @property
-    def word_size(self):
-        #Depends on the percent identity
-        pass
     """
 
     def __init__(self, input_fasta, seq_type, database, algorithm='blast', num_threads=None, filtering=None, out_path=None):
@@ -49,8 +41,8 @@ class SeqSearch(object):
         if num_threads is None: self.num_threads = multiprocessing.cpu_count()
         else: self.num_threads = num_threads
         # Output path #
-        if out_path is None: self.out_path = self.input_fasta.prefix_path + '.' + algorithm + 'out'
-        else: self.out_path = out_path
+        if out_path is None: self.out_path = FilePath(self.input_fasta.prefix_path + '.' + algorithm + 'out')
+        else: self.out_path = FilePath(out_path)
 
     @property
     def query(self):
@@ -60,15 +52,33 @@ class SeqSearch(object):
         raise NotImplemented(self.algorithm)
 
     @property_cached
+    def blast_params(self):
+        """A dictionary of options to pass to the blast executable.
+        The params should depend on the filtering options."""
+        # Initialize #
+        params = {}
+        # Defaults #
+        params['-num_threads'] = self.num_threads
+        params['-dust'] = 'no'
+        # Conditionals #
+        if 'e_value'      in self.filtering: params['-evalue']          = self.filtering['e_value']
+        if 'max_targets'  in self.filtering: params['-max_target_seqs'] = self.filtering['max_targets']
+        # Depends on sequence type #
+        if self.seq_type == 'nucl':
+            if 'min_identity' in self.filtering: params['-perc_identity'] = self.filtering['min_identity']
+        # Output format #
+        params['-outfmt'] = "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qcovs staxids"
+        # Return #
+        return params
+
+    @property_cached
     def blast_query(self):
         """Make a BLAST search object."""
-        # The params should depend on the filtering options #
-        params = {'-dust': 'no', '-outfmt': '6', '-num_threads': self.num_threads}
         # Sequence type #
         if self.seq_type == 'nucl': blast_algo = 'blastn'
         if self.seq_type == 'prot': blast_algo = 'blastp'
         # The query object #
-        query = BLASTquery(self.input_fasta, self.database, params, blast_algo, "plus", self.out_path)
+        query = BLASTquery(self.input_fasta, self.database, self.blast_params, blast_algo, "plus", self.out_path)
         return query
 
     @property_cached
@@ -83,4 +93,5 @@ class SeqSearch(object):
         return self.query.run()
 
     def filter(self):
-        raise NotImplemented('')
+        """Filter the results accordingly"""
+        return self.query.filter(self.filtering)

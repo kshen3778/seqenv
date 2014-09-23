@@ -2,10 +2,11 @@
 from __future__ import division
 
 # Built-in modules #
-import os, multiprocessing, threading
+import os, multiprocessing, threading, shutil
 
 # Internal modules #
 from seqenv.common.autopaths import FilePath
+from seqenv.common import new_temp_path
 from seqenv.fasta import FASTA
 
 # Third party modules #
@@ -79,11 +80,30 @@ class BLASTquery(object):
         if os.path.exists("error.log") and os.path.getsize("error.log") == 0: os.remove("error.log")
 
     def non_block_run(self):
-        """Special method to use run the query in a thread without blocking"""
+        """Special method to run the query in a thread without blocking."""
         self.thread = threading.Thread(target=self.run)
         self.thread.start()
 
     def wait(self):
         """If you have run the query in a non-blocking way, call this method to pause
-        until the query is finished"""
+        until the query is finished."""
         self.thread.join()
+
+    def filter(self, filtering):
+        """We can do some special filtering on the results. For the moment only minimum coverage."""
+        # Conditions #
+        if 'min_coverage' not in filtering: return
+        if 'qcovs' not in self.params['-outfmt']: raise Exception()
+        # Iterator #
+        def filter_lines(blastout):
+            threshold = filtering['min_coverage']
+            position = self.params['-outfmt'].split().index('qcovs')
+            for line in blastout:
+                coverage = line.split()[position]
+                if coverage < threshold: continue
+                else: yield line
+        # Do it #
+        temp_path = new_temp_path()
+        with open(temp_path, 'w') as handle: handle.writelines(filter_lines(self.out_path))
+        os.remove(self.out_path)
+        shutil.move(temp_path, self.out_path)

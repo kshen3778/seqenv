@@ -34,8 +34,9 @@ class ParallelSeqSearch(SeqSearch):
     @property_cached
     def blast_queries(self):
         """Make all BLAST search objects."""
-        # The params should depend on the filtering options #
-        params = {'-dust': 'no', '-outfmt': '6', '-num_threads': self.num_threads}
+        # Only use one CPU per query #
+        params = self.blast_params.copy()
+        params['num_threads'] = 1
         # Sequence type #
         if self.seq_type == 'nucl': blast_algo = 'blastn'
         if self.seq_type == 'prot': blast_algo = 'blastp'
