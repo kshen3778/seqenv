@@ -1,4 +1,12 @@
-### Acknowledgements
+# Seqenv version 0.9
+Assign environment ontology (EnvO) terms to short DNA sequences.
+
+### Installing
+To install `seqenv` onto your server, use the python package manager:
+
+    $ pip install seqenv
+
+### Acknowledgments
 
 `SEQenv` was conceived and developed in the following hackathons supported by European Union's Earth System Science and Environmental Management ES1103 COST Action ("[Microbial ecology & the earth system: collaborating for insight and success with the new generation of sequencing tools](http://www.cost.eu/domains_actions/essem/Actions/ES1103)"):
 
@@ -17,6 +25,7 @@ This work would not have been possible without the advice and support of many pe
 - Alica Chronakova (alicach@upb.cas.cz)
 - Ali Zeeshan Ijaz (alizeeshanijaz@gmail.com)
 - Simon Berger (simon.berger@h-its.org)
+- Lucas Sinclair (lucas.sinclair@me.com)
 
 [1] Main developers
 [2] Contact for correspondence
