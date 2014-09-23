@@ -2,7 +2,7 @@
 from __future__ import division
 
 # Built-in modules #
-import os, multiprocessing
+import os, multiprocessing, threading
 
 # Internal modules #
 from seqenv.common.autopaths import FilePath
@@ -28,6 +28,8 @@ class BLASTquery(object):
                       '-num_threads': 16}
             search = parallelblast.BLASTquery(records_path, db, params)
             search.run()
+
+       You can also call search.non_block_run() to run maybe searches in parallel.
        """
 
     def __repr__(self): return '<%s on "%s">' % (self.__class__.__name__, self.query_path)
@@ -39,6 +41,7 @@ class BLASTquery(object):
                  out_path = None,
                  executable = None):
         # Save attributes #
+        self.path = query_path
         self.query = FASTA(query_path)
         self.db = FilePath(db_path)
         self.version = version
@@ -51,11 +54,11 @@ class BLASTquery(object):
         else: self.out_path = out_path
         self.out_path = FilePath(self.out_path)
         # Defaults #
-        cpus = multiprocessing.cpu_count()
+        self.cpus = multiprocessing.cpu_count()
         if self.version == 'plus':
-            if '-num_threads' not in self.params: self.params['-num_threads'] = cpus
+            if '-num_threads' not in self.params: self.params['-num_threads'] = self.cpus
         if self.version == 'legacy':
-            if '-a' not in self.params: self.params['-a'] = cpus
+            if '-a' not in self.params: self.params['-a'] = self.cpus
 
     @property
     def command(self):
@@ -75,9 +78,12 @@ class BLASTquery(object):
         sh.Command(self.command[0])(self.command[1:])
         if os.path.exists("error.log") and os.path.getsize("error.log") == 0: os.remove("error.log")
 
-    def run_parallel(self):
-        """Special method to use GNU parallel to run the query"""
-        self.params['-num_threads'] = 1
-        self.query = "{}"
-        # --block $sizeChunksString --recstart '>' --pipe
-        sh.parallel(self.query.cmd)
+    def non_block_run(self):
+        """Special method to use run the query in a thread without blocking"""
+        self.thread = threading.Thread(target=self.run)
+        self.thread.start()
+
+    def wait(self):
+        """If you have run the query in a non-blocking way, call this method to pause
+        until the query is finished"""
+        self.thread.join()

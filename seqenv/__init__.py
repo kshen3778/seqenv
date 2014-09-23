@@ -8,7 +8,7 @@ import multiprocessing
 
 # Internal modules #
 from seqenv.fasta import FASTA
-from seqenv.seqsearch import SeqSearch
+from seqenv.seqsearch.parallel import ParallelSeqSearch
 from seqenv.common.cache import property_cached
 
 # Third party modules #
@@ -86,11 +86,11 @@ class Analysis(object):
     @property_cached
     def search(self):
         """The similarity search object with all the relevant parameters."""
-        return SeqSearch(input_fasta = self.only_top_sequences,
-                         seq_type = self.seq_type,
-                         algorithm = self.search_algo,
-                         database = self.search_db,
-                         num_threads = self.num_threads,)
+        return ParallelSeqSearch(input_fasta = self.only_top_sequences,
+                                 seq_type = self.seq_type,
+                                 algorithm = self.search_algo,
+                                 database = self.search_db,
+                                 num_threads = self.num_threads,)
 
     @property
     def search_results(self):

@@ -13,7 +13,7 @@ class SeqSearch(object):
     """A sequence similarity search. Could use different algorithms such
     as BLAST, USEARCH, BLAT etc.
 
-    Operates by chopping in the input up into smaller pieces and running the
+    Can also operates by chopping in the input up into smaller pieces and running the
     algorithm on each piece separately, finally joining the outputs.
 
     Input: - List of sequences
@@ -21,6 +21,7 @@ class SeqSearch(object):
            - A database to search against
            - The type of algorithm to use
            - Number of threads to use
+           - The desired output path
            - The filtering options:
              * BLAST supported:   - Minimum identity
                                   - E value
@@ -36,16 +37,20 @@ class SeqSearch(object):
         pass
     """
 
-    def __init__(self, input_fasta, seq_type, database, algorithm='blast', num_threads=None, filtering=None):
+    def __init__(self, input_fasta, seq_type, database, algorithm='blast', num_threads=None, filtering=None, out_path=None):
         # Base parameters #
         self.input_fasta = input_fasta
         self.seq_type = seq_type
         self.database = database
+        # Optional #
         self.algorithm = algorithm
         self.filtering = filtering
         # Number of cores to use #
         if num_threads is None: self.num_threads = multiprocessing.cpu_count()
         else: self.num_threads = num_threads
+        # Output path #
+        if out_path is None: self.out_path = self.input_fasta.prefix_path + '.' + algorithm + 'out'
+        else: self.out_path = out_path
 
     @property
     def query(self):
@@ -58,12 +63,12 @@ class SeqSearch(object):
     def blast_query(self):
         """Make a BLAST search object."""
         # The params should depend on the filtering options #
-        params = {'-dust': 'no', '-outfmt': '6'}
+        params = {'-dust': 'no', '-outfmt': '6', '-num_threads': self.num_threads}
         # Sequence type #
         if self.seq_type == 'nucl': blast_algo = 'blastn'
         if self.seq_type == 'prot': blast_algo = 'blastp'
         # The query object #
-        query = BLASTquery(self.input_fasta, self.database, params, blast_algo, version="plus")
+        query = BLASTquery(self.input_fasta, self.database, params, blast_algo, "plus", self.out_path)
         return query
 
     @property_cached
@@ -75,14 +80,7 @@ class SeqSearch(object):
 
     def run(self):
         """Run the search"""
-        # Parallel version #
-        if self.num_threads > 1: return self.run_parallel()
-        # Single threaded version #
         return self.query.run()
-
-    def run_parallel(self):
-        """Use GNU parallel to run the search job"""
-        return self.query.run_parallel()
 
     def filter(self):
         raise NotImplemented('')

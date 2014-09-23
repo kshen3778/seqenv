@@ -39,3 +39,10 @@ class FilePath(str):
     def extension(self):
         """The extension with the leading period"""
         return os.path.splitext(self.path)[1]
+
+    @property
+    def count_bytes(self):
+        """The number of bytes"""
+        if not self.exists: return 0
+        return os.path.getsize(self.path)
+
