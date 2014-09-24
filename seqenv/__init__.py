@@ -11,10 +11,9 @@ from collections import defaultdict
 from seqenv.fasta import FASTA
 from seqenv.seqsearch.parallel import ParallelSeqSearch
 from seqenv.common.cache import property_cached
+from seqenv.eutils import gi_to_source, gi_to_abstract
 
 # Third party modules #
-from Bio import Entrez
-Entrez.email = "I don't know who will be running this script"
 
 ################################################################################
 class Analysis(object):
@@ -156,17 +155,16 @@ class Analysis(object):
         Typically the text is its isolation source or a list of abstracts."""
         unique_gis = set(gi for gis in self.seq_to_gis.values() for gi in gis)
         result = {}
-        for gi in unique_gis:
-            gb_entry = Entrez.efetch(db="nucleotide", id=gi, rettype="gb", retmode="xml")
-            gb_record = Entrez.read(gb_entry)[0]
-            gb_qualifiers = gb_record['GBSeq_feature-table'][0]['GBFeature_quals']
-            for qualifier in gb_qualifiers:
-                key, value = qualifier.items()
-                1/0
-                if key == 'isolation_source': result[gi] = value
-        # TODO #
+        # Case source #
         if self.text_source == 'source': pass
+            for gi in unique_gis:
+                source = gi_to_source(gi)
+                if source is not None: result[gi] = source
+        # Case abstract #
         if self.text_source == 'abstract': pass
+            for gi in unique_gis:
+                source = gi_to_abstract(gi)
+                if source is not None: result[gi] = source
 
     @property_cached
     def gi_to_matches(self):
