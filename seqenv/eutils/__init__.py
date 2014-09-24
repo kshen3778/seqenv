@@ -2,42 +2,35 @@
 
 # Third party modules #
 from Bio import Entrez
+from tqdm import tqdm
+
+# Constants #
 Entrez.email = "I don't know who will be running this script"
 
 ################################################################################
-def gi_to_source(gi):
-    gb_entry = Entrez.efetch(db="nucleotide", id=gi, rettype="gb", retmode="xml")
-    gb_record = Entrez.read(gb_entry)[0]
-    gb_qualifiers = gb_record['GBSeq_feature-table'][0]['GBFeature_quals']
-    for qualifier in gb_qualifiers:
+def gis_to_records(gis, progress=True):
+    # Should we display progress ? #
+    progress = tqdm if progress else lambda x:x
+    # Do it by chunks #
+    at_a_time = 1000
+    result = {}
+    for i in progress(range(0, len(gis), at_a_time)):
+        chunk = gis[i:i+at_a_time]
+        entries = Entrez.efetch(db="nucleotide", id=chunk, rettype="gb", retmode="xml")
+        result.update(dict(zip(gis, Entrez.parse(entries))))
+    # Return #
+    return result
+
+################################################################################
+def record_to_source(record):
+    qualifiers = record['GBSeq_feature-table'][0]['GBFeature_quals']
+    for qualifier in qualifiers:
         if qualifier['GBQualifier_name'] == 'isolation_source':
             return qualifier['GBQualifier_value']
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ################################################################################
-def gi_to_abstract(gi):
-    gb_entry = Entrez.efetch(db="nucleotide", id=gi, rettype="gb", retmode="xml")
-    gb_record = Entrez.read(gb_entry)[0]
-    gb_qualifiers = gb_record['GBSeq_feature-table'][0]['GBFeature_quals']
-    for qualifier in gb_qualifiers:
-        key, value = qualifier.items()
-        if key == 'isolation_source': return value
+def record_to_abstract(record):
+    qualifiers = record['GBSeq_feature-table'][0]['GBFeature_quals']
+    for qualifier in qualifiers:
+        if qualifier['GBQualifier_name'] == 'isolation_source':
+            return qualifier['GBQualifier_value']

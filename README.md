@@ -24,15 +24,16 @@ If you have abundance data you would like to add to your analysis you can specif
     $ seqenv --in sequences.fasta --abundances counts.tsv
 
 ### All parameters
-   * `--text_source`: Text source: `1` for GenBank record "isolation source" field or `2` PubMed abstracts (Default: `1`).
-   * `--num_threads`: Number of cores to use (Defaults to the total number of cores). Use 1 for non-parallel processing.
+   * `--seq_type`: Sequence type `nucl` or `prot` for nucleotides or amino acids, respectively (Default: `nucl`).
    * `--search_algo`: Search algorithm. Either `blast` or `usearch` (Default: `blast`).
    * `--search_db`: The database to search against (Default: `nt`). You can specify the full path or provide a `.ncbirc` file.
-   * `--seq_type`: Sequence type nucl/prot (Default: nucl).
+   * `--text_source`: Text source: `source` for GenBank record "isolation source" field or `abstractt` for PubMed abstracts (Default: `source`).
+   * `--num_threads`: Number of cores to use (Defaults to the total number of cores). Use 1 for non-parallel processing.
+   * `--out_dir`: The output directory in which to store the result and intermediary files. Defaults to the same directory as the input file.
    * `--min_identity`: Minimum identity in similarity search (Default: 0.97). Note: not available when using `blastp`.
-   * `--e_value`: Minimum e-value in similarity search (Default: 0.97).
-   * `--min_coverage`: Minimum query coverage in similarity search (Default: 0.97).
+   * `--e_value`: Minimum e-value in similarity search (Default: 0.0001).
    * `--max_targets`: Maximum number of reference matches in similarity search (Default: 10).
+   * `--min_coverage`: Minimum query coverage in similarity search (Default: 0.97).
    * `--abundances`: Abundances file (Default: None).
    * `--N`: If abundances are given, pick only the top N sequences (Default: 1000).
    * `--envo_id`: Extract terms for the given ENVO ID (Default: `all`)

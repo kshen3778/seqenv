@@ -1,28 +1,48 @@
 #!/usr/bin/env python2
-# -*- coding: utf8 -*-
-
-"""
-To use seqenv from the command line you can simply type:
-
-    $ seqenv --in sequences.fasta
-
-To modify the minimum identity in the similarity search, use the following:
-
-    $ seqenv --in sequences.fasta --identity 97
-"""
 
 # Built-in modules #
-import sys, argparse
+import os, argparse, re
+from argparse import RawTextHelpFormatter
 
 # Internal modules #
 import seqenv
 
-# Parse the shell arguments #
-parser = argparse.ArgumentParser(description=sys.modules[__name__].__doc__)
+# Retrieve the documentation from the README file #
+home = os.environ['HOME'] + '/'
+readme_path = home + "repos/seqenv/README.md"
+readme_contens = open(readme_path, 'r').read()
+desc = re.findall('^### All parameters(.+?)###', readme_contens, flags=re.M|re.DOTALL)[0]
+
+# Make a shell arguments parser #
+parser = argparse.ArgumentParser(description=desc, formatter_class=RawTextHelpFormatter)
+
+# All the required arguments #
 parser.add_argument("input_file", help="The fasta file to process", type=str)
+
+# All the optional arguments #
+parameters = {
+    "seq_type"     : "Either `nucl` or `prot`. Defaults to `nucl`.",
+    "search_algo"  : "Either 'blast' or 'usearch'. Defaults to `blast`.",
+    "search_db"    : "The path to the database to search against. Defaults to `nt`.",
+    "text_source"  : "Either `source` for isolation source or `abstract` for the pubmed abstracts. Defaults to `source`.",
+    "num_threads"  : "Number of threads to use. Default to the number of cores on the current machine.",
+    "out_dir"      : "Place all the outputs in the specified directory. Defaults to the input file's directory.",
+    "min_identity" : "Minimum identity in similarity search. Defaults to 0.97.",
+    "e_value"      : "Minimum e-value in similarity search. Defaults to 0.0001.",
+    "max_targets"  : "Maximum number of reference matches in similarity search. Defaults to 10.",
+    "min_coverage" : "Minimum query coverage in similarity search. Defaults to 0.97.",
+    "abundances"   : "If you have sample information, give is as a TSV file.",
+    "N"            : "Use only the top `N` sequences in terms of their abundance. Defaults to 1000.",
+}
+
+# Add them to the parser #
+for param, help in parameters.items(): parser.add_argument("--" + param, help=help)
+
+# Parse it #
 args = parser.parse_args()
 input_path = args.input_file
+kwargs = {k:getattr(args,k) for k in params}
 
 # Run the pipeline #
-analysis = seqenv.Analysis(input_path)
+analysis = seqenv.Analysis(input_path, **kwargs)
 analysis.run()

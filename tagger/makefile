@@ -13,7 +13,7 @@ clean:
 #
 tagger_swig.py tagger_swig_wrap.cxx: tagger_swig.i tagger.h
 	swig -python -c++ -threads $<
-	
+
 tagger.o: tagger.cxx acronyms.h tagger.h tagger_types.h tagger_core.h acronyms.h hash.h tokens.h
 	$(CC) $(CFLAGS) -c $<
 

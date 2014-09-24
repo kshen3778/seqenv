@@ -12,7 +12,7 @@ import cPickle as pickle
 from seqenv.fasta import FASTA
 from seqenv.seqsearch.parallel import ParallelSeqSearch
 from seqenv.common.cache import property_cached
-from seqenv.eutils import gi_to_source, gi_to_abstract
+from seqenv.eutils import record_to_source, record_to_abstract
 from seqenv.common.timer import Timer
 from seqenv.common.autopaths import FilePath
 
@@ -25,49 +25,49 @@ from tqdm import tqdm
 ################################################################################
 class Analysis(object):
     """The main object. The only mandatory argument is the input fasta file path.
-    The text below is somewhat redundant with what is in the readme file.
-
-    * `abundances`: If you have sample information, then you can provide the
-                    'abundances' argument too. It should be a TSV file.
-
-    * `N`: Use only the top `N` sequences in terms of their abundance, discard
-           the rest. Only valid if abundances are provided.
+    The text below is somewhat redundant with what is in the readme file and the
+    command line utitliy.
 
     * 'seq_type': Either `nucl` or `prot`. Defaults to `nucl`.
 
+    * `search_algo`: Either 'blast' or 'usearch'. Defaults to `blast`.
+
+    * `search_db`: The path to the database to search against. Defaults to `nt`.
+
     * `text_source`: Either `source` for isolation source terms or `abstract` for parsing
-                     the publication abstracts.
-
-    * `search_algo`: Either 'blast' or 'usearch' or ...
-
-    * `search_db`: Either 'nt' or 'silva' or ...
+                     the publication abstracts. Defaults to `source`.
 
     * `num_threads`: The number of threads. Default to the number of cores on the
                      current machine.
 
-    * `out_dir`: Place all the outputs in the specified directory.
+    * `out_dir`: Place all the outputs in the specified directory. Defaults to the input file's directory.
 
     * Sequence similarity search filtering options:
         - min_identity: Defaults to 0.97
         - e_value: Defaults to 0.0001
         - max_targets: Defaults to 10
         - min_coverage: Defaults to 0.97
+
+    * `abundances`: If you have sample information, then you can provide the
+                    'abundances' argument too. It should be a TSV file.
+
+    * `N`: Use only the top `N` sequences in terms of their abundance, discard
+           the rest. Only valid if abundances are provided.
     """
 
     def __init__(self, input_file,
-                 abundances   = None,
-                 N            = 1000,
                  seq_type     = 'nucl',
-                 text_source  = 'source',
                  search_algo  = 'blast',
                  search_db    = 'nt',
+                 text_source  = 'source',
                  num_threads  = None,
+                 out_dir      = None,
                  min_identity = 0.97,
                  e_value      = 0.0001,
                  max_targets  = 10,
                  min_coverage = 0.97,
-                 out_dir      = None,
-                 ):
+                 abundances   = None,
+                 N            = 1000):
         # Base parameters #
         self.input_file = FASTA(input_file)
         self.abundances = abundances
@@ -78,7 +78,7 @@ class Analysis(object):
         self.search_algo = search_algo
         self.search_db = search_db
         # Number of cores to use #
-        if num_threads is None: self.num_threads = multiprocessing.cpu_count()/2
+        if num_threads is None: self.num_threads = multiprocessing.cpu_count()
         else: self.num_threads = num_threads
         self.num_threads = min(self.num_threads, self.input_file.count)
         # Hit filtering parameters #
@@ -181,10 +181,11 @@ class Analysis(object):
         if not text_entries.exists:
             result = {}
             unique_gis = set(gi for gis in self.seq_to_gis.values() for gi in gis)
-            if self.text_source == 'source': fn = gi_to_source
-            if self.text_source == 'abstract': fn = gi_to_abstract
             print "STEP 4: Download data from NCBI"
-            for gi in tqdm(unique_gis):
+            all_records = gis_to_records(unique_gis)
+            if self.text_source == 'source': fn = record_to_source
+            if self.text_source == 'abstract': fn = record_to_abstract
+            for gi, record in all_records.items():
                 text = fn(gi)
                 if text is not None: result[gi] = text
             with open(text_entries, 'w') as handle: pickle.dump(result, handle)
@@ -196,8 +197,8 @@ class Analysis(object):
     @property_cached
     def gi_to_concepts(self):
         """A dictionary linking every `gi` identifier to the concept counts.
-        (dictionaries of concept:int). By finding regions of interest in the text
-        (i.e. a match) we can assign meaning to them in terms of concepts.
+        (dictionaries of concept:int). This is done by finding regions of interest in the text
+        (i.e. a match). We can assign meaning to the matches in terms of concepts.
         A 'concept' or 'entity' here would be an envo term such as 'ENVO:01000047'
         When you call `t.GetMatches(python_string, "", [-27])` you get a list back.
         The second argument can be left empty in our case (per document blacklisting)

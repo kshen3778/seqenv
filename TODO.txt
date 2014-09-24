@@ -1,5 +1,9 @@
 Add the abundance file processing
+Add the abstract processing
+Add the tagger output
+
+Add the backtracking
 Add a clean function that wipes all the files
 Have the setup.py compile the tagger
 Have the setup.py copy the data directory somewhere
-Add in the install procedure that swig needs to be installed
+Add in the install procedure that swig needs to be installed (or just distribute)
