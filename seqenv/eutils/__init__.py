@@ -13,6 +13,26 @@ def gi_to_source(gi):
         if qualifier['GBQualifier_name'] == 'isolation_source':
             return qualifier['GBQualifier_value']
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ################################################################################
 def gi_to_abstract(gi):
     gb_entry = Entrez.efetch(db="nucleotide", id=gi, rettype="gb", retmode="xml")

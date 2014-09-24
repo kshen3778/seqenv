@@ -43,6 +43,11 @@ class FilePath(str):
         return os.path.splitext(self.path)[1]
 
     @property
+    def directory(self):
+        """The containing directory"""
+        return os.path.dirname(self.path) + '/'
+
+    @property
     def count_bytes(self):
         """The number of bytes"""
         if not self.exists: return 0

@@ -4,8 +4,9 @@ b'This module needs Python 2.7.x'
 __version__ = '0.9.0'
 
 # Built-in modules #
-import multiprocessing
+import os, multiprocessing
 from collections import defaultdict
+import cPickle as pickle
 
 # Internal modules #
 from seqenv.fasta import FASTA
@@ -13,12 +14,18 @@ from seqenv.seqsearch.parallel import ParallelSeqSearch
 from seqenv.common.cache import property_cached
 from seqenv.eutils import gi_to_source, gi_to_abstract
 from seqenv.common.timer import Timer
+from seqenv.common.autopaths import FilePath
+
+# Compiled modules #
+#import tagger
 
 # Third party modules #
+from tqdm import tqdm
 
 ################################################################################
 class Analysis(object):
     """The main object. The only mandatory argument is the input fasta file path.
+    The text below is somewhat redundant with what is in the readme file.
 
     * `abundances`: If you have sample information, then you can provide the
                     'abundances' argument too. It should be a TSV file.
@@ -37,6 +44,8 @@ class Analysis(object):
 
     * `num_threads`: The number of threads. Default to the number of cores on the
                      current machine.
+
+    * `out_dir`: Place all the outputs in the specified directory.
 
     * Sequence similarity search filtering options:
         - min_identity: Defaults to 0.97
@@ -57,6 +66,7 @@ class Analysis(object):
                  e_value      = 0.0001,
                  max_targets  = 10,
                  min_coverage = 0.97,
+                 out_dir      = None,
                  ):
         # Base parameters #
         self.input_file = FASTA(input_file)
@@ -76,9 +86,13 @@ class Analysis(object):
         self.e_value      = e_value
         self.max_targets  = max_targets
         self.min_coverage = min_coverage
-        # Let's time the pipeline #
+        # Time the pipeline execution #
         self.timer = Timer()
         self.timer.print_start()
+        # Keep all outputs in a directory #
+        if out_dir is None: self.out_dir = self.input_file.directory
+        else: self.out_dir = self.out_dir
+        assert os.path.exists(self.out_dir)
 
     @property_cached
     def orig_names_to_renamed(self):
@@ -149,7 +163,8 @@ class Analysis(object):
 
     @property_cached
     def seq_to_gis(self):
-        """A dictionary linking every input sequence to a list of gi identifiers found."""
+        """A dictionary linking every input sequence to a list of gi identifiers found
+        that are relating to it."""
         result = defaultdict(list)
         for hit in self.search_results:
             seq_name = hit[0]
@@ -161,73 +176,54 @@ class Analysis(object):
     def gi_to_text(self):
         """A dictionary linking every gi identifier to some unspecified text blob.
         Typically the text is its isolation source or a list of abstracts."""
-        unique_gis = set(gi for gis in self.seq_to_gis.values() for gi in gis)
-        result = {}
-        # Case source #
-        if self.text_source == 'source':
-            print "STEP 4: Download the isolation sources from NCBI"
-            for gi in unique_gis:
-                source = gi_to_source(gi)
-                if source is not None: result[gi] = source
-        # Case abstract #
-        if self.text_source == 'abstract':
-            print "STEP 4: Download the abstracts from NCBI"
-            for gi in unique_gis:
-                source = gi_to_abstract(gi)
-                if source is not None: result[gi] = source
-        # Return #
-        self.timer.print_elapsed()
-        return result
+        # Check that it was run #
+        text_entries = FilePath(self.out_dir + 'gi_to_text.pickle')
+        if not text_entries.exists:
+            result = {}
+            unique_gis = set(gi for gis in self.seq_to_gis.values() for gi in gis)
+            if self.text_source == 'source': fn = gi_to_source
+            if self.text_source == 'abstract': fn = gi_to_abstract
+            print "STEP 4: Download data from NCBI"
+            for gi in tqdm(unique_gis):
+                text = fn(gi)
+                if text is not None: result[gi] = text
+            with open(text_entries, 'w') as handle: pickle.dump(result, handle)
+            self.timer.print_elapsed()
+            return result
+        # Parse the results #
+        with open(text_entries, 'r') as handle: return pickle.load(handle)
 
     @property_cached
-    def gi_to_matches(self):
-        """A dictionary linking every gi identifier to a list of
-        regions of interest in the text (i.e. a match) and their meaning in terms of concepts.
-        A 'concept' or 'entity' here would be an envo term such as 'ENVO:01000047'"""
+    def gi_to_concepts(self):
+        """A dictionary linking every `gi` identifier to the concept counts.
+        (dictionaries of concept:int). By finding regions of interest in the text
+        (i.e. a match) we can assign meaning to them in terms of concepts.
+        A 'concept' or 'entity' here would be an envo term such as 'ENVO:01000047'
+        When you call `t.GetMatches(python_string, "", [-27])` you get a list back.
+        The second argument can be left empty in our case (per document blacklisting)
+        The result is something like:
+        - XX
+        The number -27 is ENVO terms, -26 could be tissues, etc.
+        """
         # Call the tagger
+        print "STEP 5: Run the text mining tagger on NCBI results."
         t = tagger.Tagger()
         # Load the dictionary #
         t.LoadNames('data/envo_entities.tsv', 'data/envo_names.tsv')
         # Load a global blacklist #
         t.LoadGlobal('data/envo_global.tsv')
         # Tag all the text #
-        # -27 is envo terms, -26 could be tissues, etc.
-        # The second argument can be left empty in our case (per document blacklisting)
-        l = t.GetMatches(python_string, "", [-27])
-        start_pos, end_pos, concepts = l[0]
-        type, id = concept[0] # -27, ENVO:01000047
-
-    @property
-    def gi_to_concepts(self, ):
-        """Parse the matches data structure to extract the concepts and their respective counts"""
-        # Loop over the counts
-        pass
-        # If backtracking is activated, add all the parent terms for every child term
-
-    #--------------------------------------------------------------------------------------#
-    @property
-    def ncbi_results(self):
-        """Using the search results, for every hit, download the relevant information from
-        NCBI (e.g. abstract text)."""
-        # Check that it was run #
-        if not somefile.exists:
-            print "Using %i results from the similarity search" % len(search_results)
-            unique_ids = set(hit[1] for hit in self.search_results)
-            # See envo_get_isolation_source.py
-            # See envo_get_abstract.py
-            print "STEP 4: Download data from NCBI."
-        # Parse the results #
-        return somestuff
-
-    @property
-    def tagger_results(self):
-        """Using the NCBI results, for every piece of text, run the tagger on it."""
-        # Check that it was run #
-        if not somefile.exists:
-            print "Using %i results from the NCBI data" % len(ncbi_results)
-            print "STEP 5: Run the text mining tagger on the NCBI data."
-        # Parse the results #
-        return somestuff
+        result = defaultdict(lambda: defaultdict(int))
+        for gi, text in self.gi_to_text.items():
+            matches = t.GetMatches(text, "", [-27])
+            for start_pos, end_pos, concepts in matches:
+                for id_num, term in concepts:
+                    1/0
+                    result[gi][term] +=1
+        # Return #
+        self.timer.print_elapsed()
+        return result
+        # TODO If backtracking is activated, add all the parent terms for every child term
 
     def generate_freq_tables(self):
         """Generate the frequencies tables..."""
