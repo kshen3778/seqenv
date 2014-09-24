@@ -173,37 +173,46 @@ class Analysis(object):
     def seq_to_gis(self):
         """A dictionary linking every input sequence to a list of gi identifiers found
         that are relating to it."""
-        result = defaultdict(list)
-        for hit in self.search_results:
-            seq_name = hit[0]
-            gi = hit[1].split('|')[1]
-            result[seq_name].append(gi)
-        return result
+        seq_to_gis = FilePath(self.out_dir + 'seq_to_gis.pickle')
+        # Check that is was run #
+        if not seq_to_gis.exists:
+            self.search_results
+            print "STEP 4A: Parsing the search results"
+            result = defaultdict(list)
+            for hit in self.search_results:
+                seq_name = hit[0]
+                gi = hit[1].split('|')[1]
+                result[seq_name].append(gi)
+            with open(gi_to_text, 'w') as handle: pickle.dump(result, handle)
+            self.timer.print_elapsed()
+            return result
+        # Parse the results #
+        with open(seq_to_gis, 'r') as handle: return pickle.load(handle)
 
     @property_cached
     def gi_to_text(self):
         """A dictionary linking every gi identifier to some unspecified text blob.
         Typically the text is its isolation source or a list of abstracts."""
+        gi_to_text = FilePath(self.out_dir + 'gi_to_text.pickle')
         # Check that it was run #
-        text_entries = FilePath(self.out_dir + 'gi_to_text.pickle')
-        if not text_entries.exists:
+        if not gi_to_text.exists:
             result = {}
             unique_gis = set(gi for gis in self.seq_to_gis.values() for gi in gis)
-            print "STEP 4: Download data from NCBI"
+            print "STEP 4B: Download data from NCBI"
             all_records = gis_to_records(unique_gis)
             if self.text_source == 'source': fn = record_to_source
             if self.text_source == 'abstract': fn = record_to_abstract
             for gi, record in all_records.items():
                 text = fn(gi)
                 if text is not None: result[gi] = text
-            with open(text_entries, 'w') as handle: pickle.dump(result, handle)
+            with open(gi_to_text, 'w') as handle: pickle.dump(result, handle)
             self.timer.print_elapsed()
             return result
         # Parse the results #
-        with open(text_entries, 'r') as handle: return pickle.load(handle)
+        with open(gi_to_text, 'r') as handle: return pickle.load(handle)
 
     @property_cached
-    def gi_to_concepts(self):
+    def gi_to_counts(self):
         """A dictionary linking every `gi` identifier to the concept counts.
         (dictionaries of concept:int). This is done by finding regions of interest in the text
         (i.e. a match). We can assign meaning to the matches in terms of concepts.
@@ -214,39 +223,41 @@ class Analysis(object):
         - [(53, 62, ((-27, 'ENVO:00002001'),)), (64, 69, ((-27, 'ENVO:00002044'),))]
         The number -27 is ENVO terms, -26 could be tissues, etc.
         """
-        # Call the tagger
-        print "STEP 5: Run the text mining tagger on NCBI results."
-        t = tagger.Tagger()
-        # Load the dictionary #
-        t.LoadNames('data/envo_entities.tsv', 'data/envo_names.tsv')
-        # Load a global blacklist #
-        t.LoadGlobal('data/envo_global.tsv')
-        # Tag all the text #
-        result = defaultdict(lambda: defaultdict(int))
-        for gi, text in self.gi_to_text.items():
-            matches = t.GetMatches(text, "", [-27])
-            for start_pos, end_pos, concepts in matches:
-                ids = set([concept_id for concept_type, concept_id in concepts])
-                if self.backtracking: ids.update([p for c in ids for p in self.child_to_parents[c]])
-                for concept_id in ids: result[gi][concept_id] +=1
-        # Return #
-        self.timer.print_elapsed()
-        return result
-        # TODO If backtracking is activated, add all the parent terms for every child term
+        gi_to_counts = FilePath(self.out_dir + 'gi_to_counts.pickle')
+        # Check that it was run #
+        if not gi_to_concepts.exists:
+            print "Using %i text blobs" % len(self.gi_to_text)
+            print "STEP 5: Run the text mining tagger on NCBI results."
+            t = tagger.Tagger()
+            # Load the dictionary #
+            t.LoadNames('data/envo_entities.tsv', 'data/envo_names.tsv')
+            # Load a global blacklist #
+            t.LoadGlobal('data/envo_global.tsv')
+            # Tag all the text #
+            result = defaultdict(lambda: defaultdict(int))
+            for gi, text in self.gi_to_text.items():
+                matches = t.GetMatches(text, "", [-27])
+                for start_pos, end_pos, concepts in matches:
+                    ids = set([concept_id for concept_type, concept_id in concepts])
+                    if self.backtracking: ids.update([p for c in ids for p in self.child_to_parents[c]])
+                    for concept_id in ids: result[gi][concept_id] +=1
+            with open(gi_to_counts, 'w') as handle: pickle.dump(result, handle)
+            self.timer.print_elapsed()
+            return result
+        # Parse the results #
+        with open(gi_to_counts, 'r') as handle: return pickle.load(handle)
 
     @property_cached
     def serial_to_concept(self):
-        """Lorem ipsum. This could overflow the memory."""
-        result = {}
-        with open(data_dir + 'envo_entities.tsv') as handle:
-            for line in handle:
-                serial, concept_type, concept_id = line.split()
-                result[serial] = concept_id
-        return result
+        """A dictionary linking every concept serial to its concept id.
+        Every line in the file contains three columns: serial, concept_type, concept_id
+        This could possibly overflow the memory when we come with NCBI taxonomy etc."""
+        return {s:ci for s, ct, ci in open(data_dir + 'envo_entities.tsv')}
 
     @property_cached
     def child_to_parents(self):
-        """Lorem ipsum. This could overflow the memory."""
+        """A dictionary linking every concept id to a list of parent concept ids.
+        Every line in the file contains two columns: child_serial, parent_serial"""
         result = defaultdict(list)
         with open(data_dir + 'envo_groups.tsv') as handle:
             for line in handle:
@@ -257,7 +268,18 @@ class Analysis(object):
         return result
 
     def generate_freq_tables(self):
-        """Generate the frequencies tables..."""
+        """Generate the frequencies tables...
+        Possible output 1:
+        - OTU1, ENVO:00001, 4, GIs : [56, 123, 345]
+          or
+        - OTU1, ocean, 4, GIs : [56, 123, 345]
+        Possible output 2:
+        - GI56 : oceanic soil
+          or
+        - GI56 : PubMed6788
+        Possible output 3:
+        - ENVO:00001 : ocean
+        """
         if not somefile.exists:
             print "Using %i results from the text mining results" % len(tagger_results)
             print "STEP 6: Generating main output."
