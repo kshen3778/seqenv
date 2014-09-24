@@ -1,0 +1,1179 @@
+ENVO:00000015	ocean
+ENVO:00000031	wadi
+ENVO:00000047	canopy
+ENVO:00000063	water body
+ENVO:00000079	flume
+ENVO:00000095	lava field
+ENVO:00000111	forest
+ENVO:00000127	badland
+ENVO:00000143	river bank
+ENVO:00000159	sugar plantation
+ENVO:00000175	karst
+ENVO:00000191	physiographic feature
+ENVO:00000207	oceanic zone
+ENVO:00000223	continental shelf
+ENVO:00000239	pocasin
+ENVO:00000255	flood plain
+ENVO:00000271	chott
+ENVO:00000287	butte
+ENVO:00000303	coast
+ENVO:00000319	low tide zone
+ENVO:00000335	polygonal karst
+ENVO:00000351	volcanic arc
+ENVO:00000367	national park
+ENVO:00000384	river bed
+ENVO:00000400	cinder cone
+ENVO:00000416	coastal dune
+ENVO:00000432	monadnock
+ENVO:00000448	hydroelectric reservoir
+ENVO:00000464	artificial harbor
+ENVO:00000480	peak
+ENVO:00000496	rill
+ENVO:00000512	pond bed
+ENVO:00000528	ice cap ridge
+ENVO:00000544	leat
+ENVO:00000560	nuclear weapons test site
+ENVO:00002019	brackish water
+ENVO:00002035	meteorite
+ENVO:00002051	stony-iron meteorite
+ENVO:00002115	petroleum contaminated sediment
+ENVO:00002131	epilimnion
+ENVO:00002147	coal mine lake sediment
+ENVO:00002179	intertidal sediment
+ENVO:00002195	pyritic acid mine drainage
+ENVO:00002212	thermophilic granular sludge
+ENVO:00002228	pond water
+ENVO:00002244	gleysol
+ENVO:00002260	dune soil
+ENVO:00002276	animal waste
+ENVO:00003085	skatole enriched soil
+ENVO:00003860	pig manure
+ENVO:00005747	compost soil
+ENVO:00005763	humus-rich acidic ash soil
+ENVO:00005779	vegetable garden soil
+ENVO:00012408	aquifer
+ENVO:01000003	oil well
+ENVO:01000019	cave floor
+ENVO:01000067	marine current
+ENVO:01000083	pelagic isopycnal surface
+ENVO:01000099	marine surface current
+ENVO:01000115	cobble sediment
+ENVO:01000131	mesophilic sediment
+ENVO:01000147	marine coral reef fore reef
+ENVO:01000243	boulder
+ENVO:00000009	national geopolitical entity
+ENVO:00000025	reservoir
+ENVO:00000041	tidal creek
+ENVO:00000057	mangrove swamp
+ENVO:00000073	building
+ENVO:00000089	inland cliff
+ENVO:00000105	lake surface
+ENVO:00000121	artificial channel
+ENVO:00000137	coastal inlet
+ENVO:00000153	headwater
+ENVO:00000169	canyon
+ENVO:00000185	raised mire
+ENVO:00000201	fjord lake
+ENVO:00000217	solfatara
+ENVO:00000233	swamp
+ENVO:00000249	lateral moraine
+ENVO:00000265	guyot
+ENVO:00000281	fault escarpment
+ENVO:00000297	paddy field
+ENVO:00000313	blowout
+ENVO:00000329	phreatic zone
+ENVO:00000345	grain of beach sand
+ENVO:00000361	site of special scientific interest
+ENVO:00000377	artificial lake
+ENVO:00000394	strait
+ENVO:00000410	kipuka
+ENVO:00000426	ocean floor
+ENVO:00000442	maelstrom
+ENVO:00000458	valley glacier
+ENVO:00000474	cut
+ENVO:00000490	consequent stream
+ENVO:00000506	intermittent reservoir
+ENVO:00000522	canal tunnel
+ENVO:00000538	arrugado
+ENVO:00000554	saddle dam
+ENVO:00000570	brackish water habitat
+ENVO:00001997	acid mine drainage
+ENVO:00002013	igneous rock
+ENVO:00002029	extraterrestial habitat
+ENVO:00002045	anaerobic sediment
+ENVO:00002061	oil spill
+ENVO:00002125	anaerobic dechlorinating bioreactor
+ENVO:00002141	leachate
+ENVO:00002157	stromatolite mat
+ENVO:00002173	hospital
+ENVO:00002205	unexploded-ordnance dump
+ENVO:00002222	food shop
+ENVO:00002238	durisol
+ENVO:00002254	vertisol
+ENVO:00002270	chemocline
+ENVO:00002875	oil contaminated soil
+ENVO:00003095	quinate enriched soil
+ENVO:00005741	alpine soil
+ENVO:00005757	bacteria enriched soil
+ENVO:00005773	pasture soil
+ENVO:00005789	blue-grass field soil
+ENVO:00005805	nest of bird
+ENVO:00010621	medical instrument
+ENVO:01000061	marine wind mixed layer
+ENVO:01000077	marine pycnocline
+ENVO:01000093	boundary current front
+ENVO:01000109	marine warm-water sphere
+ENVO:01000141	seal fall
+ENVO:01000157	microbial mat material
+ENVO:01000173	anoxic water
+ENVO:01000205	subtropical
+ENVO:01000237	coastal scrubland
+ENVO:02000003	pockmark field
+ENVO:00000010	transport feature
+ENVO:00000026	well
+ENVO:00000042	drainage canal
+ENVO:00000058	underground lake
+ENVO:00000074	dam
+ENVO:00000090	coastal plain
+ENVO:00000106	grassland
+ENVO:00000122	track
+ENVO:00000138	cove
+ENVO:00000154	flood meadow
+ENVO:00000170	dune
+ENVO:00000186	string mire
+ENVO:00000202	oxbow lake
+ENVO:00000218	black smoker
+ENVO:00000234	bayou
+ENVO:00000250	medial moraine
+ENVO:00000266	pasture
+ENVO:00000282	esker
+ENVO:00000298	iceberg
+ENVO:00000314	alluvial fan
+ENVO:00000330	stalagmite
+ENVO:00000346	grain of acid dune sand
+ENVO:00000362	marine park
+ENVO:00000378	canal head reservoir
+ENVO:00000395	channel
+ENVO:00000411	ford
+ENVO:00000427	meander
+ENVO:00000443	flood control reservoir
+ENVO:00000459	outlet glacier
+ENVO:00000475	inlet
+ENVO:00000491	subsequent stream
+ENVO:00000507	wadi mouth
+ENVO:00000523	cutoff
+ENVO:00000539	sill
+ENVO:00000555	check dam
+ENVO:00000571	arboreal habitat
+ENVO:00000886	endolithic habitat
+ENVO:00001998	soil
+ENVO:00002014	plutonic rock
+ENVO:00002046	activated sludge
+ENVO:00002126	aerobic bioreactor
+ENVO:00002142	borax leachate
+ENVO:00002158	ditch water
+ENVO:00002206	coal mine waste
+ENVO:00002223	oligotrophic water
+ENVO:00002239	calcisol
+ENVO:00002255	solonetz
+ENVO:00002271	nuclear power plant
+ENVO:00002926	warm seep
+ENVO:00003064	drinking water
+ENVO:00003096	tap water
+ENVO:00005742	arable soil
+ENVO:00005758	alluvial swamp soil
+ENVO:00005774	peat soil
+ENVO:00005790	red soil
+ENVO:00010622	vivarium
+ENVO:01000062	marine benthic storm
+ENVO:01000078	marine nutricline
+ENVO:01000094	subtropical convergence front
+ENVO:01000110	hydrogenous sediment
+ENVO:01000142	wood fall
+ENVO:01000158	marine snow
+ENVO:01000206	temperate
+ENVO:01000238	polar
+ENVO:02000004	nesting material
+ENVO:02000052	umbrella
+ENVO:02000084	goat manure
+ENVO:00000011	garden
+ENVO:00000027	spring
+ENVO:00000043	wetland
+ENVO:00000059	underground river
+ENVO:00000075	bridge
+ENVO:00000091	beach
+ENVO:00000107	heath
+ENVO:00000123	political entity
+ENVO:00000139	irrigation ditch
+ENVO:00000155	cirque
+ENVO:00000171	river valley
+ENVO:00000187	tundra mire
+ENVO:00000203	rift lake
+ENVO:00000219	landlocked sea
+ENVO:00000235	carr
+ENVO:00000251	ground moraine
+ENVO:00000267	submarine canyon
+ENVO:00000283	ridge
+ENVO:00000299	ice mass
+ENVO:00000315	bajada
+ENVO:00000331	stalactite
+ENVO:00000347	grain of sea sand
+ENVO:00000363	nature reserve
+ENVO:00000380	ice shelf
+ENVO:00000396	marine channel
+ENVO:00000412	tidal watercourse
+ENVO:00000444	clearing
+ENVO:00000460	penplain
+ENVO:00000476	lake inlet
+ENVO:00000492	resequent stream
+ENVO:00000508	terrace
+ENVO:00000524	abandoned watercourse
+ENVO:00000540	brackish lake
+ENVO:00000556	wing dam
+ENVO:00000572	subterrestrial habitat
+ENVO:00001999	marine water body
+ENVO:00002015	volcanic rock
+ENVO:00002031	anthropogenic habitat
+ENVO:00002063	oil seep
+ENVO:00002127	stream sediment
+ENVO:00002143	calcite hot spring
+ENVO:00002159	drilling bore water
+ENVO:00002191	animal litter
+ENVO:00002207	self-heating coal mine waste
+ENVO:00002224	eutrophic water
+ENVO:00002240	kastanozem
+ENVO:00002256	regosol
+ENVO:00002272	waste treatment plant
+ENVO:00002982	clay
+ENVO:00003030	silage
+ENVO:00003081	metal contaminated soil
+ENVO:00003097	bore hole water
+ENVO:00003893	cosmetic product
+ENVO:00003914	chalk soil
+ENVO:00005743	roadside soil
+ENVO:00005759	alluvial paddy field soil
+ENVO:00005775	salt contaminated soil
+ENVO:01000031	marine feature
+ENVO:01000063	marine upwelling
+ENVO:01000079	marine lysocline
+ENVO:01000095	marginal ice zone front
+ENVO:01000111	cosmogenous sediment
+ENVO:01000143	marine reef
+ENVO:01000159	organic feature
+ENVO:01000207	mediterranean
+ENVO:01000239	oak woodland
+ENVO:00000012	hydrographic feature
+ENVO:00000028	sand pit quarry
+ENVO:00000044	peatland
+ENVO:00000060	underground stream
+ENVO:00000076	mine
+ENVO:00000092	sea beach
+ENVO:00000108	meadow
+ENVO:00000124	supranational geopolitical entity
+ENVO:00000140	drainage ditch
+ENVO:00000156	desert oasis
+ENVO:00000172	sandy desert
+ENVO:00000188	paisa mire
+ENVO:00000204	ephemeral spring
+ENVO:00000220	archipelago
+ENVO:00000236	dambo
+ENVO:00000252	terminal moraine
+ENVO:00000268	lake bed
+ENVO:00000284	quarry
+ENVO:00000300	scrubland
+ENVO:00000316	intertidal zone
+ENVO:00000332	doline
+ENVO:00000348	grain of rocky sand
+ENVO:00000364	national wildlife refuge
+ENVO:00000381	massif
+ENVO:00000397	lake channel
+ENVO:00000413	pingo
+ENVO:00000429	arete
+ENVO:00000445	transvasement
+ENVO:00000461	pseudocrater
+ENVO:00000477	mount
+ENVO:00000493	obsequent stream
+ENVO:00000509	marine terrace
+ENVO:00000525	canalized stream
+ENVO:00000541	brackish pond
+ENVO:00000557	dry dam
+ENVO:00000856	city
+ENVO:00002000	slope
+ENVO:00002016	sedimentary rock
+ENVO:00002048	chondrite
+ENVO:00002112	gold mine drainage
+ENVO:00002128	mesophilic sulfur spring
+ENVO:00002144	cave wall
+ENVO:00002160	estuarine mud
+ENVO:00002176	contaminated sludge
+ENVO:00002192	poultry litter
+ENVO:00002209	saline lake sediment
+ENVO:00002225	mesotrophic water
+ENVO:00002241	leptosol
+ENVO:00002257	podzol
+ENVO:00002273	fluvisol
+ENVO:00002983	fuel oil
+ENVO:00003031	animal manure
+ENVO:00003082	enriched soil
+ENVO:00003323	tannery
+ENVO:00003894	face cream product
+ENVO:00005744	allotment garden soil
+ENVO:00005760	burned soil
+ENVO:00005776	peaty paddy field soil
+ENVO:00005792	underground water
+ENVO:00010624	botanical garden
+ENVO:01000000	humus
+ENVO:01000016	silt
+ENVO:01000064	marine downwelling
+ENVO:01000080	pelagic isothermal surface
+ENVO:01000096	water mass front
+ENVO:01000112	polymetallic nodule
+ENVO:01000144	marine coral reef flat zone
+ENVO:01000160	marine pockmark
+ENVO:01000240	conifer woodland
+ENVO:02000006	cultured habitat
+ENVO:02000054	bone meal
+ENVO:00000013	cave system
+ENVO:00000029	watercourse
+ENVO:00000045	estuary
+ENVO:00000061	underground water body
+ENVO:00000077	agricultural feature
+ENVO:00000093	lacustrine beach
+ENVO:00000109	woodland
+ENVO:00000125	mineral spring
+ENVO:00000141	bank
+ENVO:00000157	peat cut
+ENVO:00000173	rocky desert
+ENVO:00000189	peat swamp
+ENVO:00000205	permanent spring
+ENVO:00000221	continental island
+ENVO:00000237	hydromorphic/phreatic dambo
+ENVO:00000253	scroll plane
+ENVO:00000269	land-tied island
+ENVO:00000285	quicksand area
+ENVO:00000301	chaparral
+ENVO:00000317	tidal pool
+ENVO:00000333	subjacent karst
+ENVO:00000349	terrarium
+ENVO:00000365	ramsar site
+ENVO:00000382	lake shore
+ENVO:00000398	volcanic cone
+ENVO:00000414	natural arch
+ENVO:00000430	dirt cone
+ENVO:00000462	polygenetic volcanic field
+ENVO:00000478	range of mounts
+ENVO:00000494	insequent stream
+ENVO:00000510	meander neck
+ENVO:00000526	cleft
+ENVO:00000542	kame
+ENVO:00000558	diversionary dam
+ENVO:00002001	waste water
+ENVO:00002017	metamorphic rock
+ENVO:00002033	carcass
+ENVO:00002049	stony meteorite
+ENVO:00002113	marine sediment
+ENVO:00002129	anaerobic sludge
+ENVO:00002145	chromate contaminated soil
+ENVO:00002177	1,4-dioxane contaminated sludge
+ENVO:00002193	pulp-bleaching waste water
+ENVO:00002210	sulfide-oxidizing bioreactor
+ENVO:00002226	borehole
+ENVO:00002242	lixisol
+ENVO:00002258	loam
+ENVO:00002274	stagnosol
+ENVO:00002984	petroleum
+ENVO:00003032	fresh animal manure
+ENVO:00003083	sarcosine enriched soil
+ENVO:00003895	paper product
+ENVO:00003919	research station
+ENVO:00005745	allotment garden
+ENVO:00005761	meadow soil
+ENVO:00005777	steppe soil
+ENVO:00005793	muddy water
+ENVO:00010625	zoological garden
+ENVO:01000001	mud
+ENVO:01000017	sand
+ENVO:01000065	marine oxygen minimum zone
+ENVO:01000081	pelagic isohaline surface
+ENVO:01000097	surface convergence
+ENVO:01000113	suspended sediment
+ENVO:01000129	marine hydrothermal vent chimney
+ENVO:01000145	marine coral reef back reef
+ENVO:01000161	marine sponge reef
+ENVO:01000241	juniper woodland
+ENVO:02000055	plant feed
+ENVO:00000014	canal
+ENVO:00000030	dead cave
+ENVO:00000046	hedge
+ENVO:00000062	populated place
+ENVO:00000078	farm
+ENVO:00000094	volcanic feature
+ENVO:00000110	lava tunnel
+ENVO:00000126	sulfur spring
+ENVO:00000142	stream bank
+ENVO:00000158	causeway
+ENVO:00000174	isthmus
+ENVO:00000190	abyssal feature
+ENVO:00000206	neritic zone
+ENVO:00000222	oceanic island
+ENVO:00000238	fluvial dambo
+ENVO:00000254	till plan
+ENVO:00000270	beaver pond
+ENVO:00000286	polder
+ENVO:00000302	rift valley
+ENVO:00000318	high tide zone
+ENVO:00000334	syngenetic karst
+ENVO:00000350	somma volcano
+ENVO:00000366	national nature reserve
+ENVO:00000383	stream bed
+ENVO:00000399	ash cone
+ENVO:00000415	raised beach
+ENVO:00000431	drumlin field
+ENVO:00000463	harbor
+ENVO:00000495	tributary
+ENVO:00000511	blanket bog
+ENVO:00000527	interfluve
+ENVO:00000543	swale
+ENVO:00000559	weapons test site
+ENVO:00002002	food product
+ENVO:00002018	sewage
+ENVO:00002034	biofilm
+ENVO:00002050	achondrite
+ENVO:00002114	contaminated sediment
+ENVO:00002130	hypolimnion
+ENVO:00002146	xylene contaminated soil
+ENVO:00002178	iron-reducing zone of petroleum contaminated sediment
+ENVO:00002194	oil field production water
+ENVO:00002211	thermophilic anaerobic methanogenic reactor
+ENVO:00002227	saline water habitat
+ENVO:00002243	histosol
+ENVO:00002259	agricultural soil
+ENVO:00002275	technosol
+ENVO:00002985	oil
+ENVO:00003033	mushroom compost
+ENVO:00003084	trimethylamine enriched soil
+ENVO:00003859	horse manure
+ENVO:00003896	currency note
+ENVO:00003927	stable manure
+ENVO:00005746	savanna soil
+ENVO:00005762	chloropicrin enriched soil
+ENVO:00005778	tropical soil
+ENVO:00005794	water scum
+ENVO:00011764	ocean time series station
+ENVO:01000002	water well
+ENVO:01000018	gravel
+ENVO:01000066	marine anoxic zone
+ENVO:01000082	biogenous sediment
+ENVO:01000098	deep ocean current
+ENVO:01000114	boulder sediment
+ENVO:01000130	marine hydrothermal plume
+ENVO:01000146	marine coral reef crest
+ENVO:01000242	desert scrubland
+ENVO:00000000	geographic feature
+ENVO:00000016	sea
+ENVO:00000032	bay
+ENVO:00000048	navigation canal
+ENVO:00000064	road
+ENVO:00000080	mountain range
+ENVO:00000096	caldera
+ENVO:00000112	tundra
+ENVO:00000128	dry valley
+ENVO:00000144	aquatic habitat
+ENVO:00000160	sisal plantation
+ENVO:00000176	elevation
+ENVO:00000192	mudflat
+ENVO:00000208	pelagic zone
+ENVO:00000224	slightly stratified estuary
+ENVO:00000240	saline wetland
+ENVO:00000256	floodway
+ENVO:00000272	confluence
+ENVO:00000288	cotton plantation
+ENVO:00000304	shore
+ENVO:00000320	crevasse
+ENVO:00000336	doline karst
+ENVO:00000352	continental arc
+ENVO:00000368	ephemeral island
+ENVO:00000385	stream mouth
+ENVO:00000401	spatter cone
+ENVO:00000417	machair
+ENVO:00000433	kame terrace
+ENVO:00000449	drinking water reservoir
+ENVO:00000465	natural harbor
+ENVO:00000481	pinnacle
+ENVO:00000497	rincon
+ENVO:00000513	reservoir bed
+ENVO:00000529	beach ridge
+ENVO:00000545	shingle beach
+ENVO:00000561	military training area
+ENVO:00002004	mesoscopic physical object
+ENVO:00002020	extreme habitat
+ENVO:00002036	habitat
+ENVO:00002052	iron meteorite
+ENVO:00002116	contaminated soil
+ENVO:00002132	metalimnion
+ENVO:00002148	coarse beach sand
+ENVO:00002164	fossil
+ENVO:00002180	naphthalene contaminated sediment
+ENVO:00002196	aquarium
+ENVO:00002213	anaerobic sludge blanket reactor
+ENVO:00002229	arenosol
+ENVO:00002245	gypsisol
+ENVO:00002261	forest soil
+ENVO:00002277	back-arc basin
+ENVO:00003086	ethanol enriched soil
+ENVO:00003861	industrial building
+ENVO:00003978	potato silage
+ENVO:00005748	dry soil
+ENVO:00005764	pond soil
+ENVO:00005780	greenhouse soil
+ENVO:00005796	marine sludge
+ENVO:00009686	ice rise
+ENVO:00012411	karst cave
+ENVO:01000068	marine streamer
+ENVO:01000084	estuarine front
+ENVO:01000100	along-front current
+ENVO:01000116	pebble sediment
+ENVO:01000132	thermophilic sediment
+ENVO:01000148	marine coral reef buttress zone
+ENVO:01000244	pinyon juniper woodland
+ENVO:02000058	cloth
+ENVO:2000000	chemical product
+ENVO:00000001	bedding-plane cave
+ENVO:00000017	saline hydrographic feature
+ENVO:00000033	pond
+ENVO:00000049	volcanic hydrographic feature
+ENVO:00000065	railway
+ENVO:00000081	mountain
+ENVO:00000097	desert
+ENVO:00000113	cultivated habitat
+ENVO:00000129	stream valley
+ENVO:00000145	ice cap
+ENVO:00000161	banana plantation
+ENVO:00000177	moraine
+ENVO:00000193	olive grove
+ENVO:00000209	photic zone
+ENVO:00000225	highly stratified estuary
+ENVO:00000241	tidal mudflat
+ENVO:00000257	flood fringe
+ENVO:00000273	continental slope
+ENVO:00000289	horst
+ENVO:00000305	peninsula
+ENVO:00000321	joint-plane cave
+ENVO:00000353	island arc
+ENVO:00000369	brine pool
+ENVO:00000386	river mouth
+ENVO:00000402	mud volcano
+ENVO:00000418	ria
+ENVO:00000434	outwash fan
+ENVO:00000450	irrigation reservoir
+ENVO:00000482	sea floor
+ENVO:00000498	volcanic dike
+ENVO:00000514	crater
+ENVO:00000530	apron
+ENVO:00000546	lake sediment
+ENVO:00000562	park
+ENVO:00002005	air
+ENVO:00002021	acid habitat
+ENVO:00002037	freshwater habitat
+ENVO:00002053	limestone
+ENVO:00002117	creosote contaminated soil
+ENVO:00002133	anaerobic mud
+ENVO:00002149	sea water
+ENVO:00002181	neutral hot spring
+ENVO:00002197	saline water aquarium
+ENVO:00002214	power plant
+ENVO:00002230	anthrosol
+ENVO:00002246	ferralsol
+ENVO:00002262	clay soil
+ENVO:00002297	environmental feature
+ENVO:00003071	grass silage
+ENVO:00003087	acetamide enriched soil
+ENVO:00003862	dairy
+ENVO:00003900	rye grass silage
+ENVO:00003930	scum
+ENVO:00005749	farm soil
+ENVO:00005765	frozen compost soil
+ENVO:00005781	heat stressed soil
+ENVO:00005797	lake bottom mud
+ENVO:00009725	ice piedmont
+ENVO:01000005	upwelling
+ENVO:01000069	mesoscale marine eddy
+ENVO:01000085	plume front
+ENVO:01000101	warm surface current
+ENVO:01000117	granular sediment
+ENVO:01000133	hyperthermophilic sediment
+ENVO:01000149	marine coral reef deep fore reef
+ENVO:02000059	surface soil
+ENVO:2000001	creosote
+ENVO:00000002	anthropogenic feature
+ENVO:00000018	dry river
+ENVO:00000034	rapids
+ENVO:00000050	geyser
+ENVO:00000066	man-made tunnel
+ENVO:00000082	hill range
+ENVO:00000098	island
+ENVO:00000114	field
+ENVO:00000130	reef
+ENVO:00000146	snow field
+ENVO:00000162	tea plantation
+ENVO:00000178	levee
+ENVO:00000194	scree
+ENVO:00000210	aphotic zone
+ENVO:00000226	saline wedge estuary
+ENVO:00000242	lacustrine mudflat
+ENVO:00000258	alluvial plain
+ENVO:00000274	continental rise
+ENVO:00000290	graben
+ENVO:00000322	lava cave
+ENVO:00000354	volcanic field
+ENVO:00000370	tuya
+ENVO:00000387	intermittent lake
+ENVO:00000403	shield volcano
+ENVO:00000419	stack
+ENVO:00000435	proglacial lake
+ENVO:00000451	amenity lake
+ENVO:00000467	university campus
+ENVO:00000483	plunge pool
+ENVO:00000499	trough
+ENVO:00000515	road cut
+ENVO:00000531	ice cap depression
+ENVO:00000547	waterhole
+ENVO:00000563	pier
+ENVO:00002006	water
+ENVO:00002022	alkaline habitat
+ENVO:00002118	sea sand
+ENVO:00002134	anaerobic stream sediment
+ENVO:00002150	coastal water
+ENVO:00002182	nitrobenzene contaminated sediment
+ENVO:00002198	fresh water aquarium
+ENVO:00002215	geothermal power plant
+ENVO:00002231	alisol
+ENVO:00002247	nitisol
+ENVO:00002263	garden soil
+ENVO:00002450	ocean basin
+ENVO:00003040	animal house
+ENVO:00003088	pantothenate enriched soil
+ENVO:00003863	food processing factory
+ENVO:00003903	aviation fuel
+ENVO:00003963	warehouse
+ENVO:00005750	grassland soil
+ENVO:00005766	limed soil
+ENVO:00005782	ornithogenic soil
+ENVO:00005798	acid dune sand
+ENVO:00009726	strand crack
+ENVO:0010001	anthropogenic environmental material
+ENVO:0010162	dry stream valley
+ENVO:01000006	coastal upwelling
+ENVO:01000070	terrigenous sediment
+ENVO:01000086	coastal buoyancy current front
+ENVO:01000102	cold surface current
+ENVO:01000118	sandy sediment
+ENVO:01000134	hydrothermal fluid
+ENVO:01000150	marine subtidal rocky reef
+ENVO:01000230	arid
+ENVO:02000044	siliceous ooze
+ENVO:2000002	industrial wastewate treatment plant
+ENVO:00000003	mine tailing
+ENVO:00000019	saline lake
+ENVO:00000035	marsh
+ENVO:00000051	hot spring
+ENVO:00000067	cave
+ENVO:00000083	hill
+ENVO:00000099	artificial island
+ENVO:00000115	orchard
+ENVO:00000131	glacial feature
+ENVO:00000147	ocean current
+ENVO:00000163	coffee plantation
+ENVO:00000179	mesa
+ENVO:00000195	sinkhole
+ENVO:00000211	bathypelagic zone
+ENVO:00000227	vertically mixed estuary
+ENVO:00000243	freshwater wetland
+ENVO:00000259	lacustrine plain
+ENVO:00000275	ocean trench
+ENVO:00000291	drainage basin
+ENVO:00000307	icefall
+ENVO:00000323	live cave
+ENVO:00000339	piece of rock
+ENVO:00000355	monogenetic volcanic field
+ENVO:00000371	complex volcano
+ENVO:00000404	stratovolcano
+ENVO:00000420	tombolo
+ENVO:00000436	tunnel valley
+ENVO:00000452	ribbon lake
+ENVO:00000468	hydroelectric dam
+ENVO:00000484	polynya
+ENVO:00000500	beaver dam
+ENVO:00000516	hammock
+ENVO:00000532	intermittent saline evaporation pond
+ENVO:00000548	gravel field
+ENVO:00000564	archeological site
+ENVO:00002007	sediment
+ENVO:00002023	high pressure habitat
+ENVO:00002055	sandstone
+ENVO:00002119	alkaline hot spring
+ENVO:00002135	treated wood
+ENVO:00002151	ocean water
+ENVO:00002167	platinum mine
+ENVO:00002183	oil tank
+ENVO:00002199	sandy beach
+ENVO:00002232	andosol
+ENVO:00002248	luvisol
+ENVO:00002264	waste
+ENVO:00003041	cow shed
+ENVO:00003089	testosterone enriched soil
+ENVO:00003864	bakery
+ENVO:00003884	farmyard manure
+ENVO:00003964	tobacco warehouse
+ENVO:00003982	travertine
+ENVO:00005751	jungle soil
+ENVO:00005767	manured soil
+ENVO:00005783	leafy wood soil
+ENVO:00005799	rocky sand
+ENVO:00010358	fomite
+ENVO:0010163	dry river valley
+ENVO:01000007	microbial feature
+ENVO:01000055	marine bulk water
+ENVO:01000071	oceanic front
+ENVO:01000087	tidal mixing front
+ENVO:01000103	western boundary current
+ENVO:01000119	silty sediment
+ENVO:01000135	nitrate-reducing sediment
+ENVO:01000151	manganese-reducing sediment
+ENVO:01000231	lava
+ENVO:02000045	red clay
+ENVO:2000003	agricultural wastewater treatment plant
+ENVO:00000004	administrative region
+ENVO:00000020	lake
+ENVO:00000036	irrigation canal
+ENVO:00000052	crater lake
+ENVO:00000068	tunnel
+ENVO:00000084	mountain pass
+ENVO:00000100	valley
+ENVO:00000116	vineyard
+ENVO:00000132	ice sheet
+ENVO:00000148	riffle
+ENVO:00000164	rubber plantation
+ENVO:00000180	mound
+ENVO:00000196	alkaline flat
+ENVO:00000212	abyssalpelagic zone
+ENVO:00000228	inverse estuary
+ENVO:00000244	abyssal plain
+ENVO:00000260	prairie
+ENVO:00000276	drumlin
+ENVO:00000292	watershed
+ENVO:00000308	dune slack
+ENVO:00000324	outflow cave
+ENVO:00000340	grain of sand
+ENVO:00000356	pyroclastic cone
+ENVO:00000372	pyroclastic shield volcano
+ENVO:00000389	intermittent wetland
+ENVO:00000421	wave-cut platform
+ENVO:00000437	Nye channel
+ENVO:00000453	liman
+ENVO:00000469	research facility
+ENVO:00000485	sea shore
+ENVO:00000501	bed
+ENVO:00000517	lost stream
+ENVO:00000533	landfill
+ENVO:00000549	intermittent water body
+ENVO:00000565	sports facility
+ENVO:00002008	dust
+ENVO:00002024	haline habitat
+ENVO:00002040	wood
+ENVO:00002056	shale
+ENVO:00002120	acid hot spring
+ENVO:00002136	arsenate treated wood
+ENVO:00002152	biofilter
+ENVO:00002168	gold mine
+ENVO:00002184	underground physiographic feature
+ENVO:00002200	sea ice
+ENVO:00002233	albeluvisol
+ENVO:00002249	phaeozem
+ENVO:00002265	agricultural waste
+ENVO:00002870	adobe soil
+ENVO:00003042	piggery
+ENVO:00003074	manufactured product
+ENVO:00003090	kynurenate enriched soil
+ENVO:00003885	brewery
+ENVO:00003965	anaerobic digester sludge
+ENVO:00004638	sawmill
+ENVO:00005752	sawah soil
+ENVO:00005768	orchid soil
+ENVO:00005784	spruce forest soil
+ENVO:00005800	desert sand
+ENVO:00010442	midden
+ENVO:0010003	agricultural environmental material
+ENVO:01000008	microbial mat
+ENVO:01000056	estuarine bulk water
+ENVO:01000072	marine Taylor column
+ENVO:01000088	mid-shelf fronts
+ENVO:01000104	eastern boundary current
+ENVO:01000120	clay sediment
+ENVO:01000136	drop stone
+ENVO:01000152	iron-reducing sediment
+ENVO:01000232	felsic lava
+ENVO:02000046	calcareous ooze
+ENVO:2000004	algal bloom
+ENVO:00000005	first-order administrative region
+ENVO:00000021	freshwater lake
+ENVO:00000037	ditch
+ENVO:00000053	freshwater marsh
+ENVO:00000069	distributary
+ENVO:00000085	alpine glacier
+ENVO:00000101	delta
+ENVO:00000117	plantation
+ENVO:00000133	glacier
+ENVO:00000149	artificial reef
+ENVO:00000165	asphalt lake
+ENVO:00000181	nunatak
+ENVO:00000197	endorheic lake
+ENVO:00000213	mesopelagic zone
+ENVO:00000229	intermittent estuary
+ENVO:00000245	maar
+ENVO:00000261	savanna
+ENVO:00000277	dry lake
+ENVO:00000293	continental divide
+ENVO:00000325	polje
+ENVO:00000341	piece of gravel
+ENVO:00000357	lock
+ENVO:00000373	geothermal field
+ENVO:00000390	mountain spur
+ENVO:00000406	mid-ocean ridge
+ENVO:00000422	limestone pavement
+ENVO:00000438	alas
+ENVO:00000454	turlough
+ENVO:00000470	irrigation dam
+ENVO:00000486	shoreline
+ENVO:00000502	intermittent saline lake
+ENVO:00000518	ditch mouth
+ENVO:00000534	pothole
+ENVO:00000550	range of seamounts
+ENVO:00000566	winter sports facility
+ENVO:00002009	terrestrial habitat
+ENVO:00002025	high temperature habitat
+ENVO:00002041	ground water
+ENVO:00002057	raw primary sludge
+ENVO:00002121	alkaline salt lake
+ENVO:00002137	brackish estuary
+ENVO:00002153	compost biofilter
+ENVO:00002169	coal mine
+ENVO:00002185	oil reservoir
+ENVO:00002201	cis-dichloroethane contaminated sediment
+ENVO:00002234	acrisol
+ENVO:00002250	plinthosol
+ENVO:00002266	chicken breeding waste
+ENVO:00002871	alluvial soil
+ENVO:00003043	sewage plant
+ENVO:00003075	anthropogenic abiotic mesoscopic feature
+ENVO:00003091	threonine enriched soil
+ENVO:00004683	karst field
+ENVO:00005753	urea enriched soil
+ENVO:00005769	mountain forest soil
+ENVO:00005785	volcanic soil
+ENVO:00005801	rhizosphere
+ENVO:00010483	environmental material
+ENVO:01000009	biotic mesoscopic physical object
+ENVO:01000057	marine algal bloom
+ENVO:01000073	marine oligotrophic desert
+ENVO:01000089	shelf-slope/shelf-break front
+ENVO:01000105	marine benthic feature
+ENVO:01000121	colloidal sediment
+ENVO:01000137	organic matter fall
+ENVO:01000153	sulphate-reducing sediment
+ENVO:01000233	intermediate lava
+ENVO:02000047	animal feed
+ENVO:2000005	freshwater algal bloom
+ENVO:00000006	second-order administrative region
+ENVO:00000022	river
+ENVO:00000038	lagoon
+ENVO:00000054	saline marsh
+ENVO:00000070	constructed feature
+ENVO:00000086	plain
+ENVO:00000102	cave entrance
+ENVO:00000118	coconut plantation
+ENVO:00000134	permafrost
+ENVO:00000150	coral reef
+ENVO:00000166	atoll
+ENVO:00000182	plateau
+ENVO:00000198	subglacial lake
+ENVO:00000214	hadalpelagic zone
+ENVO:00000230	coastal wetland
+ENVO:00000246	volcanic crater
+ENVO:00000262	steppe
+ENVO:00000278	dry stream
+ENVO:00000294	fish farm
+ENVO:00000310	impact crater
+ENVO:00000326	sea cave
+ENVO:00000342	ice cap dome
+ENVO:00000358	protected area
+ENVO:00000374	wildlife management area
+ENVO:00000391	land bridge
+ENVO:00000407	subglacial volcano
+ENVO:00000423	river island
+ENVO:00000439	dell
+ENVO:00000455	tarn
+ENVO:00000471	flood control dam
+ENVO:00000487	paternoster lake
+ENVO:00000503	intermittent oxbow lake
+ENVO:00000519	agricultural terrace
+ENVO:00000535	weir
+ENVO:00000551	endorheic basin
+ENVO:00000567	calanque
+ENVO:00002010	saline water
+ENVO:00002026	cold temperature habitat
+ENVO:00002042	surface water
+ENVO:00002058	secondary sludge
+ENVO:00002122	arsenic-rich mud
+ENVO:00002138	beach sand
+ENVO:00002154	radioactive sediment
+ENVO:00002170	compost
+ENVO:00002186	contaminated water
+ENVO:00002202	organically contaminated sediment
+ENVO:00002235	cambisol
+ENVO:00002251	planosol
+ENVO:00002267	industrial waste
+ENVO:00002872	bagasse
+ENVO:00003044	brine
+ENVO:00003092	salicylate enriched soil
+ENVO:00003967	creamery
+ENVO:00005738	foam
+ENVO:00005754	fertilized soil
+ENVO:00005770	beech forest soil
+ENVO:00005786	upland soil
+ENVO:00005802	bulk soil
+ENVO:00010504	surface
+ENVO:01000010	abiotic mesoscopic physical object
+ENVO:01000058	kelp forest
+ENVO:01000074	oceanic gyre
+ENVO:01000090	coastal upwelling front
+ENVO:01000106	permanent marine thermocline
+ENVO:01000122	marine hydrothermal vent
+ENVO:01000138	plant matter fall
+ENVO:01000154	carbon dioxide-reducing sediment
+ENVO:01000234	mafic lava
+ENVO:02000000	hypodermic needle
+ENVO:02000048	contaminated animal feed
+ENVO:2000006	nest of termite
+ENVO:00000007	third-order administrative region
+ENVO:00000023	stream
+ENVO:00000039	fjord
+ENVO:00000055	saline evaporation pond
+ENVO:00000071	fault cave
+ENVO:00000087	cliff
+ENVO:00000103	mangrove island
+ENVO:00000119	planted forest
+ENVO:00000135	buffer zone
+ENVO:00000151	sabkha
+ENVO:00000167	bar
+ENVO:00000183	stony desert
+ENVO:00000199	meromictic lake
+ENVO:00000215	hydrothermal vent
+ENVO:00000231	moor
+ENVO:00000247	volcano
+ENVO:00000263	fissure cave
+ENVO:00000279	saline pan
+ENVO:00000295	fish hatchery
+ENVO:00000311	kettle
+ENVO:00000327	speleothem
+ENVO:00000343	particle of silt
+ENVO:00000359	natural monument
+ENVO:00000375	world heritage site
+ENVO:00000392	ice tongue
+ENVO:00000408	volcanic fissure
+ENVO:00000424	lake island
+ENVO:00000440	rock shelter
+ENVO:00000456	tidewater glacier
+ENVO:00000472	backwater
+ENVO:00000488	glacial lake
+ENVO:00000504	intermittent pond
+ENVO:00000520	landslide
+ENVO:00000536	moatan
+ENVO:00000552	talik
+ENVO:00000568	aerial habitat
+ENVO:00001995	rock
+ENVO:00002011	fresh water
+ENVO:00002027	extreme high temperature habitat
+ENVO:00002043	wastewater treatment plant
+ENVO:00002059	biosolids
+ENVO:00002123	bioreactor
+ENVO:00002139	pebble
+ENVO:00002155	high-level radioactive sediment
+ENVO:00002171	hay compost
+ENVO:00002203	inorganically contaminated sediment
+ENVO:00002236	cryosol
+ENVO:00002252	solonchak
+ENVO:00002268	sphagnum bog
+ENVO:00002873	organic waste
+ENVO:00003045	bacon curing brine
+ENVO:00003093	poly-beta-hydroxybutyrate enriched soil
+ENVO:00003908	poultry deep litter
+ENVO:00003968	air filter
+ENVO:00005739	sea foam
+ENVO:00005755	field soil
+ENVO:00005771	muddy soil
+ENVO:00005787	eucalyptus forest soil
+ENVO:00005803	animal habitation
+ENVO:00010505	aerosol
+ENVO:01000059	sea grass bed
+ENVO:01000075	marine thermocline
+ENVO:01000091	topographic upwelling front
+ENVO:01000107	seasonal marine thermocline
+ENVO:01000139	animal matter fall
+ENVO:01000155	organic material
+ENVO:01000203	environmental condition
+ENVO:01000235	ultramafic lava
+ENVO:02000001	textile
+ENVO:02000049	coastal water body
+ENVO:02000081	letter
+ENVO:00000008	fourth-order administrative region
+ENVO:00000040	waterfall
+ENVO:00000056	fishpond
+ENVO:00000072	aquaduct
+ENVO:00000088	sea cliff
+ENVO:00000104	undersea feature
+ENVO:00000120	oil palm plantation
+ENVO:00000136	demilitiarized zone
+ENVO:00000152	anabranch
+ENVO:00000168	blowhole
+ENVO:00000184	hanging valley
+ENVO:00000200	periglacial lake
+ENVO:00000216	fumarole
+ENVO:00000232	fen
+ENVO:00000248	glacial valley
+ENVO:00000264	seamount
+ENVO:00000280	escarpment
+ENVO:00000296	rice field
+ENVO:00000312	sandur
+ENVO:00000328	vadoze zone
+ENVO:00000344	grain of desert sand
+ENVO:00000360	national forest
+ENVO:00000376	biosphere reserve
+ENVO:00000393	sound
+ENVO:00000409	whirlpool
+ENVO:00000425	cold seep
+ENVO:00000441	terracette
+ENVO:00000457	plateau glacier
+ENVO:00000473	gravel pit
+ENVO:00000489	palsa
+ENVO:00000505	underground irrigation canal
+ENVO:00000521	rockfall
+ENVO:00000537	boulder field
+ENVO:00000553	multipurpose dam
+ENVO:00000569	marine habitat
+ENVO:00001996	mine drainage
+ENVO:00002012	hypersaline water
+ENVO:00002028	high osmolarity habitat
+ENVO:00002044	sludge
+ENVO:00002060	oil sludge
+ENVO:00002124	anaerobic bioreactor
+ENVO:00002140	cobble
+ENVO:00002156	Superfund site
+ENVO:00002204	anthropogenic contamination feature
+ENVO:00002221	shop
+ENVO:00002237	chernozem
+ENVO:00002253	umbrisol
+ENVO:00002269	thermocline
+ENVO:00002874	air conditioning unit
+ENVO:00003094	L-(+)-tartrate enriched soil
+ENVO:00003911	sake brewery
+ENVO:00005740	paddy field soil
+ENVO:00005756	lawn soil
+ENVO:00005772	orchard soil
+ENVO:00005788	rubber plantation soil
+ENVO:00005804	nest of ant
+ENVO:00010506	emulsion
+ENVO:01000044	marine pelagic feature
+ENVO:01000060	marine brine pool
+ENVO:01000076	marine chemocline
+ENVO:01000092	equatorial upwelling front
+ENVO:01000108	marine cold-water sphere
+ENVO:01000140	whale fall
+ENVO:01000156	biofilm material
+ENVO:01000204	tropical
+ENVO:01000236	basalt
+ENVO:02000002	bedclothing
+ENVO:00000875	ENVO:00000875
+ENVO:00002986	ENVO:00002986
+ENVO:00003002	ENVO:00003002
+ENVO:00003018	ENVO:00003018
+ENVO:02000073	ENVO:02000073
+ENVO:00000885	ENVO:00000885
+ENVO:00002996	ENVO:00002996
+ENVO:00003012	ENVO:00003012
+ENVO:00003028	ENVO:00003028
+ENVO:02000051	ENVO:02000051
+ENVO:00002062	ENVO:00002062
+ENVO:00002997	ENVO:00002997
+ENVO:00003013	ENVO:00003013
+ENVO:00003029	ENVO:00003029
+ENVO:00003080	ENVO:00003080
+ENVO:00005806	ENVO:00005806
+ENVO:00002998	ENVO:00002998
+ENVO:00003014	ENVO:00003014
+ENVO:00002999	ENVO:00002999
+ENVO:00003015	ENVO:00003015
+ENVO:00003000	ENVO:00003000
+ENVO:00003016	ENVO:00003016
+ENVO:00000479	ENVO:00000479
+ENVO:00000874	ENVO:00000874
+ENVO:00003001	ENVO:00003001
+ENVO:00003017	ENVO:00003017
+ENVO:00000876	ENVO:00000876
+ENVO:00002987	ENVO:00002987
+ENVO:00003003	ENVO:00003003
+ENVO:00003019	ENVO:00003019
+ENVO:0010015	ENVO:0010015
+ENVO:00000466	ENVO:00000466
+ENVO:00000877	ENVO:00000877
+ENVO:00002988	ENVO:00002988
+ENVO:00003004	ENVO:00003004
+ENVO:00003020	ENVO:00003020
+ENVO:0010161	ENVO:0010161
+ENVO:01000021	ENVO:01000021
+ENVO:02000075	ENVO:02000075
+ENVO:00000306	ENVO:00000306
+ENVO:00000878	ENVO:00000878
+ENVO:00000894	ENVO:00000894
+ENVO:00002038	ENVO:00002038
+ENVO:00002054	chalkic
+ENVO:00002989	ENVO:00002989
+ENVO:00003005	ENVO:00003005
+ENVO:00003021	ENVO:00003021
+ENVO:00000388	ENVO:00000388
+ENVO:00000879	ENVO:00000879
+ENVO:00000895	ENVO:00000895
+ENVO:00002039	ENVO:00002039
+ENVO:00002990	ENVO:00002990
+ENVO:00003006	ENVO:00003006
+ENVO:00003022	ENVO:00003022
+ENVO:00000405	ENVO:00000405
+ENVO:00000880	ENVO:00000880
+ENVO:00000896	ENVO:00000896
+ENVO:00002991	ENVO:00002991
+ENVO:00003007	ENVO:00003007
+ENVO:00003023	ENVO:00003023
+ENVO:02000062	ENVO:02000062
+ENVO:00000309	depressional
+ENVO:00000881	ENVO:00000881
+ENVO:00000897	ENVO:00000897
+ENVO:00002992	ENVO:00002992
+ENVO:00003008	ENVO:00003008
+ENVO:00003024	ENVO:00003024
+ENVO:0010004	ENVO:0010004
+ENVO:00000882	ENVO:00000882
+ENVO:00000898	ENVO:00000898
+ENVO:00002993	ENVO:00002993
+ENVO:00003009	ENVO:00003009
+ENVO:00003025	ENVO:00003025
+ENVO:00000883	ENVO:00000883
+ENVO:00002220	ENVO:00002220
+ENVO:00002994	ENVO:00002994
+ENVO:00003010	ENVO:00003010
+ENVO:00003026	ENVO:00003026
+ENVO:00000024	ENVO:00000024
+ENVO:00000884	ENVO:00000884
+ENVO:00002995	ENVO:00002995
+ENVO:00003011	ENVO:00003011
+ENVO:00003027	ENVO:00003027
+ENVO:root	ENVO_root
