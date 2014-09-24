@@ -5,7 +5,7 @@ __version__ = '0.9.0'
 
 # Built-in modules #
 import multiprocessing
-from colletions import defaultdict
+from collections import defaultdict
 
 # Internal modules #
 from seqenv.fasta import FASTA
@@ -13,6 +13,8 @@ from seqenv.seqsearch.parallel import ParallelSeqSearch
 from seqenv.common.cache import property_cached
 
 # Third party modules #
+from Bio import Entrez
+Entrez.email = "I don't know who will be running this script"
 
 ################################################################################
 class Analysis(object):
@@ -26,15 +28,15 @@ class Analysis(object):
 
     * 'seq_type': Either `nucl` or `prot`. Defaults to `nucl`.
 
+    * `text_source`: Either `source` for isolation source terms or `abstract` for parsing
+                     the publication abstracts.
+
     * `search_algo`: Either 'blast' or 'usearch' or ...
 
     * `search_db`: Either 'nt' or 'silva' or ...
 
     * `num_threads`: The number of threads. Default to the number of cores on the
                      current machine.
-
-    * `text_source`: Either `source` for isolation source terms or `abstract` for parsing
-                     the publication abstracts.
 
     * Sequence similarity search filtering options:
         - min_identity: Defaults to 0.97
@@ -47,6 +49,7 @@ class Analysis(object):
                  abundances   = None,
                  N            = 1000,
                  seq_type     = 'nucl',
+                 text_source  = 'source',
                  search_algo  = 'blast',
                  search_db    = 'nt',
                  num_threads  = None,
@@ -60,6 +63,7 @@ class Analysis(object):
         self.abundances = abundances
         self.N = N
         self.seq_type = seq_type
+        self.text_source = text_source
         # Search parameters #
         self.search_algo = search_algo
         self.search_db = search_db
@@ -149,7 +153,17 @@ class Analysis(object):
     def gi_to_text(self):
         """A dictionary linking every gi identifier to some unspecified text blob.
         Typically the text is its isolation source or a list of abstracts."""
-        unique_gis = set(gi for gis in seq_to_gis.values() for gi in gis)
+        unique_gis = set(gi for gis in self.seq_to_gis.values() for gi in gis)
+        result = {}
+        for gi in unique_gis:
+            gb_entry = Entrez.efetch(db="nucleotide", id=gi, rettype="gb", retmode="xml")
+            gb_record = Entrez.read(gb_entry)[0]
+            gb_qualifiers = gb_record['GBSeq_feature-table'][0]['GBFeature_quals']
+            for qualifier in gb_qualifiers:
+                key, value = qualifier.items()
+                1/0
+                if key == 'isolation_source': result[gi] = value
+        # TODO #
         if self.text_source == 'source': pass
         if self.text_source == 'abstract': pass
 
@@ -165,7 +179,7 @@ class Analysis(object):
         # Load a global blacklist #
         t.LoadGlobal('data/envo_global.tsv')
         # Tag all the text #
-        # -27 is envo terms, -26 could tissues, etc.
+        # -27 is envo terms, -26 could be tissues, etc.
         # The second argument can be left empty in our case (per document blacklisting)
         l = t.GetMatches(python_string, "", [-27])
         start_pos, end_pos, concepts = l[0]
@@ -174,7 +188,7 @@ class Analysis(object):
     @property
     def gi_to_concepts(self, ):
         """Parse the matches data structure to extract the concepts and their respective counts"""
-        # Loop over the counts
+        # Loop over the counts
         pass
         # If backtracking is activated, add all the parent terms for every child term
 
