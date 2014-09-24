@@ -75,7 +75,7 @@ class FASTA(FilePath):
         current fasta file using the mapping dictionary also provided."""
         assert isinstance(new_fasta, FASTA)
         new_fasta.create()
-        for seq in self.input_file:
+        for seq in self:
             new_name = mapping[seq.id]
             nucleotides = str(seq.seq)
             new_fasta.add_str(nucleotides, new_name)

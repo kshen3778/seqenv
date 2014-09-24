@@ -70,6 +70,7 @@ class Tagger(object):
 		self.cpp_tagger.load_local(file)
 
 	def LoadNames(self, file1, file2):
+		"""file1 is the entities file and file2 is names file"""
 		if not os.path.exists(file1):
 			raise IOError("File '%s' not found." % file1)
 		if not os.path.exists(file2):

@@ -5,9 +5,10 @@ from __future__ import division
 import os, multiprocessing, threading, shutil
 
 # Internal modules #
-from seqenv.common.autopaths import FilePath
-from seqenv.common import new_temp_path
 from seqenv.fasta import FASTA
+from seqenv.common import new_temp_path
+from seqenv.common.autopaths import FilePath
+from seqenv.common.cache import property_cached
 
 # Third party modules #
 import sh
@@ -32,8 +33,6 @@ class BLASTquery(object):
 
        You can also call search.non_block_run() to run maybe searches in parallel.
        """
-
-    def __repr__(self): return '<%s on "%s">' % (self.__class__.__name__, self.query_path)
 
     def __init__(self, query_path, db_path,
                  params = None,
@@ -96,8 +95,8 @@ class BLASTquery(object):
         if 'qcovs' not in self.params['-outfmt']: raise Exception()
         # Iterator #
         def filter_lines(blastout):
-            threshold = filtering['min_coverage']
-            position = self.params['-outfmt'].split().index('qcovs')
+            threshold = filtering['min_coverage'] * 100
+            position = self.params['-outfmt'].strip('"').split().index('qcovs') - 1
             for line in blastout:
                 coverage = line.split()[position]
                 if coverage < threshold: continue
@@ -107,3 +106,8 @@ class BLASTquery(object):
         with open(temp_path, 'w') as handle: handle.writelines(filter_lines(self.out_path))
         os.remove(self.out_path)
         shutil.move(temp_path, self.out_path)
+
+    @property
+    def results(self):
+        """Parse the results."""
+        for line in self.out_path: yield line.split()

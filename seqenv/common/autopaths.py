@@ -15,6 +15,8 @@ class FilePath(str):
         if isinstance(path, FilePath): path = path.path
         self.path = path
 
+    def __iter__(self): return open(self.path)
+
     @property
     def exists(self):
         """Does it exist in the file system. Returns True or False."""

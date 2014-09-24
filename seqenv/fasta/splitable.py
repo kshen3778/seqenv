@@ -58,6 +58,6 @@ class SplitableFASTA(FASTA):
         seqs = self.parse()
         for part in self.parts:
             for i in xrange(self.seqs_per_part): part.add_seq(seqs.next())
-        for seq in seqs: part.add_read(seq)
+        for seq in seqs: part.add_seq(seq)
         # Clean up #
         for part in self.parts: part.close()

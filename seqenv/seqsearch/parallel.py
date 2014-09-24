@@ -36,7 +36,7 @@ class ParallelSeqSearch(SeqSearch):
         """Make all BLAST search objects."""
         # Only use one CPU per query #
         params = self.blast_params.copy()
-        params['num_threads'] = 1
+        params['-num_threads'] = 1
         # Sequence type #
         if self.seq_type == 'nucl': blast_algo = 'blastn'
         if self.seq_type == 'prot': blast_algo = 'blastp'

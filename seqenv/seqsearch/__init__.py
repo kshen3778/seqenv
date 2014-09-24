@@ -36,7 +36,9 @@ class SeqSearch(object):
         self.database = database
         # Optional #
         self.algorithm = algorithm
-        self.filtering = filtering
+        # The filtering options #
+        if filtering is None: self.filtering = {}
+        else: self.filtering = filtering
         # Number of cores to use #
         if num_threads is None: self.num_threads = multiprocessing.cpu_count()
         else: self.num_threads = num_threads
@@ -65,7 +67,7 @@ class SeqSearch(object):
         if 'max_targets'  in self.filtering: params['-max_target_seqs'] = self.filtering['max_targets']
         # Depends on sequence type #
         if self.seq_type == 'nucl':
-            if 'min_identity' in self.filtering: params['-perc_identity'] = self.filtering['min_identity']
+            if 'min_identity' in self.filtering: params['-perc_identity'] = self.filtering['min_identity'] * 100
         # Output format #
         params['-outfmt'] = "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qcovs staxids"
         # Return #
@@ -95,3 +97,8 @@ class SeqSearch(object):
     def filter(self):
         """Filter the results accordingly"""
         return self.query.filter(self.filtering)
+
+    @property
+    def results(self):
+        """Parse the results."""
+        return self.query.results

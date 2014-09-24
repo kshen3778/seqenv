@@ -5,6 +5,7 @@ __version__ = '0.9.0'
 
 # Built-in modules #
 import multiprocessing
+from colletions import defaultdict
 
 # Internal modules #
 from seqenv.fasta import FASTA
@@ -31,6 +32,9 @@ class Analysis(object):
 
     * `num_threads`: The number of threads. Default to the number of cores on the
                      current machine.
+
+    * `text_source`: Either `source` for isolation source terms or `abstract` for parsing
+                     the publication abstracts.
 
     * Sequence similarity search filtering options:
         - min_identity: Defaults to 0.97
@@ -60,16 +64,13 @@ class Analysis(object):
         self.search_algo = search_algo
         self.search_db = search_db
         # Number of cores to use #
-        if num_threads is None: self.num_threads = multiprocessing.cpu_count()
+        if num_threads is None: self.num_threads = multiprocessing.cpu_count()/2
         else: self.num_threads = num_threads
         # Hit filtering parameters #
         self.min_identity = min_identity
         self.e_value      = e_value
         self.max_targets  = max_targets
         self.min_coverage = min_coverage
-
-    def run(self):
-        pass
 
     @property_cached
     def orig_names_to_renamed(self):
@@ -99,7 +100,7 @@ class Analysis(object):
         #TODO
         return only_top_fasta
 
-    @property
+    @property_cached
     def filtering(self):
         """Return a dictionary with the filtering options for the sequence similarity
         search."""
@@ -120,38 +121,87 @@ class Analysis(object):
                                  num_threads = self.num_threads,
                                  filtering   = self.filtering)
 
-    @property_cached
+    @property
     def search_results(self):
         """For every sequence, search against a database and return the best hits
         after filtering."""
-        # Check that it was run #
+        # Check that the search was run #
         if not self.search.out_path.exists:
             print "Using: " + self.only_top_sequences
-            print "STEP 2: BLAST against the '%s' database" % self.search_db
+            print "STEP 2: Similarity search against the '%s' database" % self.search_db
             self.search.run()
-            print "STEP 3: Filter out bad hits"
+            print "STEP 3: Filter out bad hits from the search results"
             self.search.filter()
         # Parse the results #
         return self.search.results
 
+    @property_cached
+    def seq_to_gis(self):
+        """A dictionary linking every input sequence to a list of gi identifiers found."""
+        result = defaultdict(list)
+        for hit in self.search_results:
+            seq_name = hit[0]
+            gi = hit[1].split('|')[1]
+            result[seq_name].append(gi)
+        return result
+
+    @property_cached
+    def gi_to_text(self):
+        """A dictionary linking every gi identifier to some unspecified text blob.
+        Typically the text is its isolation source or a list of abstracts."""
+        unique_gis = set(gi for gis in seq_to_gis.values() for gi in gis)
+        if self.text_source == 'source': pass
+        if self.text_source == 'abstract': pass
+
+    @property_cached
+    def gi_to_matches(self):
+        """A dictionary linking every gi identifier to a list of
+        regions of interest in the text (i.e. a match) and their meaning in terms of concepts.
+        A 'concept' or 'entity' here would be an envo term such as 'ENVO:01000047'"""
+        # Call the tagger
+        t = tagger.Tagger()
+        # Load the dictionary #
+        t.LoadNames('data/envo_entities.tsv', 'data/envo_names.tsv')
+        # Load a global blacklist #
+        t.LoadGlobal('data/envo_global.tsv')
+        # Tag all the text #
+        # -27 is envo terms, -26 could tissues, etc.
+        # The second argument can be left empty in our case (per document blacklisting)
+        l = t.GetMatches(python_string, "", [-27])
+        start_pos, end_pos, concepts = l[0]
+        type, id = concept[0] # -27, ENVO:01000047
+
+    @property
+    def gi_to_concepts(self, ):
+        """Parse the matches data structure to extract the concepts and their respective counts"""
+        # Loop over the counts
+        pass
+        # If backtracking is activated, add all the parent terms for every child term
+
+    #--------------------------------------------------------------------------------------#
     @property
     def ncbi_results(self):
-        """Using the search results, for every hit download the relevant information from
+        """Using the search results, for every hit, download the relevant information from
         NCBI (e.g. abstract text)."""
+        # Check that it was run #
         if not somefile.exists:
             print "Using %i results from the similarity search" % len(search_results)
+            unique_ids = set(hit[1] for hit in self.search_results)
+            # See envo_get_isolation_source.py
+            # See envo_get_abstract.py
             print "STEP 4: Download data from NCBI."
-        else:
-            return somestuff
+        # Parse the results #
+        return somestuff
 
     @property
     def tagger_results(self):
         """Using the NCBI results, for every piece of text, run the tagger on it."""
+        # Check that it was run #
         if not somefile.exists:
             print "Using %i results from the NCBI data" % len(ncbi_results)
             print "STEP 5: Run the text mining tagger on the NCBI data."
-        else:
-            return somestuff
+        # Parse the results #
+        return somestuff
 
     def generate_freq_tables(self):
         """Generate the frequencies tables..."""
