@@ -7,3 +7,4 @@ Add a clean function that wipes all the files
 Have the setup.py compile the tagger
 Have the setup.py copy the data directory somewhere
 Add in the install procedure that swig needs to be installed (or just distribute)
+Integrate VSEARCH in the sequence similarty search

@@ -25,6 +25,7 @@ parameters = {
     "search_algo"  : "Either 'blast' or 'usearch'. Defaults to `blast`.",
     "search_db"    : "The path to the database to search against. Defaults to `nt`.",
     "text_source"  : "Either `source` for isolation source or `abstract` for the pubmed abstracts. Defaults to `source`.",
+    "backtracking" : "For every term identified by the tagger, we will propagate frequency counts up the acyclic directed graph described by the ontology. Defaults to `False`.",
     "num_threads"  : "Number of threads to use. Default to the number of cores on the current machine.",
     "out_dir"      : "Place all the outputs in the specified directory. Defaults to the input file's directory.",
     "min_identity" : "Minimum identity in similarity search. Defaults to 0.97.",
@@ -45,4 +46,5 @@ kwargs = {k:getattr(args,k) for k in params}
 
 # Run the pipeline #
 analysis = seqenv.Analysis(input_path, **kwargs)
+analysis.timer.print_start()
 analysis.run()

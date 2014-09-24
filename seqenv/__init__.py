@@ -22,6 +22,10 @@ import tagger
 # Third party modules #
 from tqdm import tqdm
 
+# Constants #
+home = os.environ['HOME'] + '/'
+data_dir = home + "repos/seqenv/data/"
+
 ################################################################################
 class Analysis(object):
     """The main object. The only mandatory argument is the input fasta file path.
@@ -36,6 +40,9 @@ class Analysis(object):
 
     * `text_source`: Either `source` for isolation source terms or `abstract` for parsing
                      the publication abstracts. Defaults to `source`.
+
+    * `backtracking`: For every term identified by the tagger, we will propagate frequency counts
+                      up the acyclic directed graph described by the ontology. Defaults to `False`.
 
     * `num_threads`: The number of threads. Default to the number of cores on the
                      current machine.
@@ -60,6 +67,7 @@ class Analysis(object):
                  search_algo  = 'blast',
                  search_db    = 'nt',
                  text_source  = 'source',
+                 backtracking = False,
                  num_threads  = None,
                  out_dir      = None,
                  min_identity = 0.97,
@@ -67,13 +75,14 @@ class Analysis(object):
                  max_targets  = 10,
                  min_coverage = 0.97,
                  abundances   = None,
-                 N            = 1000):
+                 N            = 1000,):
         # Base parameters #
         self.input_file = FASTA(input_file)
         self.abundances = abundances
         self.N = N
         self.seq_type = seq_type
         self.text_source = text_source
+        self.backtracking = backtracking
         # Search parameters #
         self.search_algo = search_algo
         self.search_db = search_db
@@ -88,7 +97,6 @@ class Analysis(object):
         self.min_coverage = min_coverage
         # Time the pipeline execution #
         self.timer = Timer()
-        self.timer.print_start()
         # Keep all outputs in a directory #
         if out_dir is None: self.out_dir = self.input_file.directory
         else: self.out_dir = self.out_dir
@@ -218,12 +226,35 @@ class Analysis(object):
         for gi, text in self.gi_to_text.items():
             matches = t.GetMatches(text, "", [-27])
             for start_pos, end_pos, concepts in matches:
-                for concept_type, concept_id in concepts:
-                    result[gi][concept_id] +=1
+                ids = set([concept_id for concept_type, concept_id in concepts])
+                if self.backtracking: ids.update([p for c in ids for p in self.child_to_parents[c]])
+                for concept_id in ids: result[gi][concept_id] +=1
         # Return #
         self.timer.print_elapsed()
         return result
         # TODO If backtracking is activated, add all the parent terms for every child term
+
+    @property_cached
+    def serial_to_concept(self):
+        """Lorem ipsum. This could overflow the memory."""
+        result = {}
+        with open(data_dir + 'envo_entities.tsv') as handle:
+            for line in handle:
+                serial, concept_type, concept_id = line.split()
+                result[serial] = concept_id
+        return result
+
+    @property_cached
+    def child_to_parents(self):
+        """Lorem ipsum. This could overflow the memory."""
+        result = defaultdict(list)
+        with open(data_dir + 'envo_groups.tsv') as handle:
+            for line in handle:
+                child_serial, parent_serial = line.split()
+                child_concept = self.serial_to_concept[child_serial]
+                parent_concept = self.serial_to_concept[parent_serial]
+                result[child_concept].append(parent_concept)
+        return result
 
     def generate_freq_tables(self):
         """Generate the frequencies tables..."""
