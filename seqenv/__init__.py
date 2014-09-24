@@ -17,7 +17,7 @@ from seqenv.common.timer import Timer
 from seqenv.common.autopaths import FilePath
 
 # Compiled modules #
-#import tagger
+import tagger
 
 # Third party modules #
 from tqdm import tqdm
@@ -203,7 +203,7 @@ class Analysis(object):
         When you call `t.GetMatches(python_string, "", [-27])` you get a list back.
         The second argument can be left empty in our case (per document blacklisting)
         The result is something like:
-        - XX
+        - [(53, 62, ((-27, 'ENVO:00002001'),)), (64, 69, ((-27, 'ENVO:00002044'),))]
         The number -27 is ENVO terms, -26 could be tissues, etc.
         """
         # Call the tagger
@@ -218,9 +218,8 @@ class Analysis(object):
         for gi, text in self.gi_to_text.items():
             matches = t.GetMatches(text, "", [-27])
             for start_pos, end_pos, concepts in matches:
-                for id_num, term in concepts:
-                    1/0
-                    result[gi][term] +=1
+                for concept_type, concept_id in concepts:
+                    result[gi][concept_id] +=1
         # Return #
         self.timer.print_elapsed()
         return result

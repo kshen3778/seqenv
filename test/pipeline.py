@@ -15,4 +15,4 @@ fasta = current_dir + "community.fasta"
 
 ################################################################################
 analysis = Analysis(fasta, num_threads=3, min_identity=0.1, e_value=0.1)
-print analysis.gi_to_matches
+print analysis.gi_to_concepts
