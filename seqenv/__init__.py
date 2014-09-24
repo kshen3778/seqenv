@@ -70,6 +70,7 @@ class Analysis(object):
         # Number of cores to use #
         if num_threads is None: self.num_threads = multiprocessing.cpu_count()/2
         else: self.num_threads = num_threads
+        self.num_threads = max(self.num_threads, self.input_file.count)
         # Hit filtering parameters #
         self.min_identity = min_identity
         self.e_value      = e_value
