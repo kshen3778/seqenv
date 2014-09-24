@@ -12,6 +12,7 @@ from seqenv.fasta import FASTA
 from seqenv.seqsearch.parallel import ParallelSeqSearch
 from seqenv.common.cache import property_cached
 from seqenv.eutils import gi_to_source, gi_to_abstract
+from seqenv.common.timer import Timer
 
 # Third party modules #
 
@@ -75,6 +76,9 @@ class Analysis(object):
         self.e_value      = e_value
         self.max_targets  = max_targets
         self.min_coverage = min_coverage
+        # Let's time the pipeline #
+        self.timer = Timer()
+        self.timer.print_start()
 
     @property_cached
     def orig_names_to_renamed(self):
@@ -90,6 +94,7 @@ class Analysis(object):
         if renamed_fasta.exists: return renamed_fasta
         print "STEP 1: Generate mappings for sequence headers in FASTA file."
         self.input_file.rename_sequences(renamed_fasta, self.orig_names_to_renamed)
+        self.timer.print_elapsed()
         return renamed_fasta
 
     @property
@@ -101,6 +106,7 @@ class Analysis(object):
         if only_top_fasta.exists: return only_top_fasta
         print "Using: " + self.renamed_fasta
         print "STEP 1B: Get the top %i sequences (in terms of their abundances)." % self.N
+        self.timer.print_elapsed()
         #TODO
         return only_top_fasta
 
@@ -134,8 +140,10 @@ class Analysis(object):
             print "Using: " + self.only_top_sequences
             print "STEP 2: Similarity search against the '%s' database" % self.search_db
             self.search.run()
+            self.timer.print_elapsed()
             print "STEP 3: Filter out bad hits from the search results"
             self.search.filter()
+            self.timer.print_elapsed()
         # Parse the results #
         return self.search.results
 
@@ -156,15 +164,20 @@ class Analysis(object):
         unique_gis = set(gi for gis in self.seq_to_gis.values() for gi in gis)
         result = {}
         # Case source #
-        if self.text_source == 'source': pass
+        if self.text_source == 'source':
+            print "STEP 4: Download the isolation sources from NCBI"
             for gi in unique_gis:
                 source = gi_to_source(gi)
                 if source is not None: result[gi] = source
         # Case abstract #
-        if self.text_source == 'abstract': pass
+        if self.text_source == 'abstract':
+            print "STEP 4: Download the abstracts from NCBI"
             for gi in unique_gis:
                 source = gi_to_abstract(gi)
                 if source is not None: result[gi] = source
+        # Return #
+        self.timer.print_elapsed()
+        return result
 
     @property_cached
     def gi_to_matches(self):
