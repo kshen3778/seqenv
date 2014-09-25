@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 
 # Built-in modules #
-import os, argparse, re
+import os, inspect, argparse, re
 from argparse import RawTextHelpFormatter
 
 # Internal modules #
 import seqenv
 
 # Retrieve the documentation from the README file #
-home = os.environ['HOME'] + '/'
-readme_path = home + "repos/seqenv/README.md"
-readme_contens = open(readme_path, 'r').read()
-desc = re.findall('^### All parameters(.+?)###', readme_contens, flags=re.M|re.DOTALL)[0]
+current_script = inspect.getframeinfo(inspect.currentframe()).filename
+current_dir = os.path.dirname(os.path.abspath(current_script)) + '/'
+readme_path = current_dir + '../README.md'
+if os.path.exists(readme_path): readme_contents = open(readme_path, 'r').read()
+else: readme_contents = ""
+desc = re.findall('^### All parameters(.+?)###', readme_contents, flags=re.M|re.DOTALL)[0]
 
 # Add the version number #
 desc = "seqenv version %s\n\n" % (seqenv.__version__) + desc
@@ -49,7 +51,7 @@ input_path = args.input_file
 kwargs = {k:getattr(args,k) for k in parameters if getattr(args,k) is not None}
 
 # Start message #
-print "seqenv version %s" % seqenv.__version__
+print "seqenv version %s (pid %i)" % (seqenv.__version__, os.getpid())
 
 # Run the pipeline #
 analysis = seqenv.Analysis(input_path, **kwargs)

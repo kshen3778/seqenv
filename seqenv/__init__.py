@@ -7,7 +7,7 @@ from __future__ import division
 __version__ = '0.9.0'
 
 # Built-in modules #
-import os, multiprocessing, shutil
+import os, inspect, multiprocessing, shutil
 from collections import defaultdict
 import cPickle as pickle
 
@@ -27,8 +27,11 @@ import tagger
 import pandas
 
 # Constants #
-home = os.environ['HOME'] + '/'
-data_dir = home + "repos/seqenv/data/"
+current_script = inspect.getframeinfo(inspect.currentframe()).filename
+current_dir = os.path.dirname(os.path.abspath(current_script)) + '/'
+possible = current_dir + '../data/envo_preferred.tsv'
+if os.path.exists(possible): data_dir = current_dir + '../data/'
+else: possible = '' #TODO
 
 ################################################################################
 class Analysis(object):
@@ -100,7 +103,7 @@ class Analysis(object):
         self.search_db = search_db
         # Number of cores to use #
         if num_threads is None: self.num_threads = multiprocessing.cpu_count()
-        else: self.num_threads = num_threads
+        else: self.num_threads = int(num_threads)
         self.num_threads = min(self.num_threads, self.input_file.count)
         # Hit filtering parameters #
         self.min_identity = min_identity
@@ -113,7 +116,7 @@ class Analysis(object):
         if out_dir is None: self.out_dir = self.input_file.directory
         else: self.out_dir = out_dir
         if not self.out_dir.endswith('/'): self.out_dir += '/'
-        if not os.path.exists(self.out_dir): shutil.mkdirs(self.out_dir)
+        if not os.path.exists(self.out_dir): os.makedirs(self.out_dir)
         # The object that can make the outputs #
         self.outputs = OutputGenerator(self)
 
