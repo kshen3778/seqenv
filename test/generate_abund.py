@@ -5,7 +5,7 @@ Generate fake abundances
 """
 
 # Modules #
-import os, inspect, numpy, random, scipy, pandas, names
+import os, inspect, numpy, pandas, names
 from seqenv.fasta import FASTA
 
 # Constants #
@@ -16,14 +16,10 @@ fasta = FASTA(current_dir + "community.fasta")
 ################################################################################
 def data():
     """Create some fake data in a dataframe"""
-    numpy.random.seed(0)
-    random.seed(0)
     x_size = len(fasta)
     y_size = 10
-    data = scipy.rand(max(x_size,y_size))
-    M = scipy.zeros([x_size,y_size])
-    for i in range(x_size):
-        for j in range(y_size): M[i,j] = abs(data[i] - data[j])
+    numpy.random.seed(0)
+    M = numpy.random.randint(0, 1000, (x_size, y_size))
     df = pandas.DataFrame(M, index=[seq.id for seq in fasta], columns=[names.get_first_name() for j in range(y_size)])
     return df
 
