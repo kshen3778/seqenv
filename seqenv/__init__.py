@@ -3,6 +3,9 @@ b'This module needs Python 2.7.x'
 # Special variables #
 __version__ = '0.9.0'
 
+# Futures #
+from __future__ import division
+
 # Built-in modules #
 import os, multiprocessing
 from collections import defaultdict
@@ -10,9 +13,10 @@ import cPickle as pickle
 
 # Internal modules #
 from seqenv.fasta import FASTA
+from seqenv.outputs import OutputGenerator
 from seqenv.seqsearch.parallel import ParallelSeqSearch
-from seqenv.common.cache import property_cached
 from seqenv.eutils import record_to_source, record_to_abstract
+from seqenv.common.cache import property_cached
 from seqenv.common.timer import Timer
 from seqenv.common.autopaths import FilePath
 
@@ -20,7 +24,6 @@ from seqenv.common.autopaths import FilePath
 import tagger
 
 # Third party modules #
-from tqdm import tqdm
 
 # Constants #
 home = os.environ['HOME'] + '/'
@@ -29,8 +32,8 @@ data_dir = home + "repos/seqenv/data/"
 ################################################################################
 class Analysis(object):
     """The main object. The only mandatory argument is the input fasta file path.
-    The text below is somewhat redundant with what is in the readme file and the
-    command line utitliy.
+    The text below is somewhat redundant with what is in the README file and in
+    the command line utility.
 
     * 'seq_type': Either `nucl` or `prot`. Defaults to `nucl`.
 
@@ -43,6 +46,9 @@ class Analysis(object):
 
     * `backtracking`: For every term identified by the tagger, we will propagate frequency counts
                       up the acyclic directed graph described by the ontology. Defaults to `False`.
+
+    * `normalization`: Should we divide the counts of every input sequence by the number of
+                       text entries that were associated to it. Defaults to `True`.
 
     * `num_threads`: The number of threads. Default to the number of cores on the
                      current machine.
@@ -63,19 +69,20 @@ class Analysis(object):
     """
 
     def __init__(self, input_file,
-                 seq_type     = 'nucl',
-                 search_algo  = 'blast',
-                 search_db    = 'nt',
-                 text_source  = 'source',
-                 backtracking = False,
-                 num_threads  = None,
-                 out_dir      = None,
-                 min_identity = 0.97,
-                 e_value      = 0.0001,
-                 max_targets  = 10,
-                 min_coverage = 0.97,
-                 abundances   = None,
-                 N            = 1000,):
+                 seq_type      = 'nucl',
+                 search_algo   = 'blast',
+                 search_db     = 'nt',
+                 text_source   = 'source',
+                 backtracking  = False,
+                 normalization = True,
+                 num_threads   = None,
+                 out_dir       = None,
+                 min_identity  = 0.97,
+                 e_value       = 0.0001,
+                 max_targets   = 10,
+                 min_coverage  = 0.97,
+                 abundances    = None,
+                 N             = 1000,):
         # Base parameters #
         self.input_file = FASTA(input_file)
         self.abundances = abundances
@@ -83,6 +90,7 @@ class Analysis(object):
         self.seq_type = seq_type
         self.text_source = text_source
         self.backtracking = backtracking
+        self.normalization = normalization
         # Search parameters #
         self.search_algo = search_algo
         self.search_db = search_db
@@ -101,6 +109,8 @@ class Analysis(object):
         if out_dir is None: self.out_dir = self.input_file.directory
         else: self.out_dir = self.out_dir
         assert os.path.exists(self.out_dir)
+        # The object that can make the outputs #
+        self.outputs = OutputGenerator(self)
 
     @property_cached
     def orig_names_to_renamed(self):
@@ -112,7 +122,7 @@ class Analysis(object):
     def renamed_fasta(self):
         """Make a new fasta file where every name in the input FASTA file is replaced
         with "C1", "C2", "C3" etc. Returns this new FASTA file."""
-        renamed_fasta = FASTA(self.input_file.prefix_path + '_renamed.fasta')
+        renamed_fasta = FASTA(self.out_dir + 'renamed.fasta')
         if renamed_fasta.exists: return renamed_fasta
         print "STEP 1: Generate mappings for sequence headers in FASTA file."
         self.input_file.rename_sequences(renamed_fasta, self.orig_names_to_renamed)
@@ -124,7 +134,7 @@ class Analysis(object):
         """Make a new fasta file where only the top N sequences are included
         (in terms of their abundance)."""
         if not self.abundances: return self.renamed_fasta
-        only_top_fasta = FASTA(self.input_file.prefix_path + '_top.fasta')
+        only_top_fasta = FASTA(self.out_dir + 'top_seqs.fasta')
         if only_top_fasta.exists: return only_top_fasta
         print "Using: " + self.renamed_fasta
         print "STEP 1B: Get the top %i sequences (in terms of their abundances)." % self.N
@@ -192,7 +202,8 @@ class Analysis(object):
     @property_cached
     def gi_to_text(self):
         """A dictionary linking every gi identifier to some unspecified text blob.
-        Typically the text is its isolation source or a list of abstracts."""
+        Typically the text is its isolation source or a list of abstracts coming
+        from the NCBI online service."""
         gi_to_text = FilePath(self.out_dir + 'gi_to_text.pickle')
         # Check that it was run #
         if not gi_to_text.exists:
@@ -252,7 +263,7 @@ class Analysis(object):
         """A dictionary linking every concept serial to its concept id.
         Every line in the file contains three columns: serial, concept_type, concept_id
         This could possibly overflow the memory when we come with NCBI taxonomy etc."""
-        return {s:ci for s, ct, ci in open(data_dir + 'envo_entities.tsv')}
+        return {s:ci for line in open(data_dir + 'envo_entities.tsv') for s, ct, ci in line.split()}
 
     @property_cached
     def child_to_parents(self):
@@ -267,25 +278,22 @@ class Analysis(object):
                 result[child_concept].append(parent_concept)
         return result
 
-    def generate_freq_tables(self):
-        """Generate the frequencies tables...
-        Possible output 1:
-        - OTU1, ENVO:00001, 4, GIs : [56, 123, 345]
-          or
-        - OTU1, ocean, 4, GIs : [56, 123, 345]
-        Possible output 2:
-        - GI56 : oceanic soil
-          or
-        - GI56 : PubMed6788
-        Possible output 3:
-        - ENVO:00001 : ocean
-        """
-        if not somefile.exists:
-            print "Using %i results from the text mining results" % len(tagger_results)
-            print "STEP 6: Generating main output."
-        else:
-            print "Final results already exist !"
+    @property_cached
+    def concept_to_name(self):
+        """A dictionary linking the concept id to relevant names. In this case ENVO terms.
+        Hence, ENVO:00000095 would be linked to 'lava field'"""
+        return {c:n for line in open(data_dir + 'envo_entities.tsv') for c,n in line.split()}
 
-    def generate_dot_files(self):
-        """Generate the dot files for visualization in GraphViz..."""
-        pass
+    @property_cached
+    def seq_to_counts(self):
+        """A dictionary linking every input sequence to its summed normalized concept counts."""
+        result = {}
+        for seq, gis in self.seq_to_gis.items():
+            counts = defaultdict(int)
+            for gi in gis:
+                for c,i in self.gi_to_counts[gi]: counts[c] += i
+            if self.normalized:
+                total = len(gis)
+                for c in counts: counts[c] /= total
+            result[seq] = counts
+        return result

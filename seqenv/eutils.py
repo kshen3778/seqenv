@@ -30,7 +30,4 @@ def record_to_source(record):
 
 ################################################################################
 def record_to_abstract(record):
-    qualifiers = record['GBSeq_feature-table'][0]['GBFeature_quals']
-    for qualifier in qualifiers:
-        if qualifier['GBQualifier_name'] == 'isolation_source':
-            return qualifier['GBQualifier_value']
+    raise NotImplemented('')

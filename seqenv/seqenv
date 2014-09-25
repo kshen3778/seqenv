@@ -13,6 +13,9 @@ readme_path = home + "repos/seqenv/README.md"
 readme_contens = open(readme_path, 'r').read()
 desc = re.findall('^### All parameters(.+?)###', readme_contens, flags=re.M|re.DOTALL)[0]
 
+# Add the version number #
+desc = "SEQenv version %s\n\n" % (seqenv.__version__) + desc
+
 # Make a shell arguments parser #
 parser = argparse.ArgumentParser(description=desc, formatter_class=RawTextHelpFormatter)
 
@@ -21,19 +24,20 @@ parser.add_argument("input_file", help="The fasta file to process", type=str)
 
 # All the optional arguments #
 parameters = {
-    "seq_type"     : "Either `nucl` or `prot`. Defaults to `nucl`.",
-    "search_algo"  : "Either 'blast' or 'usearch'. Defaults to `blast`.",
-    "search_db"    : "The path to the database to search against. Defaults to `nt`.",
-    "text_source"  : "Either `source` for isolation source or `abstract` for the pubmed abstracts. Defaults to `source`.",
-    "backtracking" : "For every term identified by the tagger, we will propagate frequency counts up the acyclic directed graph described by the ontology. Defaults to `False`.",
-    "num_threads"  : "Number of threads to use. Default to the number of cores on the current machine.",
-    "out_dir"      : "Place all the outputs in the specified directory. Defaults to the input file's directory.",
-    "min_identity" : "Minimum identity in similarity search. Defaults to 0.97.",
-    "e_value"      : "Minimum e-value in similarity search. Defaults to 0.0001.",
-    "max_targets"  : "Maximum number of reference matches in similarity search. Defaults to 10.",
-    "min_coverage" : "Minimum query coverage in similarity search. Defaults to 0.97.",
-    "abundances"   : "If you have sample information, give is as a TSV file.",
-    "N"            : "Use only the top `N` sequences in terms of their abundance. Defaults to 1000.",
+    "seq_type"      : "Either `nucl` or `prot`. Defaults to `nucl`.",
+    "search_algo"   : "Either 'blast' or 'usearch'. Defaults to `blast`.",
+    "search_db"     : "The path to the database to search against. Defaults to `nt`.",
+    "text_source"   : "Either `source` for isolation source or `abstract` for the pubmed abstracts. Defaults to `source`.",
+    "backtracking"  : "For every term identified by the tagger, we will propagate frequency counts up the acyclic directed graph described by the ontology. Defaults to `False`.",
+    "normalization" : "Should we divide the counts of every input sequence by the number of text entries that were associated to it. Defaults to `True`.",
+    "num_threads"   : "Number of threads to use. Default to the number of cores on the current machine.",
+    "out_dir"       : "Place all the outputs in the specified directory. Defaults to the input file's directory.",
+    "min_identity"  : "Minimum identity in similarity search. Defaults to 0.97.",
+    "e_value"       : "Minimum e-value in similarity search. Defaults to 0.0001.",
+    "max_targets"   : "Maximum number of reference matches in similarity search. Defaults to 10.",
+    "min_coverage"  : "Minimum query coverage in similarity search. Defaults to 0.97.",
+    "abundances"    : "If you have sample information, give is as a TSV file.",
+    "N"             : "Use only the top `N` sequences in terms of their abundance. Defaults to 1000.",
 }
 
 # Add them to the parser #
@@ -47,4 +51,6 @@ kwargs = {k:getattr(args,k) for k in params}
 # Run the pipeline #
 analysis = seqenv.Analysis(input_path, **kwargs)
 analysis.timer.print_start()
-analysis.run()
+analysis.outputs.make_all()
+analysis.timer.print_end()
+analysis.timer.print_total_elapsed()
