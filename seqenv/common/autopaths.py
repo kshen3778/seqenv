@@ -45,6 +45,7 @@ class FilePath(str):
     @property
     def directory(self):
         """The containing directory"""
+        if os.path.dirname(self.path) == "": return './'
         return os.path.dirname(self.path) + '/'
 
     @property
@@ -53,3 +54,6 @@ class FilePath(str):
         if not self.exists: return 0
         return os.path.getsize(self.path)
 
+    def must_exist(self):
+        """Raise an exception if the path doesn't exist."""
+        if not self.exists: raise Exception("The file path '%s' does not exist." % self.path)

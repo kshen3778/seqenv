@@ -7,7 +7,7 @@ from __future__ import division
 __version__ = '0.9.0'
 
 # Built-in modules #
-import os, multiprocessing
+import os, multiprocessing, shutil
 from collections import defaultdict
 import cPickle as pickle
 
@@ -85,6 +85,8 @@ class Analysis(object):
                  N             = 1000,):
         # Base parameters #
         self.input_file = FASTA(input_file)
+        self.input_file.must_exist()
+        # Other parameters #
         self.abundances = abundances
         self.N = N
         self.seq_type = seq_type
@@ -108,7 +110,8 @@ class Analysis(object):
         # Keep all outputs in a directory #
         if out_dir is None: self.out_dir = self.input_file.directory
         else: self.out_dir = out_dir
-        assert os.path.exists(self.out_dir)
+        if not self.out_dir.endswith('/'): self.out_dir += '/'
+        if not os.path.exists(self.out_dir): shutil.mkdirs(self.out_dir)
         # The object that can make the outputs #
         self.outputs = OutputGenerator(self)
 
@@ -170,7 +173,7 @@ class Analysis(object):
         # Check that the search was run #
         if not self.search.out_path.exists:
             print "-> Using: " + self.only_top_sequences
-            print "STEP 2: Similarity search against the '%s' database" % self.search_db
+            print "STEP 2: Similarity search against the '%s' database with %i processes" % (self.search_db, self.num_threads)
             self.search.run()
             self.timer.print_elapsed()
             print "STEP 3: Filter out bad hits from the search results"
@@ -239,7 +242,7 @@ class Analysis(object):
             print "STEP 6: Run the text mining tagger all blobs."
             t = tagger.Tagger()
             # Load the dictionary #
-            t.LoadNames('data/envo_entities.tsv', 'data/envo_names.tsv')
+            t.LoadNames(data_dir + 'envo_entities.tsv', data_dir + 'envo_names.tsv')
             # Load a global blacklist #
             t.LoadGlobal('data/envo_global.tsv')
             # Tag all the text #
