@@ -184,6 +184,7 @@ class Analysis(object):
         # Parse the results #
         return self.search.results
 
+    #-------------------------------------------------------------------------#
     @property_cached
     def seq_to_gis(self):
         """A dictionary linking every input sequence to a list of gi identifiers found
@@ -248,6 +249,9 @@ class Analysis(object):
             # Tag all the text #
             result = {}
             for gi, text in self.gi_to_text.items():
+                if text is None:
+                    result[gi] = []
+                    continue
                 result[gi] = t.GetMatches(text, "", [-27])
             with open(gi_to_matches, 'w') as handle: pickle.dump(result, handle)
             self.timer.print_elapsed()
@@ -268,20 +272,36 @@ class Analysis(object):
             print "STEP 7: Parsing the tagger results and counting terms."
             result = {}
             for gi, matches in self.gi_to_matches.items():
-                result[gi] = defaultdict(int)
+                counts = defaultdict(int)
                 if not matches: continue
                 for start_pos, end_pos, concepts in matches:
                     ids = [concept_id for concept_type, concept_id in concepts]
                     score = 1 / len(ids)
                     if self.backtracking: ids.append([p for c in ids for p in self.child_to_parents[c]])
-                    for concept_id in ids: result[gi][concept_id] += score
-            result = dict(result)
+                    for concept_id in ids: counts[concept_id] += score
+                result[gi] = dict(counts)
             with open(gi_to_counts, 'w') as handle: pickle.dump(result, handle)
             self.timer.print_elapsed()
             return result
         # Parse the results #
         with open(gi_to_counts, 'r') as handle: return pickle.load(handle)
 
+    @property_cached
+    def seq_to_counts(self):
+        """A dictionary linking every input sequence to its summed normalized concept counts."""
+        result = {}
+        for seq, gis in self.seq_to_gis.items():
+            counts = defaultdict(int)
+            for gi in gis:
+                if gi not in self.gi_to_counts: continue
+                for c,i in self.gi_to_counts[gi].items(): counts[c] += i
+            if self.normalization:
+                tot_matches = sum([len(self.gi_to_matches[gi]) for gi in gis])
+                for k in counts: counts[k] /= tot_matches
+            result[seq] = counts
+        return result
+
+    #-------------------------------------------------------------------------#
     @property_cached
     def serial_to_concept(self):
         """A dictionary linking every concept serial to its concept id.
@@ -307,17 +327,6 @@ class Analysis(object):
         """A dictionary linking the concept id to relevant names. In this case ENVO terms.
         Hence, ENVO:00000095 would be linked to 'lava field'"""
         return dict(line.strip('\n').split('\t') for line in open(data_dir + 'envo_preferred.tsv'))
-
-    @property_cached
-    def seq_to_counts(self):
-        """A dictionary linking every input sequence to its summed normalized concept counts."""
-        result = {}
-        for seq, gis in self.seq_to_gis.items():
-            counts = defaultdict(int)
-            for gi in gis:
-                for c,i in self.gi_to_counts[gi].items(): counts[c] += i
-            result[seq] = counts
-        return result
 
     @property_cached
     def df_abundances(self):

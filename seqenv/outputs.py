@@ -25,8 +25,6 @@ class OutputGenerator(object):
         """A normalized matrix with sequences as columns and concepts as rows."""
         df = pandas.DataFrame(self.analysis.seq_to_counts)
         df = df.fillna(0)
-        df = df.apply(lambda x: x/x.sum())
-        df = df.fillna(0)
         return df
 
     def make_all(self):

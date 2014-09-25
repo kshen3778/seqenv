@@ -23,7 +23,6 @@ def data():
     df = pandas.DataFrame(M, index=[seq.id for seq in fasta], columns=[names.get_first_name() for j in range(y_size)])
     return df
 
-
 df = data()
 df = df.apply(lambda x: x/x.sum())
 df.to_csv(current_dir + 'abundances.tsv', sep='\t')
