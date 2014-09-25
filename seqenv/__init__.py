@@ -334,4 +334,5 @@ class Analysis(object):
     @property_cached
     def df_abundances(self):
         """A pandas DataFrame object containing the abundance counts."""
+        assert self.abundances
         return pandas.io.parsers.read_csv(self.abundances, sep='\t', index_col=0, encoding='utf-8')

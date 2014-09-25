@@ -20,17 +20,22 @@ class OutputGenerator(object):
         self.analysis = analysis
         self.out_dir = analysis.out_dir
 
-    @property_cached
-    def df_seqs_concepts(self):
-        """A normalized matrix with sequences as columns and concepts as rows."""
-        df = pandas.DataFrame(self.analysis.seq_to_counts)
-        df = df.fillna(0)
-        return df
-
     def make_all(self):
         """Let's generate all the files"""
         with open(self.out_dir + 'seq_to_concepts.csv', 'w') as handle: handle.writelines(self.csv_seq_to_concepts())
         with open(self.out_dir + 'seq_to_names.csv', 'w')    as handle: handle.writelines(self.csv_seq_to_names())
+
+    @property_cached
+    def df_seqs_concepts(self):
+        """A normalized matrix with sequences as columns and concepts as rows."""
+        # Get the data #
+        df = pandas.DataFrame(self.analysis.seq_to_counts)
+        df = df.fillna(0)
+        # Rename to original names #
+        renamed_to_orig = dict((v,k) for k,v in self.analysis.orig_names_to_renamed.iteritems())
+        df = df.rename(columns=renamed_to_orig)
+        # Return
+        return df
 
     def csv_seq_to_concepts(self):
         """A CSV file"""
@@ -38,16 +43,14 @@ class OutputGenerator(object):
 
     def csv_seq_to_names(self, sep='\t'):
         """A CSV file"""
-        df = self.df_seqs_concepts.rename(self.analysis.concept_to_name)
+        df = self.df_seqs_concepts.rename(index=self.analysis.concept_to_name)
         return df.to_csv(sep=self.sep, float_format=self.float_format)
 
     def csv_otu_to_names(self, sep='\t'):
         """A CSV file"""
         # Get both matrices #
-        df1 = self.df_seqs_concepts.rename(self.analysis.concept_to_name)
-        df1 = df1
-        renamed_to_orig = dict((v,k) for k, v in self.analysis.orig_names_to_renamed.iteritems())
-        df2 = self.analysis.abundance_df.rename(renamed_to_orig)
+        df1 = self.df_seqs_concepts.rename(index=self.analysis.concept_to_name).transpose()
+        df2 = self.abundance_df.transpose()
         # Multiply them #
         df = df1.dot(df2)
         return df.to_csv(sep=self.sep, float_format=self.float_format)
