@@ -244,7 +244,7 @@ class Analysis(object):
             # Load the dictionary #
             t.LoadNames(data_dir + 'envo_entities.tsv', data_dir + 'envo_names.tsv')
             # Load a global blacklist #
-            t.LoadGlobal('data/envo_global.tsv')
+            t.LoadGlobal(data_dir + 'envo_global.tsv')
             # Tag all the text #
             result = {}
             for gi, text in self.gi_to_text.items():
