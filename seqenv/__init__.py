@@ -1,10 +1,10 @@
 b'This module needs Python 2.7.x'
 
+# Futures #
+from __future__ import division
+
 # Special variables #
 __version__ = '0.9.0'
-
-# Futures #
-from __future__ import division
 
 # Built-in modules #
 import os, multiprocessing
@@ -15,7 +15,7 @@ import cPickle as pickle
 from seqenv.fasta import FASTA
 from seqenv.outputs import OutputGenerator
 from seqenv.seqsearch.parallel import ParallelSeqSearch
-from seqenv.eutils import record_to_source, record_to_abstract
+from seqenv.eutils import record_to_source, record_to_abstract, gis_to_records
 from seqenv.common.cache import property_cached
 from seqenv.common.timer import Timer
 from seqenv.common.autopaths import FilePath
@@ -107,7 +107,7 @@ class Analysis(object):
         self.timer = Timer()
         # Keep all outputs in a directory #
         if out_dir is None: self.out_dir = self.input_file.directory
-        else: self.out_dir = self.out_dir
+        else: self.out_dir = out_dir
         assert os.path.exists(self.out_dir)
         # The object that can make the outputs #
         self.outputs = OutputGenerator(self)
@@ -124,7 +124,7 @@ class Analysis(object):
         with "C1", "C2", "C3" etc. Returns this new FASTA file."""
         renamed_fasta = FASTA(self.out_dir + 'renamed.fasta')
         if renamed_fasta.exists: return renamed_fasta
-        print "STEP 1: Generate mappings for sequence headers in FASTA file."
+        print "STEP 1: Parse the input FASTA file."
         self.input_file.rename_sequences(renamed_fasta, self.orig_names_to_renamed)
         self.timer.print_elapsed()
         return renamed_fasta
@@ -136,7 +136,7 @@ class Analysis(object):
         if not self.abundances: return self.renamed_fasta
         only_top_fasta = FASTA(self.out_dir + 'top_seqs.fasta')
         if only_top_fasta.exists: return only_top_fasta
-        print "Using: " + self.renamed_fasta
+        print "-> Using: " + self.renamed_fasta
         print "STEP 1B: Get the top %i sequences (in terms of their abundances)." % self.N
         self.timer.print_elapsed()
         #TODO
@@ -169,7 +169,7 @@ class Analysis(object):
         after filtering."""
         # Check that the search was run #
         if not self.search.out_path.exists:
-            print "Using: " + self.only_top_sequences
+            print "-> Using: " + self.only_top_sequences
             print "STEP 2: Similarity search against the '%s' database" % self.search_db
             self.search.run()
             self.timer.print_elapsed()
@@ -187,13 +187,13 @@ class Analysis(object):
         # Check that is was run #
         if not seq_to_gis.exists:
             self.search_results
-            print "STEP 4A: Parsing the search results"
+            print "STEP 4: Parsing the search results"
             result = defaultdict(list)
             for hit in self.search_results:
                 seq_name = hit[0]
                 gi = hit[1].split('|')[1]
                 result[seq_name].append(gi)
-            with open(gi_to_text, 'w') as handle: pickle.dump(result, handle)
+            with open(seq_to_gis, 'w') as handle: pickle.dump(result, handle)
             self.timer.print_elapsed()
             return result
         # Parse the results #
@@ -209,13 +209,11 @@ class Analysis(object):
         if not gi_to_text.exists:
             result = {}
             unique_gis = set(gi for gis in self.seq_to_gis.values() for gi in gis)
-            print "STEP 4B: Download data from NCBI"
+            print "STEP 5: Download data from NCBI"
             all_records = gis_to_records(unique_gis)
             if self.text_source == 'source': fn = record_to_source
             if self.text_source == 'abstract': fn = record_to_abstract
-            for gi, record in all_records.items():
-                text = fn(gi)
-                if text is not None: result[gi] = text
+            for gi, record in all_records.items(): result[gi] = fn(record) # Possibly None
             with open(gi_to_text, 'w') as handle: pickle.dump(result, handle)
             self.timer.print_elapsed()
             return result
@@ -236,22 +234,25 @@ class Analysis(object):
         """
         gi_to_counts = FilePath(self.out_dir + 'gi_to_counts.pickle')
         # Check that it was run #
-        if not gi_to_concepts.exists:
-            print "Using %i text blobs" % len(self.gi_to_text)
-            print "STEP 5: Run the text mining tagger on NCBI results."
+        if not gi_to_counts.exists:
+            print "-> Using %i text blobs" % len(self.gi_to_text)
+            print "STEP 6: Run the text mining tagger all blobs."
             t = tagger.Tagger()
             # Load the dictionary #
             t.LoadNames('data/envo_entities.tsv', 'data/envo_names.tsv')
             # Load a global blacklist #
             t.LoadGlobal('data/envo_global.tsv')
             # Tag all the text #
-            result = defaultdict(lambda: defaultdict(int))
+            result = {}
             for gi, text in self.gi_to_text.items():
+                result[gi] = defaultdict(int)
+                if text is None: continue
                 matches = t.GetMatches(text, "", [-27])
                 for start_pos, end_pos, concepts in matches:
                     ids = set([concept_id for concept_type, concept_id in concepts])
                     if self.backtracking: ids.update([p for c in ids for p in self.child_to_parents[c]])
                     for concept_id in ids: result[gi][concept_id] +=1
+            result = dict(result)
             with open(gi_to_counts, 'w') as handle: pickle.dump(result, handle)
             self.timer.print_elapsed()
             return result
@@ -263,7 +264,7 @@ class Analysis(object):
         """A dictionary linking every concept serial to its concept id.
         Every line in the file contains three columns: serial, concept_type, concept_id
         This could possibly overflow the memory when we come with NCBI taxonomy etc."""
-        return {s:ci for line in open(data_dir + 'envo_entities.tsv') for s, ct, ci in line.split()}
+        return {x[0]:x[2] for line in open(data_dir + 'envo_entities.tsv') for x in line.split()}
 
     @property_cached
     def child_to_parents(self):
@@ -282,7 +283,7 @@ class Analysis(object):
     def concept_to_name(self):
         """A dictionary linking the concept id to relevant names. In this case ENVO terms.
         Hence, ENVO:00000095 would be linked to 'lava field'"""
-        return {c:n for line in open(data_dir + 'envo_entities.tsv') for c,n in line.split()}
+        return {x[0]:x[1] for line in open(data_dir + 'envo_preferred.tsv') for x in line.split()}
 
     @property_cached
     def seq_to_counts(self):
@@ -291,9 +292,14 @@ class Analysis(object):
         for seq, gis in self.seq_to_gis.items():
             counts = defaultdict(int)
             for gi in gis:
-                for c,i in self.gi_to_counts[gi]: counts[c] += i
-            if self.normalized:
+                for c,i in self.gi_to_counts[gi].items(): counts[c] += i
+            if self.normalization:
                 total = len(gis)
                 for c in counts: counts[c] /= total
             result[seq] = counts
         return result
+
+    @property_cached
+    def abundances_df(self):
+        """A pandas DataFrame object containing the abundance counts."""
+        return 0

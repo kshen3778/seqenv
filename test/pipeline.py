@@ -12,7 +12,11 @@ from seqenv import Analysis
 current_script = inspect.getframeinfo(inspect.currentframe()).filename
 current_dir = os.path.dirname(os.path.abspath(current_script)) + '/'
 fasta = current_dir + "community.fasta"
+out_dir = current_dir + 'output/'
 
 ################################################################################
-analysis = Analysis(fasta, num_threads=3, min_identity=0.1, e_value=0.1, backtracking=True)
-#analysis.gi_to_concepts
+analysis = Analysis(fasta, out_dir=out_dir)
+analysis.timer.print_start()
+analysis.outputs.make_all()
+analysis.timer.print_end()
+analysis.timer.print_total_elapsed()

@@ -19,19 +19,18 @@ class OutputGenerator(object):
 
     def make_all(self):
         """Let's generate all the files"""
-        print "STEP 6: Generating all outputs."
         with open(self.out_dir + 'seq_to_concepts.csv', 'w') as handle: handle.writelines(self.csv_seq_to_concepts())
         with open(self.out_dir + 'seq_to_names.csv', 'w')    as handle: handle.writelines(self.csv_seq_to_names())
 
     def csv_seq_to_concepts(self):
         """A CSV file"""
         df = pandas.DataFrame(self.analysis.seq_to_counts)
-        return df.to_csv(sep=self.sep, float_format=self.float_format)
+        return df.to_csv(None, sep=self.sep, float_format=self.float_format)
 
     def csv_seq_to_names(self, sep='\t'):
         """A CSV file"""
         df = pandas.DataFrame(self.analysis.seq_to_counts)
-        1/0
+        df = df.rename(self.analysis.concept_to_name)
         return df.to_csv(sep=self.sep, float_format=self.float_format)
 
     def output_1(self):

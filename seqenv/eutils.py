@@ -12,12 +12,14 @@ def gis_to_records(gis, progress=True):
     # Should we display progress ? #
     progress = tqdm if progress else lambda x:x
     # Do it by chunks #
+    gis = list(gis)
     at_a_time = 1000
     result = {}
+    # Main loop #
     for i in progress(range(0, len(gis), at_a_time)):
         chunk = gis[i:i+at_a_time]
         entries = Entrez.efetch(db="nucleotide", id=chunk, rettype="gb", retmode="xml")
-        result.update(dict(zip(gis, Entrez.parse(entries))))
+        result.update(dict(zip(gis, Entrez.parse(entries, validate=True))))
     # Return #
     return result
 
