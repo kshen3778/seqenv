@@ -2,6 +2,9 @@ Add the abundance file processing
 Test with a large data set
 Generate the output(s)
 
+Warning that some sequences had 0s, and remove them from the matrix
+Add an output that contains the number of terms per OTU
+
 Uniquify the isolation sources ?
 Integrate VSEARCH in the sequence similarity search
 Add a clean function that wipes all the files

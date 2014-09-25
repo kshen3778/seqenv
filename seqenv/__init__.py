@@ -24,6 +24,7 @@ from seqenv.common.autopaths import FilePath
 import tagger
 
 # Third party modules #
+import pandas
 
 # Constants #
 home = os.environ['HOME'] + '/'
@@ -47,8 +48,7 @@ class Analysis(object):
     * `backtracking`: For every term identified by the tagger, we will propagate frequency counts
                       up the acyclic directed graph described by the ontology. Defaults to `False`.
 
-    * `normalization`: Should we divide the counts of every input sequence by the number of
-                       text entries that were associated to it. Defaults to `True`.
+    * `normalization`: Should we TODO. Defaults to `True`.
 
     * `num_threads`: The number of threads. Default to the number of cores on the
                      current machine.
@@ -86,8 +86,10 @@ class Analysis(object):
         # Base parameters #
         self.input_file = FASTA(input_file)
         self.input_file.must_exist()
+        # Abundance file #
+        self.abundances = FilePath(abundances)
+        if self.abundances: self.abundances.must_exist()
         # Other parameters #
-        self.abundances = abundances
         self.N = N
         self.seq_type = seq_type
         self.text_source = text_source
@@ -224,22 +226,20 @@ class Analysis(object):
         with open(gi_to_text, 'r') as handle: return pickle.load(handle)
 
     @property_cached
-    def gi_to_counts(self):
-        """A dictionary linking every `gi` identifier to the concept counts.
-        (dictionaries of concept:int). This is done by finding regions of interest in the text
-        (i.e. a match). We can assign meaning to the matches in terms of concepts.
-        A 'concept' or 'entity' here would be an envo term such as 'ENVO:01000047'
-        When you call `t.GetMatches(python_string, "", [-27])` you get a list back.
+    def gi_to_matches(self):
+        """A dictionary linking every gi to zero, one or several matches.
+        When you call `t.GetMatches(text, "", [-27])` you get a list back.
         The second argument can be left empty in our case (per document blacklisting)
         The result is something like:
         - [(53, 62, ((-27, 'ENVO:00002001'),)), (64, 69, ((-27, 'ENVO:00002044'),))]
         The number -27 is ENVO terms, -26 could be tissues, etc.
         """
-        gi_to_counts = FilePath(self.out_dir + 'gi_to_counts.pickle')
+        gi_to_matches = FilePath(self.out_dir + 'gi_to_matches.pickle')
         # Check that it was run #
-        if not gi_to_counts.exists:
+        if not gi_to_matches.exists:
             print "-> Using %i text blobs" % len(self.gi_to_text)
-            print "STEP 6: Run the text mining tagger all blobs."
+            print "STEP 6: Run the text mining tagger on all blobs."
+            # Create the tagger #
             t = tagger.Tagger()
             # Load the dictionary #
             t.LoadNames(data_dir + 'envo_entities.tsv', data_dir + 'envo_names.tsv')
@@ -248,13 +248,33 @@ class Analysis(object):
             # Tag all the text #
             result = {}
             for gi, text in self.gi_to_text.items():
+                result[gi] = t.GetMatches(text, "", [-27])
+            with open(gi_to_matches, 'w') as handle: pickle.dump(result, handle)
+            self.timer.print_elapsed()
+            return result
+        # Parse the results #
+        with open(gi_to_matches, 'r') as handle: return pickle.load(handle)
+
+    @property_cached
+    def gi_to_counts(self):
+        """A dictionary linking every `gi` identifier to the concept counts.
+        (dictionaries of concept:int). This is done by finding regions of interest in the text
+        (i.e. a match). We can assign meaning to the matches in terms of concepts.
+        A 'concept' or 'entity' here would be an envo term such as 'ENVO:01000047'"""
+        gi_to_counts = FilePath(self.out_dir + 'gi_to_counts.pickle')
+        # Check that it was run #
+        if not gi_to_counts.exists:
+            print "-> Using matches from %i gi entries" % len(self.gi_to_matches)
+            print "STEP 7: Parsing the tagger results and counting terms."
+            result = {}
+            for gi, matches in self.gi_to_matches.items():
                 result[gi] = defaultdict(int)
-                if text is None: continue
-                matches = t.GetMatches(text, "", [-27])
+                if not matches: continue
                 for start_pos, end_pos, concepts in matches:
-                    ids = set([concept_id for concept_type, concept_id in concepts])
-                    if self.backtracking: ids.update([p for c in ids for p in self.child_to_parents[c]])
-                    for concept_id in ids: result[gi][concept_id] +=1
+                    ids = [concept_id for concept_type, concept_id in concepts]
+                    score = 1 / len(ids)
+                    if self.backtracking: ids.append([p for c in ids for p in self.child_to_parents[c]])
+                    for concept_id in ids: result[gi][concept_id] += score
             result = dict(result)
             with open(gi_to_counts, 'w') as handle: pickle.dump(result, handle)
             self.timer.print_elapsed()
@@ -286,7 +306,7 @@ class Analysis(object):
     def concept_to_name(self):
         """A dictionary linking the concept id to relevant names. In this case ENVO terms.
         Hence, ENVO:00000095 would be linked to 'lava field'"""
-        return {x[0]:x[1] for line in open(data_dir + 'envo_preferred.tsv') for x in line.split()}
+        return dict(line.strip('\n').split('\t') for line in open(data_dir + 'envo_preferred.tsv'))
 
     @property_cached
     def seq_to_counts(self):
@@ -296,13 +316,10 @@ class Analysis(object):
             counts = defaultdict(int)
             for gi in gis:
                 for c,i in self.gi_to_counts[gi].items(): counts[c] += i
-            if self.normalization:
-                total = len(gis)
-                for c in counts: counts[c] /= total
             result[seq] = counts
         return result
 
     @property_cached
-    def abundances_df(self):
+    def df_abundances(self):
         """A pandas DataFrame object containing the abundance counts."""
-        return 0
+        return pandas.io.parsers.read_csv(self.abundances, sep='\t', index_col=0, encoding='utf-8')

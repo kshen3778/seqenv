@@ -14,7 +14,7 @@ readme_contens = open(readme_path, 'r').read()
 desc = re.findall('^### All parameters(.+?)###', readme_contens, flags=re.M|re.DOTALL)[0]
 
 # Add the version number #
-desc = "SEQenv version %s\n\n" % (seqenv.__version__) + desc
+desc = "seqenv version %s\n\n" % (seqenv.__version__) + desc
 
 # Make a shell arguments parser #
 parser = argparse.ArgumentParser(description=desc, formatter_class=RawTextHelpFormatter)
@@ -48,9 +48,15 @@ args = parser.parse_args()
 input_path = args.input_file
 kwargs = {k:getattr(args,k) for k in parameters if getattr(args,k) is not None}
 
+# Start message #
+print "seqenv version %s" % seqenv.__version__
+
 # Run the pipeline #
 analysis = seqenv.Analysis(input_path, **kwargs)
 analysis.timer.print_start()
 analysis.outputs.make_all()
+
+# End message #
+print "------------\nSuccess. Ouputs are in '%s'" % analysis.out_dir
 analysis.timer.print_end()
 analysis.timer.print_total_elapsed()
