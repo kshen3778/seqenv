@@ -20,8 +20,10 @@ out_dir = samples_dir + 'output/'
 analysis = Analysis(fasta, out_dir=out_dir, abundances=abund)
 
 df1 = analysis.outputs.df_seqs_concepts.rename(analysis.concept_to_name)
-df1 = df1.transpose()
 df2 = analysis.df_abundances
-df2 = df2.transpose()
+print set(df1.columns) ^ set(df2.index)
+
+df2 = df2.loc[df1.columns]
+print set(df1.columns) ^ set(df2.index)
+
 df1.dot(df2)
-df2.dot(df1)

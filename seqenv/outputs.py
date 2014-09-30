@@ -59,6 +59,8 @@ class OutputGenerator(object):
             # Get both matrices #
             df1 = self.df_seqs_concepts.rename(index=self.analysis.concept_to_name).transpose()
             df2 = self.analysis.df_abundances.transpose()
+            # Remove those that had no hits or were discarded #
+            df2 = df2.loc[df1.columns]
             # Multiply them #
             df = df1.dot(df2)
             # Write #
