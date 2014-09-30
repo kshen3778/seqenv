@@ -4,6 +4,7 @@ Generate the output(s)
 
 Add an output that contains the number of terms per OTU
 (Warning that some sequences had 0s, and remove them from the matrix)
+Uniquify the isolation sources ?
 
 Integrate VSEARCH in the sequence similarity search
 Add a clean function that wipes all the files
@@ -13,4 +14,3 @@ Add in the install procedure that swig needs to be installed (or just distribute
 Generate dot files
 Extract information only for a subset of envo terms (such as biome feature)
 Add the abstract processing
-Uniquify the isolation sources ?
