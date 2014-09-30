@@ -13,3 +13,7 @@ from seqenv.eutils import gis_to_records,record_to_source; recs = r = gis_to_rec
 
 print set(via_db) == set(via_eutils)
 all([via_db.get(k) == via_eutils.get(k) for k in via_db])
+
+from seqenv import data_dir
+import cPickle as pickle
+with open(data_dir + 'gi_to_source.pickle', 'w') as handle: pickle.dump(a.gi_to_text, handle)
