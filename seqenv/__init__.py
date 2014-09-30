@@ -216,8 +216,6 @@ class Analysis(object):
     def gi_to_text(self):
         """A dictionary linking every gi identifier in NCBI to its isolation sourcet
         test, provided it has one."""
-        possible = FilePath(data_dir + 'gi_to_source.pickle')
-        if possible.exists: return pickle.load(open(possible))
         print "STEP 5: Loading all NCBI isolation sources in RAM"
         result = {}
         with gzip.open(data_dir + 'gi_to_source.tsv.gz') as handle:
