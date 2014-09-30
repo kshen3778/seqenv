@@ -4,7 +4,7 @@ import subprocess
 # Internal modules #
 from seqenv.seqsearch import SeqSearch
 from seqenv.seqsearch.blast import BLASTquery
-from seqenv.seqsearch.usearch import USEARCHquery
+from seqenv.seqsearch.usearch import VSEARCHquery
 from seqenv.common.cache import property_cached
 from seqenv.fasta.splitable import SplitableFASTA
 
@@ -28,7 +28,7 @@ class ParallelSeqSearch(SeqSearch):
     def queries(self):
         """A list of all the queries to run."""
         if self.algorithm == 'blast': return self.blast_queries
-        if self.algorithm == 'usearch': return self.usearch_queries
+        if self.algorithm == 'usearch': return self.vsearch_queries
         raise NotImplemented(self.algorithm)
 
     @property_cached
@@ -44,12 +44,12 @@ class ParallelSeqSearch(SeqSearch):
         return [BLASTquery(p, self.database, params, blast_algo, version="plus") for p in self.splitable.parts]
 
     @property_cached
-    def usearch_queries(self):
-        """Make all USEARCH search objects."""
+    def vsearch_queries(self):
+        """Make all VSEARCH search objects."""
         # The params should depend on the filtering options #
         params = {}
         # Make many queries #
-        return [USEARCHquery(p, self.database, params) for p in self.splitable.parts]
+        return [VSEARCHquery(p, self.database, params) for p in self.splitable.parts]
 
     def run(self):
         """Run the search"""

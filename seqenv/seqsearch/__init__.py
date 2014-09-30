@@ -3,7 +3,7 @@ import multiprocessing
 
 # Internal modules #
 from seqenv.seqsearch.blast import BLASTquery
-from seqenv.seqsearch.usearch import USEARCHquery
+from seqenv.seqsearch.usearch import VSEARCHquery
 from seqenv.common.cache import property_cached
 from seqenv.common.autopaths import FilePath
 
@@ -50,7 +50,7 @@ class SeqSearch(object):
     def query(self):
         """The similarity search object with all the relevant parameters."""
         if self.algorithm == 'blast': return self.blast_query
-        if self.algorithm == 'usearch': return self.usearch_query
+        if self.algorithm == 'usearch': return self.vsearch_query
         raise NotImplemented(self.algorithm)
 
     @property_cached
@@ -84,10 +84,10 @@ class SeqSearch(object):
         return query
 
     @property_cached
-    def usearch_query(self):
+    def vsearch_query(self):
         """Make a USEARCH search object."""
         params = {}
-        query = USEARCHquery(self.input_fasta, self.database, params)
+        query = VSEARCHquery(self.input_fasta, self.database, params)
         return query
 
     def run(self):

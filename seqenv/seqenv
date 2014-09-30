@@ -13,12 +13,14 @@ current_dir = os.path.dirname(os.path.abspath(current_script)) + '/'
 readme_path = current_dir + '../README.md'
 if os.path.exists(readme_path): readme_contents = open(readme_path, 'r').read()
 else: readme_contents = ""
-desc = re.findall('^### All parameters(.+?)###', readme_contents, flags=re.M|re.DOTALL)[0]
 
-# Add the version number #
-desc = "seqenv version %s\n\n" % (seqenv.__version__) + desc
+# Get the different paragraphs #
+doc_params = re.findall('^### All parameters(.+?)###', readme_contents, flags=re.M|re.DOTALL)[0]
+doc_usage = re.findall('^### Usage (.+?)###', readme_contents, flags=re.M|re.DOTALL)[0]
+doc_version = "seqenv version %s" % (seqenv.__version__)
 
 # Make a shell arguments parser #
+desc = doc_version + "\n\n" + doc_usage + "\n\n" + doc_params
 parser = argparse.ArgumentParser(description=desc, formatter_class=RawTextHelpFormatter)
 
 # All the required arguments #
@@ -41,16 +43,14 @@ parameters = {
     "N"             : "Use only the top `N` sequences in terms of their abundance. Defaults to 1000.",
 }
 
-# Add them to the parser #
-for param, help in parameters.items(): parser.add_argument("--" + param, help=help)
-
 # Parse it #
+for param, help in parameters.items(): parser.add_argument("--" + param, help=help)
 args = parser.parse_args()
 input_path = args.input_file
-kwargs = {k:getattr(args,k) for k in parameters if getattr(args,k) is not None}
+kwargs = {k:getattr(args, k) for k in parameters if getattr(args, k) is not None}
 
 # Start message #
-print "seqenv version %s (pid %i)" % (seqenv.__version__, os.getpid())
+print doc_version + "(pid %i)" % os.getpid()
 
 # Run the pipeline #
 analysis = seqenv.Analysis(input_path, **kwargs)
@@ -58,6 +58,6 @@ analysis.timer.print_start()
 analysis.outputs.make_all()
 
 # End message #
-print "------------\nSuccess. Ouputs are in '%s'" % analysis.out_dir
+print "------------\nSuccess. Outputs are in '%s'" % analysis.out_dir
 analysis.timer.print_end()
 analysis.timer.print_total_elapsed()

@@ -1,16 +1,15 @@
 Add the abundance file processing
-Test with a large data set
 Generate the output(s)
 
 Add an output that contains the number of terms per OTU
 (Warning that some sequences had 0s, and remove them from the matrix)
 Uniquify the isolation sources ?
 
-Integrate VSEARCH in the sequence similarity search
-Add a clean function that wipes all the files
 Have the setup.py compile the tagger
 Have the setup.py copy the data directory somewhere
 Add in the install procedure that swig needs to be installed (or just distribute)
-Generate dot files
-Extract information only for a subset of envo terms (such as biome feature)
-Add the abstract processing
+
+Integrate VSEARCH in the sequence similarity search
+Test with a large data set
+Add a clean function that wipes all the files
+Extract information only for a subset of envo terms (such as biome feature) (masking)

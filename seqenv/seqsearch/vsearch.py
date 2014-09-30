@@ -11,8 +11,8 @@ from seqenv.fasta import FASTA
 import sh
 
 ###############################################################################
-class USEARCHquery(object):
-    """A usearch job."""
+class VSEARCHquery(object):
+    """A vsearch job."""
 
 
     def __init__(self, query_path, db_path,
@@ -25,8 +25,8 @@ class USEARCHquery(object):
         self.params = params if params else {}
         self.executable = FilePath(executable)
         # Output #
-        if out_path is None: self.out_path = self.query.prefix_path + '.usearchout'
-        elif out_path.endswith('/'): self.out_path = out_path + self.query.prefix + '.usearchout'
+        if out_path is None: self.out_path = self.query.prefix_path + '.vsearchout'
+        elif out_path.endswith('/'): self.out_path = out_path + self.query.prefix + '.vsearchout'
         else: self.out_path = out_path
         self.out_path = FilePath(self.out_path)
 
