@@ -13,3 +13,5 @@ Integrate VSEARCH in the sequence similarity search
 Test with a large data set
 Add a clean function that wipes all the files
 Extract information only for a subset of envo terms (such as biome feature) (masking)
+
+Delete rewrite branch

@@ -3,7 +3,7 @@ import multiprocessing
 
 # Internal modules #
 from seqenv.seqsearch.blast import BLASTquery
-from seqenv.seqsearch.usearch import VSEARCHquery
+from seqenv.seqsearch.vsearch import VSEARCHquery
 from seqenv.common.cache import property_cached
 from seqenv.common.autopaths import FilePath
 
