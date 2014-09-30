@@ -58,7 +58,7 @@ class OutputGenerator(object):
         with open(self.out_dir + 'samples_to_names.csv', 'w') as handle:
             # Get both matrices #
             df1 = self.df_seqs_concepts.rename(index=self.analysis.concept_to_name).transpose()
-            df2 = self.abundance_df.transpose()
+            df2 = self.analysis.df_abundances.transpose()
             # Multiply them #
             df = df1.dot(df2)
             # Write #
