@@ -218,7 +218,7 @@ class Analysis(object):
         if not gi_to_text.exists:
             result = {}
             unique_gis = set(gi for gis in self.seq_to_gis.values() for gi in gis)
-            print "STEP 5: Download data from NCBI"
+            print "STEP 5: Download data from NCBI for %i entries" % len(unique_gis)
             all_records = gis_to_records(unique_gis)
             if self.text_source == 'source': fn = record_to_source
             if self.text_source == 'abstract': fn = record_to_abstract

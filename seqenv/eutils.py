@@ -10,12 +10,13 @@ from tqdm import tqdm
 Entrez.email = "I don't know who will be running this script"
 
 ################################################################################
-def gis_to_records(gis, progress=True):
+def gis_to_records(gis, progress=False):
+    """Download information from NCBI in batch mode"""
     # Should we display progress ? #
     progress = tqdm if progress else lambda x:x
     # Do it by chunks #
     gis = list(gis)
-    at_a_time = 1000
+    at_a_time = 40
     result = {}
     # Main loop #
     for i in progress(range(0, len(gis), at_a_time)):
@@ -27,12 +28,19 @@ def gis_to_records(gis, progress=True):
 
 ################################################################################
 def chunk_to_records(chunk):
+    """Download from NCBI until it works. Will restart until reaching the python
+    recursion limit. We don't want to get banned from NCBI so we have a little
+    pause at every function call."""
+    time.sleep(0.5)
+    print chunk
     try:
-        response = Entrez.efetch(db="nucleotide", id=chunk, rettype="gb", retmode="xml")
-        records = Entrez.parse(response, validate=True)
+        print "-"
+        response = Entrez.efetch(db="nucleotide", id=chunk, retmode="xml")
+        print "="
+        records = list(Entrez.parse(response, validate=True))
         return records
     except CorruptedXMLError:
-        time.sleep(0.3)
+        print "*"
         return chunk_to_records(chunk)
 
 ################################################################################

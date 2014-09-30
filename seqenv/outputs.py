@@ -78,3 +78,7 @@ class OutputGenerator(object):
         - ENVO:00001 : ocean
         """
         pass
+
+    def output_4(self):
+        """Biom format"""
+        pass
