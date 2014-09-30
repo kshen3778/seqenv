@@ -27,7 +27,6 @@ If you have abundance data you would like to add to your analysis you can specif
    * `--seq_type`: Sequence type `nucl` or `prot` for nucleotides or amino acids, respectively (Default: `nucl`).
    * `--search_algo`: Search algorithm. Either `blast` or `usearch` (Default: `blast`).
    * `--search_db`: The database to search against (Default: `nt`). You can specify the full path or provide a `.ncbirc` file.
-   * `--text_source`: Text source: `source` for GenBank record "isolation source" field or `abstractt` for PubMed abstracts (Default: `source`).
    * `--backtracking`: For every term identified by the tagger, we will propagate frequency counts up the acyclic directed graph described by the ontology. Defaults to `False`.
    * `--normalization`: Should we divide the counts of every input sequence by the number of text entries that were associated to it. Defaults to `True`.
    * `--num_threads`: Number of cores to use (Defaults to the total number of cores). Use 1 for non-parallel processing.

@@ -29,7 +29,6 @@ parameters = {
     "seq_type"      : "Either `nucl` or `prot`. Defaults to `nucl`.",
     "search_algo"   : "Either 'blast' or 'usearch'. Defaults to `blast`.",
     "search_db"     : "The path to the database to search against. Defaults to `nt`.",
-    "text_source"   : "Either `source` for isolation source or `abstract` for the pubmed abstracts. Defaults to `source`.",
     "backtracking"  : "For every term identified by the tagger, we will propagate frequency counts up the acyclic directed graph described by the ontology. Defaults to `False`.",
     "normalization" : "Should we divide the counts of every input sequence by the number of text entries that were associated to it. Defaults to `True`.",
     "num_threads"   : "Number of threads to use. Default to the number of cores on the current machine.",

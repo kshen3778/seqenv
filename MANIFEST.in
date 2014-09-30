@@ -1,1 +1,7 @@
 include README.md
+include seqenv/data/envo_entities.tsv
+include seqenv/data/envo_global.tsv
+include seqenv/data/envo_groups.tsv
+include seqenv/data/envo_names.tsv
+include seqenv/data/envo_preferred.tsv
+include seqenv/data/envo.obo

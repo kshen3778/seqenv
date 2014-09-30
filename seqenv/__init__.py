@@ -7,7 +7,7 @@ from __future__ import division
 __version__ = '0.9.0'
 
 # Built-in modules #
-import os, inspect, multiprocessing, shutil
+import os, inspect, multiprocessing, shutil, gzip
 from collections import defaultdict
 import cPickle as pickle
 
@@ -15,7 +15,6 @@ import cPickle as pickle
 from seqenv.fasta import FASTA
 from seqenv.outputs import OutputGenerator
 from seqenv.seqsearch.parallel import ParallelSeqSearch
-from seqenv.eutils import record_to_source, record_to_abstract, gis_to_records
 from seqenv.common.cache import property_cached
 from seqenv.common.timer import Timer
 from seqenv.common.autopaths import FilePath
@@ -25,12 +24,16 @@ import tagger
 
 # Third party modules #
 import pandas
+from tqdm import tqdm
 
 # Constants #
+total_gis_with_source = 13658791
+
+# Find the data dir #
 current_script = inspect.getframeinfo(inspect.currentframe()).filename
 current_dir = os.path.dirname(os.path.abspath(current_script)) + '/'
-possible = current_dir + '../data/envo_preferred.tsv'
-if os.path.exists(possible): data_dir = current_dir + '../data/'
+possible = current_dir + 'data/envo_preferred.tsv'
+if os.path.exists(possible): data_dir = current_dir + 'data/'
 else: possible = '' #TODO
 
 ################################################################################
@@ -44,9 +47,6 @@ class Analysis(object):
     * `search_algo`: Either 'blast' or 'usearch'. Defaults to `blast`.
 
     * `search_db`: The path to the database to search against. Defaults to `nt`.
-
-    * `text_source`: Either `source` for isolation source terms or `abstract` for parsing
-                     the publication abstracts. Defaults to `source`.
 
     * `backtracking`: For every term identified by the tagger, we will propagate frequency counts
                       up the acyclic directed graph described by the ontology. Defaults to `False`.
@@ -75,7 +75,6 @@ class Analysis(object):
                  seq_type      = 'nucl',
                  search_algo   = 'blast',
                  search_db     = 'nt',
-                 text_source   = 'source',
                  backtracking  = False,
                  normalization = True,
                  num_threads   = None,
@@ -95,7 +94,6 @@ class Analysis(object):
         # Other parameters #
         self.N = N
         self.seq_type = seq_type
-        self.text_source = text_source
         self.backtracking = backtracking
         self.normalization = normalization
         # Search parameters #
@@ -210,24 +208,16 @@ class Analysis(object):
 
     @property_cached
     def gi_to_text(self):
-        """A dictionary linking every gi identifier to some unspecified text blob.
-        Typically the text is its isolation source or a list of abstracts coming
-        from the NCBI online service."""
-        gi_to_text = FilePath(self.out_dir + 'gi_to_text.pickle')
-        # Check that it was run #
-        if not gi_to_text.exists:
-            result = {}
-            unique_gis = set(gi for gis in self.seq_to_gis.values() for gi in gis)
-            print "STEP 5: Download data from NCBI for %i entries" % len(unique_gis)
-            all_records = gis_to_records(unique_gis)
-            if self.text_source == 'source': fn = record_to_source
-            if self.text_source == 'abstract': fn = record_to_abstract
-            for gi, record in all_records.items(): result[gi] = fn(record) # Possibly None
-            with open(gi_to_text, 'w') as handle: pickle.dump(result, handle)
-            self.timer.print_elapsed()
-            return result
-        # Parse the results #
-        with open(gi_to_text, 'r') as handle: return pickle.load(handle)
+        """A dictionary linking every gi identifier in NCBI to its isolation sourcet
+        test, provided it has one."""
+        print "STEP 5: Loading NCBI isolation sources"
+        result = {}
+        with gzip.open(data_dir + 'gi_to_source.tsv.gz') as handle:
+            for i in tqdm(xrange(total_gis_with_source), total=total_gis_with_source):
+                gi, source = handle.next().strip('\n').split('\t')
+                result[gi] = source
+        self.timer.print_elapsed()
+        return result
 
     @property_cached
     def gi_to_matches(self):
@@ -241,7 +231,9 @@ class Analysis(object):
         gi_to_matches = FilePath(self.out_dir + 'gi_to_matches.pickle')
         # Check that it was run #
         if not gi_to_matches.exists:
-            print "-> Using %i text blobs" % len(self.gi_to_text)
+            unique_gis = set(gi for gis in self.seq_to_gis.values() for gi in gis)
+            print "-> Got %i GIs from search results" % len(unique_gis)
+            print "-> Got %i GIs with isolation source" % len(self.gi_to_text)
             print "STEP 6: Run the text mining tagger on all blobs."
             # Create the tagger #
             t = tagger.Tagger()
@@ -251,7 +243,8 @@ class Analysis(object):
             t.LoadGlobal(data_dir + 'envo_global.tsv')
             # Tag all the text #
             result = {}
-            for gi, text in self.gi_to_text.items():
+            for gi in unique_gis:
+                text = self.gi_to_text.get(gi)
                 if text is None:
                     result[gi] = []
                     continue
@@ -275,11 +268,11 @@ class Analysis(object):
             print "STEP 7: Parsing the tagger results and counting terms."
             result = {}
             for gi, matches in self.gi_to_matches.items():
-                counts = defaultdict(int)
                 if not matches: continue
+                counts = defaultdict(int)
                 for start_pos, end_pos, concepts in matches:
                     ids = [concept_id for concept_type, concept_id in concepts]
-                    score = 1 / len(ids)
+                    score = 1 / len(ids) # Every gi adds up to one unless we have backtracking
                     if self.backtracking: ids.append([p for c in ids for p in self.child_to_parents[c]])
                     for concept_id in ids: counts[concept_id] += score
                 result[gi] = dict(counts)
