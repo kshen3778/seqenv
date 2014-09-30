@@ -27,7 +27,7 @@ import pandas
 from tqdm import tqdm
 
 # Constants #
-total_gis_with_source = int(3e6)#13658791
+total_gis_with_source = 13658791
 
 # Find the data dir #
 current_script = inspect.getframeinfo(inspect.currentframe()).filename
@@ -216,11 +216,13 @@ class Analysis(object):
     def gi_to_text(self):
         """A dictionary linking every gi identifier in NCBI to its isolation sourcet
         test, provided it has one."""
-        print "STEP 5: Loading NCBI isolation sources"
+        possible = FilePath(data_dir + 'gi_to_source.pickle')
+        if possible.exists: return pickle.load(open(possible))
+        print "STEP 5: Loading all NCBI isolation sources in RAM"
         result = {}
         with gzip.open(data_dir + 'gi_to_source.tsv.gz') as handle:
             for i in tqdm(xrange(total_gis_with_source), total=total_gis_with_source):
-                gi, source = handle.next().strip('\n').split('\t')
+                gi, source = handle.next().lstrip('GI:').rstrip('\n').split('\t')
                 result[gi] = source
         self.timer.print_elapsed()
         return result
