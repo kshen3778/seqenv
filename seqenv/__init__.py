@@ -51,7 +51,7 @@ class Analysis(object):
     * `backtracking`: For every term identified by the tagger, we will propagate frequency counts
                       up the acyclic directed graph described by the ontology. Defaults to `False`.
 
-    * `normalization`: Should we TODO. Defaults to `True`.
+    * `normalization`: Should we divide the counts of every input sequence by the number of text entries that were associated to it. Defaults to `True`.
 
     * `num_threads`: The number of threads. Default to the number of cores on the
                      current machine.
@@ -290,7 +290,8 @@ class Analysis(object):
 
     @property_cached
     def seq_to_counts(self):
-        """A dictionary linking every input sequence to its summed normalized concept counts."""
+        """A dictionary linking every input sequence to its summed normalized concept counts dict,
+        provided the input sequence had some hits, and a hit had a match, otherwise it is empty."""
         result = {}
         for seq, gis in self.seq_to_gis.items():
             counts = defaultdict(int)
