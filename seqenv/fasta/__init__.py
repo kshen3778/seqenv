@@ -70,6 +70,11 @@ class FASTA(FilePath):
         SeqIO.write(reads, self.handle, self.format)
         self.close()
 
+    @property_cached
+    def ids(self):
+        """All the sequences ids in a set"""
+        return frozenset([seq.id for seq in self])
+
     def rename_sequences(self, new_fasta, mapping):
         """Given a new file path, will rename all sequences in the
         current fasta file using the mapping dictionary also provided."""
@@ -79,4 +84,13 @@ class FASTA(FilePath):
             new_name = mapping[seq.id]
             nucleotides = str(seq.seq)
             new_fasta.add_str(nucleotides, new_name)
+        new_fasta.close()
+
+    def extract_sequences(self, new_fasta, ids):
+        """Will take all the sequences from the current file who's id appears in
+        the ids given and place them in the new file path given."""
+        assert isinstance(new_fasta, FASTA)
+        new_fasta.create()
+        for seq in self:
+            if seq.id in ids: new_fasta.add_seq(seq)
         new_fasta.close()

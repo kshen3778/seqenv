@@ -27,7 +27,7 @@ import pandas
 from tqdm import tqdm
 
 # Constants #
-total_gis_with_source = 13658791
+total_gis_with_source = int(3e6)#13658791
 
 # Find the data dir #
 current_script = inspect.getframeinfo(inspect.currentframe()).filename
@@ -144,8 +144,10 @@ class Analysis(object):
         if only_top_fasta.exists: return only_top_fasta
         print "-> Using: " + self.renamed_fasta
         print "STEP 1B: Get the top %i sequences (in terms of their abundances)." % self.N
+        ids = self.df_abundances.sum(axis=1).sort(inplace=False, ascending=False).index[0:self.N]
+        ids = set([self.orig_names_to_renamed[x] for x in ids])
+        self.renamed_fasta.extract_sequences(only_top_fasta, ids)
         self.timer.print_elapsed()
-        #TODO
         return only_top_fasta
 
     @property_cached
@@ -182,6 +184,8 @@ class Analysis(object):
             print "STEP 3: Filter out bad hits from the search results"
             self.search.filter()
             self.timer.print_elapsed()
+            if self.search.out_path.count_bytes == 0:
+                raise Exception("Found exactly zero hits after the similarity search.")
         # Parse the results #
         return self.search.results
 
@@ -200,6 +204,8 @@ class Analysis(object):
                 seq_name = hit[0]
                 gi = hit[1].split('|')[1]
                 result[seq_name].append(gi)
+            if not set(result).issubset(self.only_top_sequences.ids):
+                raise Exception("Found sequences in the search result that were not in the input fasta.")
             with open(seq_to_gis, 'w') as handle: pickle.dump(result, handle)
             self.timer.print_elapsed()
             return result
