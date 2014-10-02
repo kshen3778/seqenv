@@ -17,7 +17,7 @@ abund = samples_dir + "abundances.tsv"
 out_dir = samples_dir + 'output/'
 
 ################################################################################
-analysis = Analysis(fasta, out_dir=out_dir, abundances=abund)
+analysis = Analysis(fasta, out_dir=out_dir, abundances=abund, N=10)
 
 df1 = analysis.outputs.df_seqs_concepts.rename(analysis.concept_to_name)
 df2 = analysis.df_abundances

@@ -92,7 +92,7 @@ class Analysis(object):
         self.abundances = FilePath(abundances)
         if self.abundances: self.abundances.must_exist()
         # Other parameters #
-        self.N = N
+        self.N = int(N)
         self.seq_type = seq_type
         self.backtracking = backtracking
         self.normalization = normalization
@@ -100,7 +100,7 @@ class Analysis(object):
         self.search_algo = search_algo
         self.search_db = search_db
         # Number of cores to use #
-        if num_threads is None: self.num_threads = multiprocessing.cpu_count()
+        if num_threads is None: self.num_threads = min(multiprocessing.cpu_count(), 32)
         else: self.num_threads = int(num_threads)
         self.num_threads = min(self.num_threads, self.input_file.count)
         # Hit filtering parameters #
@@ -130,7 +130,7 @@ class Analysis(object):
         with "C1", "C2", "C3" etc. Returns this new FASTA file."""
         renamed_fasta = FASTA(self.out_dir + 'renamed.fasta')
         if renamed_fasta.exists: return renamed_fasta
-        print "STEP 1: Parse the input FASTA file."
+        print "--> STEP 1: Parse the input FASTA file."
         self.input_file.rename_sequences(renamed_fasta, self.orig_names_to_renamed)
         self.timer.print_elapsed()
         return renamed_fasta
@@ -142,8 +142,8 @@ class Analysis(object):
         if not self.abundances: return self.renamed_fasta
         only_top_fasta = FASTA(self.out_dir + 'top_seqs.fasta')
         if only_top_fasta.exists: return only_top_fasta
-        print "-> Using: " + self.renamed_fasta
-        print "STEP 1B: Get the top %i sequences (in terms of their abundances)." % self.N
+        print "Using: " + self.renamed_fasta
+        print "--> STEP 1B: Get the top %i sequences (in terms of their abundances)." % self.N
         ids = self.df_abundances.sum(axis=1).sort(inplace=False, ascending=False).index[0:self.N]
         ids = set([self.orig_names_to_renamed[x] for x in ids])
         self.renamed_fasta.extract_sequences(only_top_fasta, ids)
@@ -177,11 +177,11 @@ class Analysis(object):
         after filtering."""
         # Check that the search was run #
         if not self.search.out_path.exists:
-            print "-> Using: " + self.only_top_sequences
-            print "STEP 2: Similarity search against the '%s' database with %i processes" % (self.search_db, self.num_threads)
+            print "Using: " + self.only_top_sequences
+            print "--> STEP 2: Similarity search against the '%s' database with %i processes" % (self.search_db, self.num_threads)
             self.search.run()
             self.timer.print_elapsed()
-            print "STEP 3: Filter out bad hits from the search results"
+            print "--> STEP 3: Filter out bad hits from the search results"
             self.search.filter()
             self.timer.print_elapsed()
             if self.search.out_path.count_bytes == 0:
@@ -193,19 +193,18 @@ class Analysis(object):
     @property_cached
     def seq_to_gis(self):
         """A dictionary linking every input sequence to a list of gi identifiers found
-        that are relating to it."""
+        that are relating to it. You will get a KeyError if it finds sequences in the search
+        result that were not in the input fasta."""
         seq_to_gis = FilePath(self.out_dir + 'seq_to_gis.pickle')
         # Check that is was run #
         if not seq_to_gis.exists:
             self.search_results
-            print "STEP 4: Parsing the search results"
-            result = defaultdict(list)
+            print "--> STEP 4: Parsing the search results"
+            result = {seq:[] for seq in self.only_top_sequences.ids}
             for hit in self.search_results:
                 seq_name = hit[0]
                 gi = hit[1].split('|')[1]
                 result[seq_name].append(gi)
-            if not set(result).issubset(self.only_top_sequences.ids):
-                raise Exception("Found sequences in the search result that were not in the input fasta.")
             with open(seq_to_gis, 'w') as handle: pickle.dump(result, handle)
             self.timer.print_elapsed()
             return result
@@ -216,7 +215,7 @@ class Analysis(object):
     def gi_to_text(self):
         """A dictionary linking every gi identifier in NCBI to its isolation sourcet
         test, provided it has one."""
-        print "STEP 5: Loading all NCBI isolation sources in RAM"
+        print "--> STEP 5: Loading all NCBI isolation sources in RAM"
         result = {}
         with gzip.open(data_dir + 'gi_to_source.tsv.gz') as handle:
             for i in tqdm(xrange(total_gis_with_source), total=total_gis_with_source):
@@ -238,9 +237,9 @@ class Analysis(object):
         # Check that it was run #
         if not gi_to_matches.exists:
             unique_gis = set(gi for gis in self.seq_to_gis.values() for gi in gis)
-            print "-> Got %i GIs from search results" % len(unique_gis)
-            print "-> Got %i GIs with isolation source" % len(self.gi_to_text)
-            print "STEP 6: Run the text mining tagger on all blobs."
+            print "Got %i GIs from search results" % len(unique_gis)
+            print "Got %i GIs with isolation source" % len(self.gi_to_text)
+            print "--> STEP 6: Run the text mining tagger on all blobs."
             # Create the tagger #
             t = tagger.Tagger()
             # Load the dictionary #
@@ -270,8 +269,8 @@ class Analysis(object):
         gi_to_counts = FilePath(self.out_dir + 'gi_to_counts.pickle')
         # Check that it was run #
         if not gi_to_counts.exists:
-            print "-> Using matches from %i gi entries" % len(self.gi_to_matches)
-            print "STEP 7: Parsing the tagger results and counting terms."
+            print "Using matches from %i gi entries" % len(self.gi_to_matches)
+            print "--> STEP 7: Parsing the tagger results and counting terms."
             result = {}
             for gi, matches in self.gi_to_matches.items():
                 if not matches: continue

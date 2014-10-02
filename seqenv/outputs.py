@@ -56,10 +56,10 @@ class OutputGenerator(object):
     def csv_samples_to_names(self, sep='\t'):
         """A CSV file"""
         with open(self.out_dir + 'samples_to_names.csv', 'w') as handle:
-            # Get both matrices #
-            df1 = self.df_seqs_concepts.rename(index=self.analysis.concept_to_name).transpose()
-            df2 = self.analysis.df_abundances.transpose()
-            # Remove those that had no hits or were discarded #
+            # Get results #
+            df1 = self.df_seqs_concepts.rename(index=self.analysis.concept_to_name)
+            # Remove those that were discarded #
+            df2 = self.analysis.df_abundances
             df2 = df2.loc[df1.columns]
             # Multiply them #
             df = df1.dot(df2)
