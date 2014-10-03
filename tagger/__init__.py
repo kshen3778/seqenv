@@ -1,3 +1,4 @@
+# Modules #
 import os
 import re
 import datetime
@@ -9,6 +10,7 @@ import tagger_swig
 
 ################################################################################
 class Tagger(object):
+	"""No documentation was written"""
 
 	def __init__(self, java_script=None):
 		self.re_head_begin = re.compile("<head[^>]*>", re.I)
@@ -16,8 +18,7 @@ class Tagger(object):
 		self.re_base_href  = re.compile("<base href=.+?>", re.I)
 		self.re_html_end   = re.compile("(</body>)?[ \t\r\n]*(</html>)?", re.I)
 		self.script        = java_script
-		if self.script:
-			self.script = self.script.strip()
+		if self.script: self.script = self.script.strip()
 		self.styles  = {}
 		self.types = {}
 		self.blocked_documents = {}
@@ -192,7 +193,6 @@ class Tagger(object):
 			doc.append('</items>')
 			doc.append('</GetEntitiesResponse>')
 			doc = ''.join(doc)
-
 		else:
 			uniq = {}
 			for match in matches:

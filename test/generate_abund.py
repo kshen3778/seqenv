@@ -11,7 +11,7 @@ from seqenv.fasta import FASTA
 # Constants #
 current_script = inspect.getframeinfo(inspect.currentframe()).filename
 current_dir = os.path.dirname(os.path.abspath(current_script)) + '/'
-fasta = FASTA(current_dir + "community.fasta")
+fasta = FASTA(current_dir + "../examples/samples/community.fasta")
 
 ################################################################################
 def data():
