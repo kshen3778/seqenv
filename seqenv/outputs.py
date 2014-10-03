@@ -1,10 +1,12 @@
 # Built-in modules #
 
 # Internal modules #
+import seqenv
+from seqenv.common import flatter
 from seqenv.common.cache import property_cached
 
 # Third party modules #
-import pandas
+import pandas, biom
 
 ################################################################################
 class OutputGenerator(object):
@@ -23,80 +25,99 @@ class OutputGenerator(object):
     def make_all(self):
         """Let's generate all the files"""
         # General matrices #
-        self.csv_seq_to_concepts()
-        self.csv_seq_to_names()
+        self.tsv_seq_to_concepts()
+        self.tsv_seq_to_names()
+        self.list_sequence_concept()
         # Only in the samples case #
-        if self.analysis.abundances: self.csv_samples_to_names()
+        if self.analysis.abundances: self.tsv_samples_to_names()
+        if self.analysis.abundances: self.biom_output()
 
     @property_cached
     def df_seqs_concepts(self):
-        """A normalized matrix with sequences as columns and concepts as rows."""
+        """A normalized dataframe with sequences as columns and concepts (envo terms) as rows."""
         # Get the data #
         df = pandas.DataFrame(self.analysis.seq_to_counts)
         df = df.fillna(0)
         # Rename to original names #
-        renamed_to_orig = dict((v,k) for k,v in self.analysis.orig_names_to_renamed.iteritems())
-        df = df.rename(columns=renamed_to_orig)
+        df = df.rename(columns=self.analysis.renamed_to_orig)
         # Return
         return df
 
-    def csv_seq_to_concepts(self):
-        """A CSV file"""
-        with open(self.out_dir + 'seq_to_concepts.csv', 'w') as handle:
+    def tsv_seq_to_concepts(self):
+        """A TSV matrix file containing the df_seqs_concepts matrix"""
+        with open(self.out_dir + 'seq_to_concepts.tsv', 'w') as handle:
             content = self.df_seqs_concepts.to_csv(None, sep=self.sep, float_format=self.float_format)
             handle.writelines(content)
 
-    def csv_seq_to_names(self, sep='\t'):
-        """A CSV file"""
-        with open(self.out_dir + 'seq_to_names.csv', 'w') as handle:
+    def tsv_seq_to_names(self, sep='\t'):
+        """A TSV matrix file where we translate the concept to human readable names"""
+        with open(self.out_dir + 'seq_to_names.tsv', 'w') as handle:
             df = self.df_seqs_concepts.rename(index=self.analysis.concept_to_name)
             content = df.to_csv(None, sep=self.sep, float_format=self.float_format)
             handle.writelines(content)
 
-    def csv_samples_to_names(self, sep='\t'):
-        """A CSV file"""
-        with open(self.out_dir + 'samples_to_names.csv', 'w') as handle:
-            # Get results #
-            df1 = self.df_seqs_concepts.rename(index=self.analysis.concept_to_name)
-            # Remove those that were discarded #
-            df2 = self.analysis.df_abundances
-            df2 = df2.loc[df1.columns]
-            # Multiply them #
-            df = df1.dot(df2)
-            # Write #
-            content = df.to_csv(sep=self.sep, float_format=self.float_format)
+    @property_cached
+    def df_sample_names(self):
+        """A dataframe where we operate a matrix multiplication with the abundances file
+        provided to link samples to concept human readable names"""
+        # Get results #
+        df1 = self.df_seqs_concepts.rename(index=self.analysis.concept_to_name)
+        # Remove those that were discarded #
+        df2 = self.analysis.df_abundances
+        df2 = df2.loc[df1.columns]
+        # Multiply them #
+        df = df1.dot(df2)
+        # Return
+        return df
+
+    def tsv_samples_to_names(self, sep='\t'):
+        """A TSV matrix file where operate a matrix multiplication with the abundances file
+        provided to link samples to concept human readable names"""
+        with open(self.out_dir + 'samples_to_names.tsv', 'w') as handle:
+            content = self.df_sample_names.to_csv(sep=self.sep, float_format=self.float_format)
             handle.writelines(content)
 
-    def output_1(self):
-        """The counts per sequence, one concept per line:
-        - OTU1, ENVO:00001, 4, GIs : [56, 123, 345]
-        - OTU1, ENVO:00002, 7, GIs : [22, 44]
-          or
-        - OTU1, ocean, 4, GIs : [56, 123, 345]
+    def list_sequence_concept(self):
+        """A flat TSV file listing every concept found for every sequence.
+        It has one concept per line and looks something like this:
+        - OTU1, ENVO:00001, ocean, 4, GIs : [56, 123, 345]
+        - OTU1, ENVO:00002, soil, 7, GIs : [22, 44]
         """
-        for seq, counts in self.seq_to_counts.items():
-            '\t'.join(seq)
+        with open(self.out_dir + 'list_concepts_found.tsv', 'w') as handle:
+            for seq, gis in self.analysis.seq_to_gis.items():
+                gis = [gi for gi in gis if self.analysis.gi_to_matches[gi]]
+                concepts = set(flatter(self.analysis.gi_to_counts[gi].keys() for gi in gis))
+                for concept in concepts:
+                    seq_name = self.analysis.renamed_to_orig[seq]
+                    concept_name = self.analysis.concept_to_name.get(concept, concept)
+                    concept_gis = [gi for gi in gis if concept in self.analysis.gi_to_counts[gi]]
+                    count_gis = len(concept_gis)
+                    line = (seq_name, concept, concept_name, str(count_gis), str(concept_gis))
+                    handle.write('\t'.join(line) + '\n')
 
-    def output_2(self):
-        """Possible wanted output 2:
-        - GI56 : oceanic soil
-          or
-        - GI56 : PubMed6788
-        """
-        pass
+    def biom_output(self):
+        """The same matrix as the user gave in the abundance file, but with source
+        information attached for every sequence.
+        See http://biom-format.org"""
+        data = self.analysis.df_abundances
+        with open(self.out_dir + 'samples.biom', 'w') as handle:
+            # Basic #
+            sample_ids = data.columns
+            sample_md = None
+            observation_ids = data.index
+            # Observation metadata #
+            observation_md = []
+            for seq in data.index:
+                seq_name = self.analysis.orig_names_to_renamed[seq]
+                counts = self.analysis.seq_to_counts.get(seq_name)
+                if not counts: observation_md.append({})
+                else: observation_md.append({'source': counts})
+            # Output #
+            t = biom.table.Table(data.transpose().as_matrix(), sample_ids, observation_ids, sample_md, observation_md)
+            handle.write(t.to_json('seqenv version %s') % seqenv.__version__)
 
     def output_3(self):
-        """ Possible output 3:
-        - ENVO:00001 : ocean
-        """
-        pass
-
-    def output_4(self):
-        """Biom format"""
-        pass
-
-    def output_5(self):
-        """the number of terms per OTU
+        """Possible output #3: the number of terms per OTU
         OTU1: 0
         OTU2: 2
         OTU3: 1"""

@@ -123,6 +123,8 @@ class Analysis(object):
         """A dictionary linking every sequence's name in the input FASTA to a
         new name following the scheme "C1", "C2", "C3" etc."""
         return {seq.id:"C%i"%i for i, seq in enumerate(self.input_file)}
+    @property_cached
+    def renamed_to_orig(self): return dict((v,k) for k,v in self.orig_names_to_renamed.items())
 
     @property
     def renamed_fasta(self):
@@ -193,8 +195,8 @@ class Analysis(object):
     @property_cached
     def seq_to_gis(self):
         """A dictionary linking every input sequence to a list of gi identifiers found
-        that are relating to it. You will get a KeyError if it finds sequences in the search
-        result that were not in the input fasta."""
+        that are relating to it. You will get a KeyError if there are sequences in the search
+        result files that are not present in the inputed fasta."""
         seq_to_gis = FilePath(self.out_dir + 'seq_to_gis.pickle')
         # Check that is was run #
         if not seq_to_gis.exists:

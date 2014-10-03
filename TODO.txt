@@ -1,6 +1,3 @@
-Add the abundance file processing
-Generate the output(s)
-
 Uniquify the isolation sources with dates ?
 Extract information only for a subset of envo terms (such as biome feature) (masking)
 

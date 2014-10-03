@@ -2,26 +2,31 @@
 Assign environment ontology (EnvO) terms to short DNA sequences.
 
 ### Installing
-To install `seqenv` onto your server, use the python package manager:
+To install `seqenv` onto your machine, use the python package manager:
 
     $ pip install seqenv
+
+### Dependencies
+* You need to have a copy nucleotide data base of NCBI (called `nt`) installed locally as well as the `blastn` executable in your `$PATH`.
+* To compile parts of the software you will need the BOOST libraries as well as the SWIG libraries.
+* The project also depends on some other python modules such as biopython. These will be installed automatically when calling the `pip` command.
 
 ### Usage
 Once that is done, you can start processing FASTA files from the command line. For using the default parameters you can just type:
 
-    $ seqenv --in sequences.fasta
+    $ seqenv sequences.fasta
 
 We will then assume that you have inputed 16S sequences. To modify the database or use different type of sequence type:
 
-    $ seqenv --in sequences.fasta --seqtype nucl --db nt
+    $ seqenv sequences.fasta --seqtype prot --db nr
 
 To modify the minimum identity in the similarity search, use the following:
 
-    $ seqenv --in sequences.fasta --identity 97
+    $ seqenv sequences.fasta --identity 97
 
 If you have abundance data you would like to add to your analysis you can specify it like this in a TSV file:
 
-    $ seqenv --in sequences.fasta --abundances counts.tsv
+    $ seqenv sequences.fasta --abundances counts.tsv
 
 ### All parameters
    * `--seq_type`: Sequence type `nucl` or `prot` for nucleotides or amino acids, respectively (Default: `nucl`).

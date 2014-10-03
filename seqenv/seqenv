@@ -12,7 +12,7 @@ current_script = inspect.getframeinfo(inspect.currentframe()).filename
 current_dir = os.path.dirname(os.path.abspath(current_script)) + '/'
 readme_path = current_dir + '../README.md'
 if os.path.exists(readme_path): readme_contents = open(readme_path, 'r').read()
-else: readme_contents = ""
+else: readme_contents = "" #TODO
 
 # Get the different paragraphs #
 doc_params = re.findall('^### All parameters(.+?)###', readme_contents, flags=re.M|re.DOTALL)[0]
