@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
         name             = 'seqenv',
-        version          = '0.9.0',
+        version          = '1.0.0',
         description      = 'Assign environment ontology (EnvO) terms to short DNA sequences',
         long_description = open('README.md').read(),
         license          = 'MIT',
@@ -12,5 +12,5 @@ setup(
         classifiers      = ['Topic :: Scientific/Engineering :: Bio-Informatics'],
         packages         = ['seqenv'],
         scripts          = ['seqenv/seqenv'],
-        install_requires = ['biopython', 'sh', 'pandas'],
+        install_requires = ['biopython', 'sh', 'pandas', 'tqdm', 'biom-format'],
     )

@@ -1,4 +1,4 @@
-# seqenv version 0.9
+# seqenv version 1.0.0
 Assign environment ontology (EnvO) terms to short DNA sequences.
 
 ### Installing
@@ -8,8 +8,8 @@ To install `seqenv` onto your machine, use the python package manager:
 
 ### Dependencies
 * You need to have a copy nucleotide data base of NCBI (called `nt`) installed locally as well as the `blastn` executable in your `$PATH`.
-* To compile parts of the software you will need the BOOST libraries as well as the SWIG libraries.
-* The project also depends on some other python modules such as biopython. These will be installed automatically when calling the `pip` command.
+* To compile parts of the software you will need a copy of the BOOST libraries as well as the SWIG libraries.
+* The project also depends on some other python modules such as `biopython`. These will be installed automatically when calling the `pip` command.
 
 ### Usage
 Once that is done, you can start processing FASTA files from the command line. For using the default parameters you can just type:

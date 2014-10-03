@@ -4,7 +4,7 @@ b'This module needs Python 2.7.x'
 from __future__ import division
 
 # Special variables #
-__version__ = '0.9.0'
+__version__ = '1.0.0'
 
 # Built-in modules #
 import os, inspect, multiprocessing, shutil, gzip

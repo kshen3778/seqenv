@@ -6,6 +6,7 @@ flatter = lambda x: [item for sublist in x for item in sublist]
 
 ################################################################################
 def new_temp_path(**kwargs):
+    """A new temporary path"""
     handle = tempfile.NamedTemporaryFile(**kwargs)
     path = handle.name
     handle.close()

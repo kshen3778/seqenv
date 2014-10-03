@@ -8,7 +8,6 @@ import os, multiprocessing, threading, shutil
 from seqenv.fasta import FASTA
 from seqenv.common import new_temp_path
 from seqenv.common.autopaths import FilePath
-from seqenv.common.cache import property_cached
 
 # Third party modules #
 import sh
