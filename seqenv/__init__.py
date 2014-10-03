@@ -4,7 +4,7 @@ b'This module needs Python 2.7.x'
 from __future__ import division
 
 # Special variables #
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 
 # Built-in modules #
 import os, inspect, multiprocessing, shutil, gzip
@@ -94,8 +94,8 @@ class Analysis(object):
         # Other parameters #
         self.N = int(N)
         self.seq_type = seq_type
-        self.backtracking = backtracking
-        self.normalization = normalization
+        self.backtracking = bool(backtracking)
+        self.normalization = bool(normalization)
         # Search parameters #
         self.search_algo = search_algo
         self.search_db = search_db
@@ -280,7 +280,7 @@ class Analysis(object):
                 for start_pos, end_pos, concepts in matches:
                     ids = [concept_id for concept_type, concept_id in concepts]
                     score = 1 / len(ids) # Every gi adds up to one unless we have backtracking
-                    if self.backtracking: ids.append([p for c in ids for p in self.child_to_parents[c]])
+                    if self.backtracking: ids.extend([p for c in ids for p in self.child_to_parents[c]])
                     for concept_id in ids: counts[concept_id] += score
                 result[gi] = dict(counts)
             with open(gi_to_counts, 'w') as handle: pickle.dump(result, handle)
@@ -311,7 +311,7 @@ class Analysis(object):
         """A dictionary linking every concept serial to its concept id.
         Every line in the file contains three columns: serial, concept_type, concept_id
         This could possibly overflow the memory when we come with NCBI taxonomy etc."""
-        return {x[0]:x[2] for line in open(data_dir + 'envo_entities.tsv') for x in line.split()}
+        return dict(line.split()[0::2] for line in open(data_dir + 'envo_entities.tsv'))
 
     @property_cached
     def child_to_parents(self):

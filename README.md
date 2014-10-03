@@ -1,4 +1,4 @@
-# seqenv version 1.0.0
+# seqenv version 1.0.1
 Assign environment ontology (EnvO) terms to short DNA sequences.
 
 ### Installing
