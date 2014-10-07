@@ -81,7 +81,7 @@ seqenv.log
 
 - **From Signals to Environmentally Tagged Sequences** (Ref: ECOST-MEETING-ES1103-050912-018418), September 27th-29th 2012, Hellenic Centre for Marine Research, Crete, Greece.
 - **From Signals to Environmentally Tagged Sequences II** (Ref: ECOST-MEETING-ES1103-100613-031037), June 10th-13th 2013, Hellenic Centre for Marine Research, Crete, Greece.
-- **From Signals to Environmentally Tagged Sequences III** (Ref: XXX), September XXX 2014, Hellenic Centre for Marine Research, Crete, Greece.
+- **From Signals to Environmentally Tagged Sequences III** (Ref: ECOST-MEETING-ES1103-220914-047036), September 22-25 2014, Hellenic Centre for Marine Research, Crete, Greece.
 
 This work would not have been possible without the advice and support of many people who attended the hackathons:
 
