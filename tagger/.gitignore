@@ -1,7 +1,0 @@
-# Compiled stuff #
-*.so
-*.o
-
-# Swig stuff #
-tagger_swig_wrap.cxx
-tagger_swig.py
