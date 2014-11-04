@@ -1,4 +1,5 @@
 # Built-in modules #
+import warnings
 
 # Internal modules #
 import seqenv
@@ -6,7 +7,12 @@ from seqenv.common import flatter
 from seqenv.common.cache import property_cached
 
 # Third party modules #
-import pandas, biom
+import pandas
+
+# We don't want the annoying h5py warning #
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    import biom
 
 ################################################################################
 class OutputGenerator(object):
