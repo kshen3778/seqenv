@@ -17,10 +17,9 @@ else: readme_contents = "" #TODO
 # Get the different paragraphs #
 doc_params = re.findall('^### All parameters(.+?)###', readme_contents, flags=re.M|re.DOTALL)[0]
 doc_usage = re.findall('^### Usage(.+?)###', readme_contents, flags=re.M|re.DOTALL)[0]
-doc_version = "seqenv version %s" % (seqenv.__version__)
 
 # Make a shell arguments parser #
-desc = doc_version + "\n\n" + doc_usage + "\n\n" + doc_params
+desc = seqenv.version_string + "\n\n" + doc_usage + "\n\n" + doc_params
 parser = argparse.ArgumentParser(description=desc, formatter_class=RawTextHelpFormatter)
 
 # All the required arguments #
@@ -39,7 +38,7 @@ parameters = {
     "e_value"       : "Minimum e-value in similarity search. Defaults to 0.0001.",
     "max_targets"   : "Maximum number of reference matches in similarity search. Defaults to 10.",
     "min_coverage"  : "Minimum query coverage in similarity search. Defaults to 0.97.",
-    "abundances"    : "If you have sample information, give is as a TSV file.",
+    "abundances"    : "If you have sample information, give is as a TSV file with OTUs as rows and sample names as columns.",
     "N"             : "Use only the top `N` sequences in terms of their abundance. Defaults to 1000.",
 }
 
@@ -49,15 +48,5 @@ args = parser.parse_args()
 input_path = args.input_file
 kwargs = {k:getattr(args, k) for k in parameters if getattr(args, k) is not None}
 
-# Start message #
-print doc_version + " (pid %i)" % os.getpid()
-
 # Run the pipeline #
-analysis = seqenv.Analysis(input_path, **kwargs)
-analysis.timer.print_start()
-analysis.outputs.make_all()
-
-# End message #
-print "------------\nSuccess. Outputs are in '%s'" % analysis.out_dir
-analysis.timer.print_end()
-analysis.timer.print_total_elapsed()
+seqenv.Analysis(input_path, **kwargs).run()

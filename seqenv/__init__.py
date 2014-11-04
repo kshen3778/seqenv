@@ -5,9 +5,10 @@ from __future__ import division
 
 # Special variables #
 __version__ = '1.0.1'
+version_string = "seqenv version %s" % __version__
 
 # Built-in modules #
-import os, inspect, multiprocessing, shutil, gzip
+import os, inspect, multiprocessing, gzip
 from collections import defaultdict
 import cPickle as pickle
 
@@ -40,7 +41,7 @@ else: possible = '' #TODO
 class Analysis(object):
     """The main object. The only mandatory argument is the input fasta file path.
     The text below is somewhat redundant with what is in the README file and in
-    the command line utility.
+    the command line script.
 
     * 'seq_type': Either `nucl` or `prot`. Defaults to `nucl`.
 
@@ -48,15 +49,18 @@ class Analysis(object):
 
     * `search_db`: The path to the database to search against. Defaults to `nt`.
 
-    * `backtracking`: For every term identified by the tagger, we will propagate frequency counts
-                      up the acyclic directed graph described by the ontology. Defaults to `False`.
+    * `backtracking`: For every term identified by the tagger, we will propagate
+                      frequency counts up the acyclic directed graph described by
+                      the ontology. Defaults to `False`.
 
-    * `normalization`: Should we divide the counts of every input sequence by the number of text entries that were associated to it. Defaults to `True`.
+    * `normalization`: Should we divide the counts of every input sequence by the
+                       number of text entries that were associated to it. Defaults to `True`.
 
     * `num_threads`: The number of threads. Default to the number of cores on the
                      current machine.
 
-    * `out_dir`: Place all the outputs in the specified directory. Defaults to the input file's directory.
+    * `out_dir`: Place all the outputs in the specified directory.
+                 Defaults to the input file's directory.
 
     * Sequence similarity search filtering options:
         - min_identity: Defaults to 0.97
@@ -65,7 +69,8 @@ class Analysis(object):
         - min_coverage: Defaults to 0.97
 
     * `abundances`: If you have sample information, then you can provide the
-                    'abundances' argument too. It should be a TSV file.
+                    'abundances' argument too. It should be a TSV file with OTUs
+                    as rows and sample names as columns.
 
     * `N`: Use only the top `N` sequences in terms of their abundance, discard
            the rest. Only valid if abundances are provided.
@@ -84,7 +89,7 @@ class Analysis(object):
                  max_targets   = 10,
                  min_coverage  = 0.97,
                  abundances    = None,
-                 N             = 1000,):
+                 N             = 1000):
         # Base parameters #
         self.input_file = FASTA(input_file)
         self.input_file.must_exist()
@@ -104,10 +109,10 @@ class Analysis(object):
         else: self.num_threads = int(num_threads)
         self.num_threads = min(self.num_threads, self.input_file.count)
         # Hit filtering parameters #
-        self.min_identity = min_identity
-        self.e_value      = e_value
-        self.max_targets  = max_targets
-        self.min_coverage = min_coverage
+        self.min_identity = float(min_identity)
+        self.e_value      = float(e_value)
+        self.max_targets  = int(max_targets)
+        self.min_coverage = float(min_coverage)
         # Time the pipeline execution #
         self.timer = Timer()
         # Keep all outputs in a directory #
@@ -118,6 +123,18 @@ class Analysis(object):
         # The object that can make the outputs #
         self.outputs = OutputGenerator(self)
 
+    def run(self):
+        """A method to run the whole pipeline. As everything is coded in a functional
+        style, we just need to make a call to `outputs.make_all` and everything will
+        generated automatically"""
+        print version_string + " (pid %i)" % os.getpid()
+        self.timer.print_start()
+        self.outputs.make_all()
+        print "------------\nSuccess. Outputs are in '%s'" % self.out_dir
+        self.timer.print_end()
+        self.timer.print_total_elapsed()
+
+    #-------------------------------------------------------------------------#
     @property_cached
     def orig_names_to_renamed(self):
         """A dictionary linking every sequence's name in the input FASTA to a
@@ -334,6 +351,7 @@ class Analysis(object):
 
     @property_cached
     def df_abundances(self):
-        """A pandas DataFrame object containing the abundance counts."""
+        """A pandas DataFrame object containing the abundance counts
+        with OTUs as rows and sample names as columns."""
         assert self.abundances
         return pandas.io.parsers.read_csv(self.abundances, sep='\t', index_col=0, encoding='utf-8')
