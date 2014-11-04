@@ -40,7 +40,7 @@ If you have abundance data you would like to add to your analysis you can specif
    * `--e_value`: Minimum e-value in similarity search (Default: 0.0001).
    * `--max_targets`: Maximum number of reference matches in similarity search (Default: 10).
    * `--min_coverage`: Minimum query coverage in similarity search (Default: 0.97).
-   * `--abundances`: Abundances file (Default: None).
+   * `--abundances`: Abundances file TSV with OTUs as rows and sample names as columns (Default: None).
    * `--N`: If abundances are given, pick only the top N sequences (Default: 1000).
 
 ### Introduction
