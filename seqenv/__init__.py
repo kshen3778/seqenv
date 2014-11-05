@@ -89,7 +89,7 @@ class Analysis(object):
                  max_targets   = 10,
                  min_coverage  = 0.97,
                  abundances    = None,
-                 N             = 1000):
+                 N             = None):
         # Base parameters #
         self.input_file = FASTA(input_file)
         self.input_file.must_exist()
@@ -97,7 +97,7 @@ class Analysis(object):
         self.abundances = FilePath(abundances)
         if self.abundances: self.abundances.must_exist()
         # Other parameters #
-        self.N = int(N)
+        self.N = N
         self.seq_type = seq_type
         self.backtracking = bool(backtracking)
         self.normalization = bool(normalization)
@@ -161,9 +161,20 @@ class Analysis(object):
         if not self.abundances: return self.renamed_fasta
         only_top_fasta = FASTA(self.out_dir + 'top_seqs.fasta')
         if only_top_fasta.exists: return only_top_fasta
+        # Use the default in case it was not provided #
+        if self.N is None: N = 1000
+        else:              N = self.N
+        # Print status #
         print "Using: " + self.renamed_fasta
-        print "--> STEP 1B: Get the top %i sequences (in terms of their abundances)." % self.N
-        ids = self.df_abundances.sum(axis=1).sort(inplace=False, ascending=False).index[0:self.N]
+        print "--> STEP 1B: Get the top %i sequences (in terms of their abundances)." % N
+        # Check the user inputed value #
+        if self.N > self.input_file.count:
+            message = "You asked for the top %i sequences, but your input file only contains %i sequences!"
+            message = message % (self.N, self.input_file.count)
+            warnings.warn(message, UserWarning )
+            N = self.input_file.count
+        # Do it #
+        ids = self.df_abundances.sum(axis=1).sort(inplace=False, ascending=False).index[0:N]
         ids = set([self.orig_names_to_renamed[x] for x in ids])
         self.renamed_fasta.extract_sequences(only_top_fasta, ids)
         self.timer.print_elapsed()
