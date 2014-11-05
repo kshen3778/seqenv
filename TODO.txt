@@ -1,6 +1,6 @@
 Uniquify the isolation sources with dates ?
-Extract information only for a subset of envo terms (such as biome feature) (masking)
+Extract information only for a subset of envo terms (such as biome feature) (i.e. masking)
 
-Have the setup.py compile the tagger (swig)
-Integrate VSEARCH in the sequence similarity search
-Add a clean function that wipes all the files
+Have the setup.py compile the tagger (swig is a new dependency in that case) (problematic other libraries)
+Integrate VSEARCH in the sequence similarity search as an alternative to BLAST
+Have the outputted named with OTU names sorted in the same order as the user provided them
