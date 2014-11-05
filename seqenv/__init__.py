@@ -167,7 +167,7 @@ class Analysis(object):
         print "Using: " + self.renamed_fasta
         print "--> STEP 1B: Get the top %i sequences (in terms of their abundances)." % N
         # Check the user inputed value #
-        if self.N > self.input_file.count:
+        if self.N is not None and N > self.input_file.count:
             message = "You asked for the top %i sequences, but your input file only contains %i sequences!"
             message = message % (self.N, self.input_file.count)
             warnings.warn(message, UserWarning )
