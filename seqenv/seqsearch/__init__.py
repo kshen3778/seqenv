@@ -85,7 +85,7 @@ class SeqSearch(object):
 
     @property_cached
     def vsearch_query(self):
-        """Make a USEARCH search object."""
+        """Make a VSEARCH search object."""
         params = {}
         query = VSEARCHquery(self.input_fasta, self.database, params)
         return query

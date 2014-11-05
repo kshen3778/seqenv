@@ -4,11 +4,11 @@ b'This module needs Python 2.7.x'
 from __future__ import division
 
 # Special variables #
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 version_string = "seqenv version %s" % __version__
 
 # Built-in modules #
-import os, inspect, multiprocessing, gzip
+import sys, os, inspect, multiprocessing, gzip
 from collections import defaultdict
 import cPickle as pickle
 
@@ -31,11 +31,10 @@ from tqdm import tqdm
 total_gis_with_source = 13658791
 
 # Find the data dir #
-current_script = inspect.getframeinfo(inspect.currentframe()).filename
-current_dir = os.path.dirname(os.path.abspath(current_script)) + '/'
-possible = current_dir + 'data/envo_preferred.tsv'
-if os.path.exists(possible): data_dir = current_dir + 'data/'
-else: possible = '' #TODO
+module = sys.modules[__name__]
+module_dir = os.path.dirname(module.__file__) + '/'
+repos_dir = os.path.abspath(module_dir + '../') + '/'
+data_dir = module_dir + 'data/'
 
 ################################################################################
 class Analysis(object):

@@ -1,10 +1,12 @@
-# seqenv version 1.0.1
+# seqenv version 1.0.2
 Assign environment ontology (EnvO) terms to short DNA sequences.
 
 ### Installing
 To install `seqenv` onto your machine, use the python package manager:
 
     $ pip install seqenv
+
+You will need python version `2.7.x`. If you do not have this, or are missing the `pip` program on your system you can get them all by using using this: https://github.com/yyuu/pyenv
 
 ### Dependencies
 * You need to have a copy nucleotide data base of NCBI (called `nt`) installed locally as well as the `blastn` executable in your `$PATH`.
