@@ -162,7 +162,7 @@ class Analysis(object):
         if only_top_fasta.exists: return only_top_fasta
         # Use the default in case it was not provided #
         if self.N is None: N = 1000
-        else:              N = self.N
+        else:              N = int(self.N)
         # Print status #
         print "Using: " + self.renamed_fasta
         print "--> STEP 1B: Get the top %i sequences (in terms of their abundances)." % N

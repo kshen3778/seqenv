@@ -98,7 +98,6 @@ End at: 2014-11-05 00:13:40.400576
 Total elapsed time: 0:35:10.058952
 ~~~
 
-
 Once the pipeline has finished processing, you will have the following contents in the output folder:
 
 ~~~
