@@ -5,3 +5,5 @@ Have the setup.py compile the tagger (swig is a new dependency in that case) (pr
 Once this is done test that seqenv can easily be installed on a different university cluster easily through one command
 Integrate VSEARCH in the sequence similarity search as an alternative to BLAST
 Have the outputted named with OTU names sorted in the same order as the user provided them
+
+For the publication transfer the repository to github and make it public

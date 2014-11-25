@@ -32,15 +32,11 @@ def chunk_to_records(chunk):
     recursion limit. We don't want to get banned from NCBI so we have a little
     pause at every function call."""
     time.sleep(0.5)
-    print chunk
     try:
-        print "-"
         response = Entrez.efetch(db="nucleotide", id=chunk, retmode="xml")
-        print "="
         records = list(Entrez.parse(response, validate=True))
         return records
     except CorruptedXMLError:
-        print "*"
         return chunk_to_records(chunk)
 
 ################################################################################
