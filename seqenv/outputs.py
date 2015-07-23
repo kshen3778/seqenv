@@ -26,7 +26,7 @@ class OutputGenerator(object):
 
     def __init__(self, analysis):
         self.analysis = analysis
-        self.out_dir = analysis.out_dir
+        self.a        = analysis
 
     def make_all(self):
         """Let's generate all the files"""
@@ -34,31 +34,31 @@ class OutputGenerator(object):
         self.tsv_seq_to_concepts()
         self.tsv_seq_to_names()
         self.list_sequence_concept()
-        # Only in the samples case #
-        if self.analysis.abundances: self.tsv_samples_to_names()
-        if self.analysis.abundances: self.biom_output()
+        # Only in the with 'samples' case #
+        if self.a.abundances: self.tsv_samples_to_names()
+        if self.a.abundances: self.biom_output()
 
     @property_cached
     def df_seqs_concepts(self):
         """A normalized dataframe with sequences as columns and concepts (envo terms) as rows."""
         # Get the data #
-        df = pandas.DataFrame(self.analysis.seq_to_counts)
+        df = pandas.DataFrame(self.a.seq_to_counts)
         df = df.fillna(0)
         # Rename to original names #
-        df = df.rename(columns=self.analysis.renamed_to_orig)
+        df = df.rename(columns=self.a.renamed_to_orig)
         # Return
         return df
 
     def tsv_seq_to_concepts(self):
         """A TSV matrix file containing the df_seqs_concepts matrix"""
-        with open(self.out_dir + 'seq_to_concepts.tsv', 'w') as handle:
+        with open(self.a.out_dir + 'seq_to_concepts.tsv', 'w') as handle:
             content = self.df_seqs_concepts.to_csv(None, sep=self.sep, float_format=self.float_format)
             handle.writelines(content)
 
     def tsv_seq_to_names(self, sep='\t'):
         """A TSV matrix file where we translate the concept to human readable names"""
-        with open(self.out_dir + 'seq_to_names.tsv', 'w') as handle:
-            df = self.df_seqs_concepts.rename(index=self.analysis.concept_to_name)
+        with open(self.a.out_dir + 'seq_to_names.tsv', 'w') as handle:
+            df = self.df_seqs_concepts.rename(index=self.a.concept_to_name)
             content = df.to_csv(None, sep=self.sep, float_format=self.float_format)
             handle.writelines(content)
 
@@ -67,9 +67,9 @@ class OutputGenerator(object):
         """A dataframe where we operate a matrix multiplication with the abundances file
         provided to link samples to concept human readable names"""
         # Get results #
-        df1 = self.df_seqs_concepts.rename(index=self.analysis.concept_to_name)
+        df1 = self.df_seqs_concepts.rename(index=self.a.concept_to_name)
         # Remove those that were discarded #
-        df2 = self.analysis.df_abundances
+        df2 = self.a.df_abundances
         df2 = df2.loc[df1.columns]
         # Multiply them #
         df = df1.dot(df2)
@@ -89,24 +89,24 @@ class OutputGenerator(object):
         - OTU1, ENVO:00001, ocean, 4, GIs : [56, 123, 345]
         - OTU1, ENVO:00002, soil, 7, GIs : [22, 44]
         """
-        with open(self.out_dir + 'list_concepts_found.tsv', 'w') as handle:
-            for seq, gis in self.analysis.seq_to_gis.items():
-                gis = [gi for gi in gis if self.analysis.gi_to_matches[gi]]
-                concepts = set(flatter(self.analysis.gi_to_counts[gi].keys() for gi in gis))
+        with open(self.a.out_dir + 'list_concepts_found.tsv', 'w') as handle:
+            for seq, gis in self.a.seq_to_gis.items():
+                texts = set(self.a.gi_to_text.get(gi) for gi in gis if self.a.gi_to_text.get(gi))
+                concepts = set(flatter(self.a.text_to_counts[text].keys() for text in texts))
                 for concept in concepts:
-                    seq_name = self.analysis.renamed_to_orig[seq]
-                    concept_name = self.analysis.concept_to_name.get(concept, concept)
-                    concept_gis = [gi for gi in gis if concept in self.analysis.gi_to_counts[gi]]
-                    count_gis = len(concept_gis)
-                    line = (seq_name, concept, concept_name, str(count_gis), str(concept_gis))
+                    seq_name     = self.a.renamed_to_orig[seq]
+                    concept_name = self.a.concept_to_name.get(concept, concept)
+                    concept_gis  = [gi for gi in gis if concept in self.a.text_to_counts[self.a.gi_to_text[gi]]]
+                    count_gis    = len(concept_gis)
+                    line         = (seq_name, concept, concept_name, str(count_gis), str(concept_gis))
                     handle.write('\t'.join(line) + '\n')
 
     def biom_output(self):
         """The same matrix as the user gave in the abundance file, but with source
         information attached for every sequence.
         See http://biom-format.org"""
-        data = self.analysis.df_abundances
-        with open(self.out_dir + 'samples.biom', 'w') as handle:
+        data = self.a.df_abundances
+        with open(self.a.out_dir + 'samples.biom', 'w') as handle:
             # Basic #
             sample_ids = data.columns
             sample_md = None
@@ -114,8 +114,8 @@ class OutputGenerator(object):
             # Observation metadata #
             observation_md = []
             for seq in data.index:
-                seq_name = self.analysis.orig_names_to_renamed[seq]
-                counts = self.analysis.seq_to_counts.get(seq_name)
+                seq_name = self.a.orig_names_to_renamed[seq]
+                counts = self.a.seq_to_counts.get(seq_name)
                 if not counts: observation_md.append({})
                 else: observation_md.append({'source': counts})
             # Output #
