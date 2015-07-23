@@ -280,7 +280,7 @@ class Analysis(object):
         if not text_to_matches.exists:
             unique_gis = set(gi for gis in self.seq_to_gis.values() for gi in gis)
             print "Got %i GIs from search results" % len(unique_gis)
-            unique_texts = set(self.a.gi_to_text[gi] for gi in unique_gis if gi in self.a.gi_to_text)
+            unique_texts = set(self.gi_to_text[gi] for gi in unique_gis if gi in self.gi_to_text)
             print "--> STEP 6: Run the text mining tagger on all blobs."
             # Create the tagger #
             t = tagger.Tagger()
