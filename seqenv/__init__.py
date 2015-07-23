@@ -314,7 +314,7 @@ class Analysis(object):
                     # has to be thought about e.g. at some point we had decided that
                     # every gi adds up to one unless we have backtracking, not anymore
                     ids = [concept_id for concept_type, concept_id in concepts]
-                    score = 1 / len(ids) # Most of the time score is 1
+                    score = 1 / len(ids) # Most of the time score is 1
                     if self.backtracking: ids.extend([p for c in ids for p in self.child_to_parents[c]])
                     for concept_id in ids: counts[concept_id] += score
                 result[text] = dict(counts)
