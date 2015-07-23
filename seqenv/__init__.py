@@ -262,8 +262,9 @@ class Analysis(object):
         return result
 
     @property_cached
-    def gi_to_matches(self):
-        """A dictionary linking every gi to zero, one or several matches.
+    def text_to_matches(self):
+        """A dictionary linking every isolation source found in this analysis
+        to zero, one or several matches.
         When you call `t.GetMatches(text, "", [-27])` you get a list back.
         The second argument can be left empty in our case (per document blacklisting)
         The result is something like:
@@ -271,12 +272,12 @@ class Analysis(object):
         The number -27 is ENVO terms, -26 could be tissues, etc.
         Sometimes, one word can link to two concepts such as with the word 'marine'.
         """
-        gi_to_matches = FilePath(self.out_dir + 'gi_to_matches.pickle')
+        text_to_matches = FilePath(self.out_dir + 'text_to_matches.pickle')
         # Check that it was run #
-        if not gi_to_matches.exists:
+        if not text_to_matches.exists:
             unique_gis = set(gi for gis in self.seq_to_gis.values() for gi in gis)
             print "Got %i GIs from search results" % len(unique_gis)
-            print "Got %i GIs with isolation source" % len(self.gi_to_text)
+            unique_texts = set(self.gi_to_text.get(gi) for gi in unique_gis if self.gi_to_text.get(gi))
             print "--> STEP 6: Run the text mining tagger on all blobs."
             # Create the tagger #
             t = tagger.Tagger()
@@ -284,33 +285,28 @@ class Analysis(object):
             t.LoadNames(data_dir + 'envo_entities.tsv', data_dir + 'envo_names.tsv')
             # Load a global blacklist #
             t.LoadGlobal(data_dir + 'envo_global.tsv')
-            # Tag all the text #
+            # Tag all the texts #
             result = {}
-            for gi in unique_gis:
-                text = self.gi_to_text.get(gi)
-                if text is None:
-                    result[gi] = []
-                    continue
-                result[gi] = t.GetMatches(text, "", [-27])
-            with open(gi_to_matches, 'w') as handle: pickle.dump(result, handle)
+            for text in unique_texts: result[text] = t.GetMatches(text, "", [-27])
+            with open(text_to_matches, 'w') as handle: pickle.dump(result, handle)
             self.timer.print_elapsed()
             return result
         # Parse the results #
-        with open(gi_to_matches, 'r') as handle: return pickle.load(handle)
+        with open(text_to_matches, 'r') as handle: return pickle.load(handle)
 
     @property_cached
-    def gi_to_counts(self):
-        """A dictionary linking every `gi` identifier to the concept counts.
+    def text_to_counts(self):
+        """A dictionary linking every isolation source to the concept counts.
         (dictionaries of concept:int). This is done by finding regions of interest in the text
         (i.e. a match). We can assign meaning to the matches in terms of concepts.
         A 'concept' or 'entity' here would be an envo term such as 'ENVO:01000047'"""
-        gi_to_counts = FilePath(self.out_dir + 'gi_to_counts.pickle')
+        text_to_counts = FilePath(self.out_dir + 'text_to_counts.pickle')
         # Check that it was run #
-        if not gi_to_counts.exists:
-            print "Using matches from %i gi entries" % len(self.gi_to_matches)
+        if not text_to_counts.exists:
+            print "Using %i different isolation sources" % len(self.text_to_matches)
             print "--> STEP 7: Parsing the tagger results and counting terms."
             result = {}
-            for gi, matches in self.gi_to_matches.items():
+            for text, matches in self.text_to_matches.items():
                 if not matches: continue
                 counts = defaultdict(float)
                 for start_pos, end_pos, concepts in matches:
@@ -321,12 +317,12 @@ class Analysis(object):
                     score = 1 / len(ids) # Most of the time score is 1
                     if self.backtracking: ids.extend([p for c in ids for p in self.child_to_parents[c]])
                     for concept_id in ids: counts[concept_id] += score
-                result[gi] = dict(counts)
-            with open(gi_to_counts, 'w') as handle: pickle.dump(result, handle)
+                result[text] = dict(counts)
+            with open(text_to_counts, 'w') as handle: pickle.dump(result, handle)
             self.timer.print_elapsed()
             return result
         # Parse the results #
-        with open(gi_to_counts, 'r') as handle: return pickle.load(handle)
+        with open(text_to_counts, 'r') as handle: return pickle.load(handle)
 
     @property_cached
     def seq_to_counts(self):
@@ -337,12 +333,13 @@ class Analysis(object):
         In such case, we shall count the concepts from that isolation source only once."""
         result = {}
         for seq, gis in self.seq_to_gis.items():
+            texts = set(self.gi_to_text.get(gi) for gi in gis if self.gi_to_text.get(gi))
             counts = defaultdict(float)
-            for gi in gis:
-                if gi not in self.gi_to_counts: continue
-                for c,i in self.gi_to_counts[gi].items(): counts[c] += i
+            for text in texts:
+                if text not in self.text_to_counts: continue
+                for c,i in self.text_to_counts[text].items(): counts[c] += i
             if self.normalization:
-                tot_matches = sum([len(self.gi_to_matches[gi]) for gi in gis])
+                tot_matches = sum([len(self.text_to_matches[text]) for text in texts])
                 for k in counts: counts[k] /= tot_matches
             result[seq] = counts
         return result
