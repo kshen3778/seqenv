@@ -1,9 +1,19 @@
 Uniquify the isolation sources with dates ?
+
 Extract information only for a subset of envo terms (such as biome feature) (i.e. masking)
 
 Have the setup.py compile the tagger (swig is a new dependency in that case) (problematic other libraries)
-Once this is done test that seqenv can easily be installed on a different university cluster easily through one command
+
+Once this is done test that seqenv can easily be installed on a different university cluster easily through one pip command
+
 Integrate VSEARCH in the sequence similarity search as an alternative to BLAST
+
 Have the outputted named with OTU names sorted in the same order as the user provided them
 
-For the publication transfer the repository to github and make it public
+For the publication, transfer the repository to github and make it public
+
+Check Christina's bug about non float matrix multiplication
+
+Integrating SUMMARIZEplot and heatmap from T & T with seqenv
+
+Add the word cloud and heatmap generation back.

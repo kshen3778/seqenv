@@ -60,7 +60,7 @@
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{47.580659997144778, 1016.8936195954195}, {336.29031372070312, 15}}</string>
+					<string>{{63.218390458104864, 994.4744524354619}, {336.29031372070312, 15}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -96,7 +96,7 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{47.580659997144778, 1031.8936195954195}, {336.29031372070312, 15}}</string>
+					<string>{{63.218390458104864, 1009.4744524354619}, {336.29031372070312, 15}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -152,7 +152,7 @@
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{47.580659997144778, 926.70034966732157}, {336.29031372070312, 15}}</string>
+					<string>{{63.218390458104864, 904.28118250736395}, {336.29031372070312, 15}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -188,7 +188,7 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{47.580659997144778, 941.70034966732157}, {336.29031372070312, 15}}</string>
+					<string>{{63.218390458104864, 919.28118250736395}, {336.29031372070312, 15}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -244,7 +244,7 @@
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{47.580659997144778, 843.66932091976298}, {336.29031372070312, 15}}</string>
+					<string>{{63.218390458104864, 821.25015375980536}, {336.29031372070312, 15}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -280,7 +280,7 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{47.580659997144778, 858.66932091976298}, {336.29031372070312, 15}}</string>
+					<string>{{63.218390458104864, 836.25015375980536}, {336.29031372070312, 15}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -336,7 +336,7 @@
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{51.612901818433841, 760.63829980159892}, {336.29031372070312, 15}}</string>
+					<string>{{67.250632279393926, 738.21913264164129}, {336.29031372070312, 15}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -372,7 +372,7 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{51.612901818433841, 775.63829980159892}, {336.29031372070312, 15}}</string>
+					<string>{{67.250632279393926, 753.21913264164129}, {336.29031372070312, 15}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -423,7 +423,7 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{487.1451535877402, 645.07247186418545}, {106, 14}}</string>
+			<string>{{354.14091930909967, 510.47804298389724}, {106, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -478,7 +478,7 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{479.83871552127937, 506.58061157801154}, {106, 14}}</string>
+			<string>{{600.99238172713228, 410.11614894368478}, {106, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -533,7 +533,7 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{417.2903535564534, 368.08871800991301}, {69, 14}}</string>
+			<string>{{617.19353558337241, 318.05727840580784}, {69, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -588,7 +588,7 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{510.1451574014452, 219.06451433655133}, {60, 14}}</string>
+			<string>{{422.84207799642661, 174.98790493784969}, {60, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -643,11 +643,11 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{417.29034077736662, 100.09677333142088}, {69, 14}}</string>
+			<string>{{310.83871583107185, 73.387089881017602}, {73.032259799339272, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
-			<string>YES</string>
+			<string>Vertical</string>
 			<key>Flow</key>
 			<string>Resize</string>
 			<key>FontInfo</key>
@@ -693,8 +693,6 @@
 				<key>VerticalPad</key>
 				<integer>0</integer>
 			</dict>
-			<key>Wrap</key>
-			<string>NO</string>
 		</dict>
 		<dict>
 			<key>Bounds</key>
@@ -856,7 +854,7 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{661.19359595179264, 79.266774089082404}, {87, 14}}</string>
+			<string>{{661.19359595179264, 79.266774089082404}, {80, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -911,7 +909,7 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{600.80644375526208, 106.45161208451475}, {161.04954528808594, 108.87096405029297}}</string>
+			<string>{{599.99999671146793, 995.40229339488724}, {161.04954528808594, 108.87096405029297}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FontInfo</key>
@@ -1021,7 +1019,7 @@ This document just describes a plan for processing data.}</string>
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{47.580660054140367, 616.12902751946444}, {413.70968627929688, 15}}</string>
+					<string>{{47.580663643302302, 509.92915903413871}, {413.70968627929688, 15}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -1057,7 +1055,7 @@ This document just describes a plan for processing data.}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{47.580660054140367, 631.12902751946444}, {413.70968627929688, 42}}</string>
+					<string>{{47.580663643302302, 524.92915903413871}, {413.70968627929688, 42}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -1089,7 +1087,7 @@ This document just describes a plan for processing data.}</string>
 
 \f0\fs24 \cf0 C0 -&gt; (ENVO:00002007 -&gt; 0.667, ENVO:00002041 -&gt; 0.333) \
 C1 -&gt; (ENVO:00002007 -&gt; 0.123, ENVO:00002041 -&gt; 0.821)\
-C2 -&gt; (ENVO:00002007 -&gt; 0.667, ENVO:00002041 -&gt; 0.333)}</string>
+C2 -&gt; ()}</string>
 						<key>VerticalPad</key>
 						<integer>0</integer>
 					</dict>
@@ -1115,7 +1113,7 @@ C2 -&gt; (ENVO:00002007 -&gt; 0.667, ENVO:00002041 -&gt; 0.333)}</string>
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{47.580663486276364, 490.18952831403664}, {409.67739868164062, 15}}</string>
+					<string>{{47.580663068682895, 408.78780369349744}, {663.92510986328125, 15}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -1142,7 +1140,7 @@ C2 -&gt; (ENVO:00002007 -&gt; 0.667, ENVO:00002041 -&gt; 0.333)}</string>
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
 
-\f0\b\fs24 \cf0 gi_to_counts}</string>
+\f0\b\fs24 \cf0 text_to_counts}</string>
 						<key>VerticalPad</key>
 						<integer>0</integer>
 					</dict>
@@ -1151,7 +1149,7 @@ C2 -&gt; (ENVO:00002007 -&gt; 0.667, ENVO:00002041 -&gt; 0.333)}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{47.580663486276364, 505.18952831403658}, {409.67739868164062, 56}}</string>
+					<string>{{47.580663068682895, 423.78780369349744}, {663.92510986328125, 42}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -1179,11 +1177,10 @@ C2 -&gt; (ENVO:00002007 -&gt; 0.667, ENVO:00002041 -&gt; 0.333)}</string>
 \cocoascreenfonts1{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
 {\colortbl;\red255\green255\blue255;}
 \deftab720
-\pard\pardeftab720\ri0
+\pard\pardeftab720
 
-\f0\fs24 \cf0 343204354 -&gt; (ENVO:00002007 -&gt; 1, ENVO:00002041 -&gt; 2)\
-199999999 -&gt; (ENVO:00001993 -&gt; 1, ENVO:00003452 -&gt; 1)\
-343204350 -&gt; (ENVO:00002007 -&gt; 1, ENVO:00002041 -&gt; 2)\
+\f0\fs24 \cf0 "the deepest sea mud of the Mariana Trench" -&gt; (ENVO:00002007 -&gt; 1, ENVO:00002041 -&gt; 2)\
+"isolated from terrestorial samples near ..." -&gt; (ENVO:00001993 -&gt; 1, ENVO:00003452 -&gt; 1)\
 }</string>
 						<key>VerticalPad</key>
 						<integer>0</integer>
@@ -1210,7 +1207,7 @@ C2 -&gt; (ENVO:00002007 -&gt; 0.667, ENVO:00002041 -&gt; 0.333)}</string>
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{51.612904735708071, 304.58871267365367}, {312.90322875976562, 15}}</string>
+					<string>{{47.580660302208855, 317.0002914574809}, {640.6629638671875, 15}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -1237,7 +1234,7 @@ C2 -&gt; (ENVO:00002007 -&gt; 0.667, ENVO:00002041 -&gt; 0.333)}</string>
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
 
-\f0\b\fs24 \cf0 gi_to_matches (For only GIs found)}</string>
+\f0\b\fs24 \cf0 text_to_matches (Only for sources found)}</string>
 						<key>VerticalPad</key>
 						<integer>0</integer>
 					</dict>
@@ -1246,7 +1243,7 @@ C2 -&gt; (ENVO:00002007 -&gt; 0.667, ENVO:00002041 -&gt; 0.333)}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{51.612904735708071, 319.58871267365367}, {312.90322875976562, 126}}</string>
+					<string>{{47.580660302208855, 332.0002914574809}, {640.6629638671875, 28}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -1274,17 +1271,10 @@ C2 -&gt; (ENVO:00002007 -&gt; 0.667, ENVO:00002041 -&gt; 0.333)}</string>
 \cocoascreenfonts1{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
 {\colortbl;\red255\green255\blue255;}
 \deftab720
-\pard\pardeftab720\ri0
+\pard\pardeftab720
 
-\f0\fs24 \cf0 343206452 -&gt; [ENVO:123123,\
-              ENVO:123777,\
-              ENVO:123777]\
-343204354 -&gt; [ENVO:23452345]\
-199999999 -&gt; []\
-343204350 -&gt; [ENVO:123123,\
-              ENVO:123777,\
-              ENVO:123777]\
-}</string>
+\f0\fs24 \cf0 "the deepest sea mud of the Mariana Trench" -&gt; [ENVO:123123, ENVO:123777, ENVO:123777]\
+"isolated from terrestorial samples near ..." -&gt; [ENVO:23452345]}</string>
 						<key>VerticalPad</key>
 						<integer>0</integer>
 					</dict>
@@ -1541,7 +1531,7 @@ C2 -&gt; []}</string>
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2015-07-23 20:33:28 +0000</string>
+	<string>2015-07-23 22:36:53 +0000</string>
 	<key>Modifier</key>
 	<string>Lucas Sinclair</string>
 	<key>NotesVisible</key>
@@ -1622,7 +1612,7 @@ C2 -&gt; []}</string>
 			</dict>
 		</array>
 		<key>Frame</key>
-		<string>{{376, 0}, {839, 877}}</string>
+		<string>{{316, 0}, {839, 877}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
@@ -1636,7 +1626,7 @@ C2 -&gt; []}</string>
 		<key>SidebarWidth</key>
 		<integer>120</integer>
 		<key>VisibleRegion</key>
-		<string>{{-77, 305.74712476101621}, {948.27585687157273, 827.5862023606453}}</string>
+		<string>{{-77, 0}, {948.27585687157273, 844.82758157649209}}</string>
 		<key>Zoom</key>
 		<real>0.87000000476837158</real>
 		<key>ZoomValues</key>

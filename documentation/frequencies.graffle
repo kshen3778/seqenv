@@ -5215,7 +5215,7 @@ also called C1}</string>
 			</dict>
 		</array>
 		<key>Frame</key>
-		<string>{{28, 1}, {1062, 873}}</string>
+		<string>{{28, 4}, {1062, 873}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
