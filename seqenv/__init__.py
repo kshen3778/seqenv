@@ -4,11 +4,11 @@ b'This module needs Python 2.7.x'
 from __future__ import division
 
 # Special variables #
-__version__ = '1.0.2'
+__version__ = '1.0.3'
 version_string = "seqenv version %s" % __version__
 
 # Built-in modules #
-import sys, os, inspect, multiprocessing, gzip
+import sys, os, multiprocessing, gzip, warnings
 from collections import defaultdict
 import cPickle as pickle
 
@@ -31,10 +31,10 @@ from tqdm import tqdm
 total_gis_with_source = 13658791
 
 # Find the data dir #
-module = sys.modules[__name__]
+module     = sys.modules[__name__]
 module_dir = os.path.dirname(module.__file__) + '/'
-repos_dir = os.path.abspath(module_dir + '../') + '/'
-data_dir = module_dir + 'data/'
+repos_dir  = os.path.abspath(module_dir + '../') + '/'
+data_dir   = module_dir + 'data/'
 
 ################################################################################
 class Analysis(object):
@@ -124,8 +124,8 @@ class Analysis(object):
 
     def run(self):
         """A method to run the whole pipeline. As everything is coded in a functional
-        style, we just need to make a call to `outputs.make_all` and everything will
-        generated automatically"""
+        style, we just need to make a call to `outputs.make_all` and everything will be
+        generated automatically."""
         print version_string + " (pid %i)" % os.getpid()
         self.timer.print_start()
         self.outputs.make_all()
@@ -140,7 +140,9 @@ class Analysis(object):
         new name following the scheme "C1", "C2", "C3" etc."""
         return {seq.id:"C%i"%i for i, seq in enumerate(self.input_file)}
     @property_cached
-    def renamed_to_orig(self): return dict((v,k) for k,v in self.orig_names_to_renamed.items())
+    def renamed_to_orig(self):
+        """The opposite of the above dictionary"""
+        return dict((v,k) for k,v in self.orig_names_to_renamed.items())
 
     @property
     def renamed_fasta(self):
@@ -170,7 +172,7 @@ class Analysis(object):
         if self.N is not None and N > self.input_file.count:
             message = "You asked for the top %i sequences, but your input file only contains %i sequences!"
             message = message % (self.N, self.input_file.count)
-            warnings.warn(message, UserWarning )
+            warnings.warn(message, UserWarning)
             N = self.input_file.count
         # Do it #
         ids = self.df_abundances.sum(axis=1).sort(inplace=False, ascending=False).index[0:N]
@@ -337,7 +339,7 @@ class Analysis(object):
     def serial_to_concept(self):
         """A dictionary linking every concept serial to its concept id.
         Every line in the file contains three columns: serial, concept_type, concept_id
-        This could possibly overflow the memory when we come with NCBI taxonomy etc."""
+        This could possibly overflow the memory when we add NCBI taxonomy etc."""
         return dict(line.split()[0::2] for line in open(data_dir + 'envo_entities.tsv'))
 
     @property_cached

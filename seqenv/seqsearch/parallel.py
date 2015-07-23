@@ -12,9 +12,9 @@ from seqenv.fasta.splitable import SplitableFASTA
 
 ################################################################################
 class ParallelSeqSearch(SeqSearch):
-    """The same thing as a SeqSearch but operates by chopping in the input up into
-    smaller pieces and running the algorithm on each piece separately, finally joining the outputs.
-
+    """The same thing as a SeqSearch but operates by chopping the input up into
+    smaller pieces and running the algorithm on each piece separately, finally
+    joining the outputs.
     In addition, the pieces can be run separately on the local machine, or distributed to different
     compute nodes using the SLURM system.
     """

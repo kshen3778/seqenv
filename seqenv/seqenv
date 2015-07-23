@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Built-in modules #
-import sys, os, inspect, argparse, re
+import os, inspect, argparse, re
 from argparse import RawTextHelpFormatter
 
 # Internal modules #
@@ -43,10 +43,16 @@ parameters = {
 }
 
 # Parse it #
-for param, help in parameters.items(): parser.add_argument("--" + param, help=help)
+for param, hlp in parameters.items(): parser.add_argument("--" + param, help=hlp)
 args = parser.parse_args()
 input_path = args.input_file
 kwargs = {k:getattr(args, k) for k in parameters if getattr(args, k) is not None}
+
+# Check modules are installed #
+#TODO
+
+# Check executables can be found #
+#TODO
 
 # Run the pipeline #
 seqenv.Analysis(input_path, **kwargs).run()

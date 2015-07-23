@@ -12,7 +12,7 @@ from seqenv.common.autopaths import FilePath
 ################################################################################
 class SeqSearch(object):
     """A sequence similarity search. Could use different algorithms such
-    as BLAST, USEARCH, BLAT etc.
+    as BLAST, VSEARCH, BLAT etc.
 
     Input: - List of sequences in a FASTA file
            - The type of the sequences
@@ -25,7 +25,7 @@ class SeqSearch(object):
                                   - E value
                                   - Maximum targets
                                   - Minimum query coverage (via manual output format)
-             * USEARCH supported: - ?
+             * VSEARCH supported: - ?
     Output: - Sorted list of identifiers in the database (object with significance value and identity attached)
     """
 
@@ -50,7 +50,7 @@ class SeqSearch(object):
     def query(self):
         """The similarity search object with all the relevant parameters."""
         if self.algorithm == 'blast': return self.blast_query
-        if self.algorithm == 'usearch': return self.vsearch_query
+        if self.algorithm == 'vsearch': return self.vsearch_query
         raise NotImplemented(self.algorithm)
 
     @property_cached
