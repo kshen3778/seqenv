@@ -79,7 +79,7 @@ class OutputGenerator(object):
     def tsv_samples_to_names(self, sep='\t'):
         """A TSV matrix file where operate a matrix multiplication with the abundances file
         provided to link samples to concept human readable names"""
-        with open(self.out_dir + 'samples_to_names.tsv', 'w') as handle:
+        with open(self.a.out_dir + 'samples_to_names.tsv', 'w') as handle:
             content = self.df_sample_names.to_csv(sep=self.sep, float_format=self.float_format)
             handle.writelines(content)
 
