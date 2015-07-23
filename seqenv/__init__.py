@@ -175,7 +175,7 @@ class Analysis(object):
         # Check the user inputed value #
         if self.N is not None and N > self.input_file.count:
             msg = "You asked for the top %i sequences"
-            msg += ", but your input file only contains %i sequences!""
+            msg += ", but your input file only contains %i sequences!"
             msg = msg % (self.N, self.input_file.count)
             warnings.warn(msg, UserWarning)
             N = self.input_file.count
@@ -316,9 +316,9 @@ class Analysis(object):
                 for start_pos, end_pos, concepts in matches:
                     # This is the first place where the normalization technique used
                     # has to be thought about e.g. at some point we had decided that
-                    # every gi adds up to one unless we have backtracking
+                    # every gi adds up to one unless we have backtracking, not anymore
                     ids = [concept_id for concept_type, concept_id in concepts]
-                    score = 1 / len(ids)
+                    score = 1 / len(ids) # Most of the time score is 1
                     if self.backtracking: ids.extend([p for c in ids for p in self.child_to_parents[c]])
                     for concept_id in ids: counts[concept_id] += score
                 result[gi] = dict(counts)
