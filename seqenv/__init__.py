@@ -334,10 +334,10 @@ class Analysis(object):
         counts dict, provided the input sequence had some hits, and a hit had a match,
         otherwise it is empty. NB: What we want to account for is the fact that two GIs
         originating from the same sequence could be pointing to the same isolation source.
-        In this case, we shall count the concepts from that isolation source only once."""
+        In such case, we shall count the concepts from that isolation source only once."""
         result = {}
         for seq, gis in self.seq_to_gis.items():
-            counts = defaultdict(int)
+            counts = defaultdict(float)
             for gi in gis:
                 if gi not in self.gi_to_counts: continue
                 for c,i in self.gi_to_counts[gi].items(): counts[c] += i
