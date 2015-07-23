@@ -53,7 +53,8 @@ class Analysis(object):
                       the ontology. Defaults to `False`.
 
     * `normalization`: Should we divide the counts of every input sequence by the
-                       number of text entries that were associated to it. Defaults to `True`.
+                       number of text entries that were associated to it.
+                       Defaults to `True`.
 
     * `num_threads`: The number of threads. Default to the number of cores on the
                      current machine.
@@ -74,6 +75,9 @@ class Analysis(object):
     * `N`: Use only the top `N` sequences in terms of their abundance, discard
            the rest. Only valid if abundances are provided.
     """
+
+    def __repr__(self): return '<Analysis object on "%s" with %i sequences>' % \
+                        (self.input_file.filename, self.input_file.count)
 
     def __init__(self, input_file,
                  seq_type      = 'nucl',
@@ -170,9 +174,10 @@ class Analysis(object):
         print "--> STEP 1B: Get the top %i sequences (in terms of their abundances)." % N
         # Check the user inputed value #
         if self.N is not None and N > self.input_file.count:
-            message = "You asked for the top %i sequences, but your input file only contains %i sequences!"
-            message = message % (self.N, self.input_file.count)
-            warnings.warn(message, UserWarning)
+            msg = "You asked for the top %i sequences"
+            msg += ", but your input file only contains %i sequences!""
+            msg = msg % (self.N, self.input_file.count)
+            warnings.warn(msg, UserWarning)
             N = self.input_file.count
         # Do it #
         ids = self.df_abundances.sum(axis=1).sort(inplace=False, ascending=False).index[0:N]
@@ -209,7 +214,8 @@ class Analysis(object):
         # Check that the search was run #
         if not self.search.out_path.exists:
             print "Using: " + self.only_top_sequences
-            print "--> STEP 2: Similarity search against the '%s' database with %i processes" % (self.search_db, self.num_threads)
+            message = "--> STEP 2: Similarity search against the '%s' database with %i processes"
+            print message % (self.search_db, self.num_threads)
             self.search.run()
             self.timer.print_elapsed()
             print "--> STEP 3: Filter out bad hits from the search results"
@@ -263,6 +269,7 @@ class Analysis(object):
         The result is something like:
         - [(53, 62, ((-27, 'ENVO:00002001'),)), (64, 69, ((-27, 'ENVO:00002044'),))]
         The number -27 is ENVO terms, -26 could be tissues, etc.
+        Sometimes, one word can link to two concepts such as with the word 'marine'.
         """
         gi_to_matches = FilePath(self.out_dir + 'gi_to_matches.pickle')
         # Check that it was run #
@@ -305,10 +312,13 @@ class Analysis(object):
             result = {}
             for gi, matches in self.gi_to_matches.items():
                 if not matches: continue
-                counts = defaultdict(int)
+                counts = defaultdict(float)
                 for start_pos, end_pos, concepts in matches:
+                    # This is the first place where the normalization technique used
+                    # has to be thought about e.g. at some point we had decided that
+                    # every gi adds up to one unless we have backtracking
                     ids = [concept_id for concept_type, concept_id in concepts]
-                    score = 1 / len(ids) # Every gi adds up to one unless we have backtracking
+                    score = 1 / len(ids)
                     if self.backtracking: ids.extend([p for c in ids for p in self.child_to_parents[c]])
                     for concept_id in ids: counts[concept_id] += score
                 result[gi] = dict(counts)
@@ -320,8 +330,11 @@ class Analysis(object):
 
     @property_cached
     def seq_to_counts(self):
-        """A dictionary linking every input sequence to its summed normalized concept counts dict,
-        provided the input sequence had some hits, and a hit had a match, otherwise it is empty."""
+        """A dictionary linking every input sequence to its summed normalized concept
+        counts dict, provided the input sequence had some hits, and a hit had a match,
+        otherwise it is empty. NB: What we want to account for is the fact that two GIs
+        originating from the same sequence could be pointing to the same isolation source.
+        In this case, we shall count the concepts from that isolation source only once."""
         result = {}
         for seq, gis in self.seq_to_gis.items():
             counts = defaultdict(int)
