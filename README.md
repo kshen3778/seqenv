@@ -62,7 +62,7 @@ The [Environmental Ontology](http://environmentontology.org/) will be a critical
 The pipeline has already been applied to a range of datasets (e.g Greek lagoon, Swedish lake/river, African and Asian pitlatrine datasets, Black Sea sediment sample datasets have been processed).
 
 ### Pipeline overview
-#### This is an old version of the diagram.. version 1.0.2 doesn't exactly do this.
+#### This is an old version of the diagram.. the current version of seqenv doesn't exactly do this.
 ![seqenv](https://bitbucket.org/repo/6g996b/images/3493861180-SEQenv.jpg "seqenv")
 
 ### Tutorial
