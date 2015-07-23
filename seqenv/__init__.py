@@ -230,8 +230,9 @@ class Analysis(object):
     @property_cached
     def seq_to_gis(self):
         """A dictionary linking every input sequence to a list of gi identifiers found
-        that are relating to it. You will get a KeyError if there are sequences in the search
-        result files that are not present in the inputed fasta."""
+        that are relating to it. If a sequence had no hits it links to an empty list.
+        NB: You will get a KeyError if there are sequences in the search result files
+        that are not present in the inputed fasta."""
         seq_to_gis = FilePath(self.out_dir + 'seq_to_gis.pickle')
         # Check that is was run #
         if not seq_to_gis.exists:
@@ -251,7 +252,8 @@ class Analysis(object):
     @property_cached
     def gi_to_text(self):
         """A dictionary linking every gi identifier in NCBI to its isolation source
-        text, provided it has one."""
+        text, provided it has one. You will get a KeyError if you attempt to access
+        a GI that has no isolation source, so use self.gi_to_text.get(55831228)"""
         print "--> STEP 5: Loading all NCBI isolation sources in RAM"
         result = {}
         with gzip.open(data_dir + 'gi_to_source.tsv.gz') as handle:
@@ -264,7 +266,8 @@ class Analysis(object):
     @property_cached
     def text_to_matches(self):
         """A dictionary linking every isolation source found in this analysis
-        to zero, one or several matches.
+        to zero, one or several matches. You will not get a KeyError if you attempt to
+        get the matches for an isolation source that had none.
         When you call `t.GetMatches(text, "", [-27])` you get a list back.
         The second argument can be left empty in our case (per document blacklisting)
         The result is something like:
@@ -277,7 +280,7 @@ class Analysis(object):
         if not text_to_matches.exists:
             unique_gis = set(gi for gis in self.seq_to_gis.values() for gi in gis)
             print "Got %i GIs from search results" % len(unique_gis)
-            unique_texts = set(self.gi_to_text.get(gi) for gi in unique_gis if self.gi_to_text.get(gi))
+            unique_texts = set(self.a.gi_to_text[gi] for gi in unique_gis if gi in self.a.gi_to_text)
             print "--> STEP 6: Run the text mining tagger on all blobs."
             # Create the tagger #
             t = tagger.Tagger()
@@ -299,7 +302,9 @@ class Analysis(object):
         """A dictionary linking every isolation source to the concept counts.
         (dictionaries of concept:int). This is done by finding regions of interest in the text
         (i.e. a match). We can assign meaning to the matches in terms of concepts.
-        A 'concept' or 'entity' here would be an envo term such as 'ENVO:01000047'"""
+        A 'concept' or 'entity' here would be an envo term such as 'ENVO:01000047'
+        You will get a KeyError if you attempt to get the counts for an isolation source
+        that had none."""
         text_to_counts = FilePath(self.out_dir + 'text_to_counts.pickle')
         # Check that it was run #
         if not text_to_counts.exists:
