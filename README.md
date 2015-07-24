@@ -62,8 +62,7 @@ The [Environmental Ontology](http://environmentontology.org/) will be a critical
 The pipeline has already been applied to a range of datasets (e.g Greek lagoon, Swedish lake/river, African and Asian pitlatrine datasets, Black Sea sediment sample datasets have been processed).
 
 ### Pipeline overview
-#### This is an old version of the diagram.. the current version of seqenv doesn't exactly do this.
-![seqenv](documentation/frequencies.png "seqenv")
+![documentation/frequencies.png](documentation/frequencies.png "seqenv")
 
 ### Tutorial
 We will first run `seqenv` on a 16S rRNA dataset using ***isolation sources*** as a text source. Here, `abundance.tsv` is a species abundance file (97% OTUs) processed through [`illumitag`](https://github.com/limno/illumitag) software and `centers.fasta` contains the corresponding sequences for the OTUs.
