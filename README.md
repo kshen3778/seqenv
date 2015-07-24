@@ -151,3 +151,54 @@ This work would not have been possible without the advice and support of many pe
 
 ### News
 * **August 2013**: Chris Quince presented a talk on `seqenv` at [STAMPS2013](https://stamps.mbl.edu/index.php/Main_Page). You can download the PDF of the presentation: [C Quince et. al., SeqEnv: Annotating sequences with environments (STAMPS 2013)](https://stamps.mbl.edu/images/4/44/Quince_SeqEnvSTAMPS2013.pdf)
+
+### Manual installation
+This chapter will be removed once the simple `pip install seqenv` is fully operational. In the meantime, no automated installation has been developed for the `seqenv` package. But following this document and typing these commands on your bash prompt should get you started. If you cannot get a functional installation set up, contact the authors.
+
+##### Step 1: Cloning the repository
+Here you will download a copy of the code from bitbucket and place it somewhere in your home directory.
+
+    $ cd ~
+    $ mkdir repos
+    $ cd repos
+    $ git clone git@bitbucket.org:biohackers/seqenv.git
+
+##### Step 2: Modify your search paths
+Here you will edit your ``~/.bashrc`` or ``~/.bash_profile`` to add a reference to the code you just downloaded.
+
+    $ vim ~/.bash_profile
+    export PYTHONPATH="$HOME/repos/seqenv/":$PYTHONPATH
+
+    $ vim ~/.bash_profile
+    export PATH="$HOME/repos/seqenv/seqenv":$PATH
+
+##### Step 3 (optional): Install your own version of python
+Your system probably comes with a version of python installed. But the variations from system to system are too great to rely on any available python. We strongly suggest to just install our own version in your home directory. Otherwise make sure that you are using version 2.7.x of python.
+
+##### Step 4: Install all required python packages
+`seqenv` uses several third party python libraries. You can get them by running these commands:
+
+    $ pip install biopython
+    $ pip install sh
+    $ pip install pandas
+    $ pip install tqdm
+    $ pip install biom-format
+
+If you are using a python manager such as pyenv, don't forget to rehash the binary links at the end:
+
+    $ pyenv rehash
+
+You can check that it all works like this:
+
+    $ python -c "import seqenv"
+
+##### Step 5: Check you have all the required executables
+`seqenv` will search for several different binaries as it processes your data. Please check all of these are available in your `$PATH`:
+
+    $ which blastn
+
+##### Step 6: Compile the tagger if on OS X
+Having to compile code is a liability to installation unfortunately, but we don't have any other solution for the moment. I remember that there were some complicated tricks to compile it on OS X, so you will have to figure that out if you are using a Mac. But with Linux hopefully it shouldn't be too difficult because we have a precompiled binary bundled now so you can skip this step ! Unless it's a 32-bit processor, than again it's going to be difficult.
+
+    $ cd ~/repos/seqenv/tagger
+    $ make
