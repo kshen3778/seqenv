@@ -205,4 +205,4 @@ Having to compile code is a liability to installation unfortunately, but we don'
     $ make
 
 ##### Step 7: Get a local copy of the NT database
-You can choose the database you want to BLAST against. By default we will search against `nt. So check your `~/.ncbirc` file for the adequate references.
+You can choose the database you want to BLAST against. By default we will search against `nt`. So check your `~/.ncbirc` file for the adequate references.
