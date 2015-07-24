@@ -71,7 +71,12 @@ class OutputGenerator(object):
         # Remove those that were discarded #
         df2 = self.a.df_abundances
         df2 = df2.loc[df1.columns]
-        # Multiply them #
+        # Odd bug detection #
+        if any(s[:1].isdigit() for s in df2.index):
+            msg = "None of the sample names in file '%s' can start with a number"
+            raise Exception(msg % self.a.abundances.filename)
+        # Multiply them (dot product) #
+        assert all(df1.columns == df2.index)
         df = df1.dot(df2)
         # Return
         return df
