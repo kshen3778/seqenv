@@ -149,6 +149,10 @@ This work would not have been possible without the advice and support of many pe
 ### News
 * **August 2013**: Chris Quince presented a talk on `seqenv` at [STAMPS2013](https://stamps.mbl.edu/index.php/Main_Page). You can download the PDF of the presentation: [C Quince et. al., SeqEnv: Annotating sequences with environments (STAMPS 2013)](https://stamps.mbl.edu/images/4/44/Quince_SeqEnvSTAMPS2013.pdf)
 
+### Publication using seqenv
+* Bacterial diversity along a 2600 km river continuum. `doi:10.1111/1462-2920.12886`
+* Can marine bacteria be recruited from freshwater sources and the air? `doi:10.1038/ismej.2014.89`
+
 ### Manual installation
 This chapter will be removed once the simple `pip install seqenv` is fully operational. In the meantime, no automated installation has been developed for the `seqenv` package. But following this document and typing these commands on your bash prompt should get you started. If you cannot get a functional installation set up, contact the authors.
 
