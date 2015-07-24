@@ -80,43 +80,41 @@ The output you will receive should look something like this:
 
 ~~~
 seqenv version 1.0.3 (pid 20539)
-Start at: 2014-11-04 23:38:30.341661
+Start at: 2015-07-24 03:50:37.982581
 --> STEP 1: Parse the input FASTA file.
-Elapsed time: 0:00:00.578245
+Elapsed time: 0:00:02.345551
 Using: output/renamed.fasta
---> STEP 1B: Get the top 5000 sequences (in terms of their abundances).
-Elapsed time: 0:00:00.249014
+--> STEP 1B: Get the top 1000 sequences (in terms of their abundances).
+Elapsed time: 0:00:00.504347
 Using: output/top_seqs.fasta
---> STEP 2: Similarity search against the 'nt' database with 32 processes
-Elapsed time: 0:33:57.980349
+--> STEP 2: Similarity search against the 'nt' database with 24 processes
+Elapsed time: 0:38:30.489685
 --> STEP 3: Filter out bad hits from the search results
-Elapsed time: 0:00:00.040394
+Elapsed time: 0:00:00.022893
 --> STEP 4: Parsing the search results
-Elapsed time: 0:00:00.207893
-Got 8912 GIs from search results
+Elapsed time: 0:00:00.069423
 --> STEP 5: Loading all NCBI isolation sources in RAM
-#########-| 13546362/13658791  99% [elapsed: 01:04 left: 00:00, 209890.06 iters/sec]
-Elapsed time: 0:01:05.022159
-Got 13658791 GIs with isolation source
+Elapsed time: 0:02:18.169891
+Got 5654 GIs from search results
 --> STEP 6: Run the text mining tagger on all blobs.
-Elapsed time: 0:00:01.211216
-Using matches from 8912 gi entries
+Elapsed time: 0:00:00.269561
+Using 853 different isolation sources
 --> STEP 7: Parsing the tagger results and counting terms.
-Elapsed time: 0:00:00.046825
+Elapsed time: 0:00:00.014824
 ------------
 Success. Outputs are in 'output/'
-End at: 2014-11-05 00:13:40.400576
-Total elapsed time: 0:35:10.058952
+End at: 2015-07-24 04:31:42.324913
+Total elapsed time: 0:41:04.342529
 ~~~
 
 Once the pipeline has finished processing, you will have the following contents in the output folder:
 
 ~~~
 $ ls output/
-gi_to_counts.pickle      samples.biom          seq_to_names.tsv
-gi_to_matches.pickle     samples_to_names.tsv  top_seqs.blastout
-list_concepts_found.tsv  seq_to_concepts.tsv   top_seqs.fasta
-renamed.fasta            seq_to_gis.pickle     top_seqs.fasta.parts
+list_concepts_found.tsv  seq_to_concepts.tsv    text_to_matches.pickle
+renamed.fasta            seq_to_gis.pickle      top_seqs.blastout
+samples.biom             seq_to_names.tsv       top_seqs.fasta
+samples_to_names.tsv     text_to_counts.pickle  top_seqs.fasta.parts
 ~~~
 
 The most interesting files are probably:
@@ -204,4 +202,4 @@ Having to compile code is a liability to installation unfortunately, but we don'
     $ make
 
 ##### Step 7: Get a local copy of the NT database
-You can choose the database you want to BLAST against. By default we will search against `nt`. So check your `~/.ncbirc` file for the adequate references.
+You can choose the database you want to BLAST against. By default we will search against `nt. So check your `~/.ncbirc` file for the adequate references.
