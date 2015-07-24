@@ -13,7 +13,7 @@ You might be installing this onto a computer server which you don't own and thus
 If this still doesn't work, you might be missing the `pip` program on your system or the correct version of Python (any version `2.7.x`). You can get both of these things by using using this little project: https://github.com/yyuu/pyenv
 
 ### Dependencies
-* You need to have a copy of the NCBI nucleotide data base (called `nt`) installed locally as well as the `blastn` executable in your `$PATH`. So that BLAST finds the NT database, you can edit your `.ncbirc` file.
+* You need to have a copy of the NCBI nucleotide data base (called `nt`) installed locally as well as the `blastn` executable in your `$PATH`. So that BLAST finds the NT database, you can edit your `~/.ncbirc` file.
 * The project also depends on some other python modules such as `biopython`. Happily, these will be installed automatically when calling the `pip` command above.
 
 ### Optional dependencies
@@ -202,3 +202,6 @@ Having to compile code is a liability to installation unfortunately, but we don'
 
     $ cd ~/repos/seqenv/tagger
     $ make
+
+##### Step 7: Get a local copy of the NT database
+You can choose the database you want to BLAST against. By default we will search against `nt`. So check your `~/.ncbirc` file for the adequate references.
