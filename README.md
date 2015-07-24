@@ -47,7 +47,7 @@ Several other options are possible. Here is a list describing them all:
    * `--num_threads`: Number of cores to use (Defaults to the total number of cores). Use `1` for non-parallel processing.
    * `--out_dir`: The output directory in which to store the result and intermediary files. Defaults to the same directory as the input file.
    * `--min_identity`: Minimum identity in similarity search (Default: `0.97`). Note: not available when using `blastp`.
-   * `--e_value`: Minimum e-value in similarity search (Default: 0.0001`).
+   * `--e_value`: Minimum e-value in similarity search (Default: `0.0001`).
    * `--max_targets`: Maximum number of reference matches in the similarity search (Default: `10`).
    * `--min_coverage`: Minimum query coverage in similarity search (Default: `0.97`).
    * `--abundances`: Abundances file as TSV with OTUs as rows and sample names as columns (Default: None).
@@ -205,4 +205,4 @@ Having to compile code is a liability to installation unfortunately, but we don'
     $ make
 
 ##### Step 7: Get a local copy of the NT database
-You can choose the database you want to BLAST against. By default we will search against `nt`. So check your `~/.ncbirc` file for the adequate references.
+You can choose the database you want to BLAST against. By default we will search against `nt. So check your `~/.ncbirc` file for the adequate references.
