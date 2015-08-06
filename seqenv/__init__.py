@@ -118,6 +118,11 @@ class Analysis(object):
         self.seq_type = seq_type
         self.backtracking = bool(backtracking)
         self.proportional = bool(proportional)
+        # Normalization parameters #
+        options = ('flat', 'ui', 'upi')
+        message = 'Normalization has to be one of %s' % ','.join(options)
+        if normalization not in options: raise Exception(message)
+        self.normalization = normalization
         # Search parameters #
         self.search_algo = search_algo
         self.search_db = search_db
