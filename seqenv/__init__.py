@@ -48,13 +48,26 @@ class Analysis(object):
 
     * `search_db`: The path to the database to search against. Defaults to `nt`.
 
+    * `normalization`: Can be either of `flat`, `ui` or `uim`.
+                        - If you choose `flat`, we will count every isolation source once,
+                          even if the same text entry appears several time for the same inputs
+                          sequence.
+                        - If you choose `ui`, standing for unique isolation, we will uniquify
+                          every frequency count depending on the text entry of its isolation
+                          source.
+                        - If you choose `upi`, standing for unique isolation and unique pubmed-ID,
+                          we will uniquify the frequency counts based on the text entry of its
+                          isolation source and the pubmed-ID from which the isolation text was
+                          obtained.
+                       This option default to `ui`.
+
+    * `proportional`: Should we divide the counts of every input sequence by the
+                      number of text entries that were associated to it.
+                      Defaults to `True`.
+
     * `backtracking`: For every term identified by the tagger, we will propagate
                       frequency counts up the acyclic directed graph described by
                       the ontology. Defaults to `False`.
-
-    * `normalization`: Should we divide the counts of every input sequence by the
-                       number of text entries that were associated to it.
-                       Defaults to `True`.
 
     * `num_threads`: The number of threads. Default to the number of cores on the
                      current machine.
@@ -83,8 +96,9 @@ class Analysis(object):
                  seq_type      = 'nucl',
                  search_algo   = 'blast',
                  search_db     = 'nt',
+                 normalization = 'ui',
+                 proportional  = True,
                  backtracking  = False,
-                 normalization = True,
                  num_threads   = None,
                  out_dir       = None,
                  min_identity  = 0.97,
@@ -103,7 +117,7 @@ class Analysis(object):
         self.N = N
         self.seq_type = seq_type
         self.backtracking = bool(backtracking)
-        self.normalization = bool(normalization)
+        self.proportional = bool(proportional)
         # Search parameters #
         self.search_algo = search_algo
         self.search_db = search_db
@@ -343,7 +357,7 @@ class Analysis(object):
             for text in texts:
                 if text not in self.text_to_counts: continue
                 for c,i in self.text_to_counts[text].items(): counts[c] += i
-            if self.normalization:
+            if self.proportional:
                 tot_matches = sum([len(self.text_to_matches[text]) for text in texts])
                 for k in counts: counts[k] /= tot_matches
             result[seq] = counts

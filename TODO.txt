@@ -1,4 +1,4 @@
-Uniquify the isolation sources with dates ?
+Uniquify the isolation sources with dates ? Better idea: uniquify based on PubMed IDs !
 
 Extract information only for a subset of envo terms (such as biome feature) (i.e. the masking feature)
 
