@@ -76,7 +76,7 @@ def record_to_pubmed_id(record):
 ###############################################################################
 def result_dict_to_lines(result):
     for gi, info in result.iteritems():
-        yield gi + '\t' + info[0] + '\t' + info[1] + '\n'
+        yield gi + '~' + info[0] + '~' + info[1] + '\n'
 
 ###############################################################################
 def test():
@@ -86,8 +86,19 @@ def test():
                 '497', '429143984', '264670502', '74268401', '324498487']
     # The result we should get #
     template_result = """
-
+    74268401,-,-
+    6451693,-,-
+    76365841,Everglades wetlands,16907754
+    324498487,bacterioplankton sample from lake,-
+    389043336,lake water at 5 m depth during dry season,-
+    22506766,-,-
+    127,-,-
+    429143984,downstream along river bank,-
+    497,-,3120795
+    264670502,aphotic layer; anoxic zone; tucurui hydroeletric power plant reservoir,-
     """
+    # Make it pretty #
+    template_result = '\n'.join(l.lstrip(' ') for l in template_result.split('\n') if l)
     # The result we got #
     result = gis_to_records(test_gis)
     result = result_dict_to_lines(result)
