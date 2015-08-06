@@ -1,4 +1,4 @@
-# seqenv version 1.0.3
+# seqenv version 1.0.4
 Assign environment ontology (EnvO) terms to short DNA sequences. More information at: http://environments.hcmr.gr/seqenv.html
 
 ### Installing
@@ -89,7 +89,7 @@ $ seqenv centers.fasta --abundances abundance.tsv --seq_type nucl --out_dir outp
 The output you will receive should look something like this:
 
 ~~~
-seqenv version 1.0.3 (pid 20539)
+seqenv version 1.0.4 (pid 20539)
 Start at: 2015-07-24 03:50:37.982581
 --> STEP 1: Parse the input FASTA file.
 Elapsed time: 0:00:02.345551

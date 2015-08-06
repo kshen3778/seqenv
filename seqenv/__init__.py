@@ -4,7 +4,7 @@ b'This module needs Python 2.7.x'
 from __future__ import division
 
 # Special variables #
-__version__ = '1.0.3'
+__version__ = '1.0.4'
 version_string = "seqenv version %s" % __version__
 
 # Built-in modules #
@@ -21,7 +21,8 @@ from seqenv.common.timer import Timer
 from seqenv.common.autopaths import FilePath
 
 # Compiled modules #
-import tagger
+if sys.platform == 'darwin': pass # TODO compile on OSX
+else: import tagger
 
 # Third party modules #
 import pandas
