@@ -8,7 +8,7 @@ __version__ = '1.0.4'
 version_string = "seqenv version %s" % __version__
 
 # Built-in modules #
-import sys, os, multiprocessing, gzip, warnings
+import sys, os, multiprocessing, gzip, warnings, sqlite3
 from collections import defaultdict
 import cPickle as pickle
 
@@ -21,8 +21,11 @@ from seqenv.common.timer import Timer
 from seqenv.common.autopaths import FilePath
 
 # Compiled modules #
-if sys.platform == 'darwin': pass # TODO compile on OSX
-else: import tagger
+if sys.platform == 'darwin':
+    msg = "Usage on OS X is current disabled because of compliation of the tagger"
+    warnings.warn(msg, UserWarning)
+else:
+    import tagger
 
 # Third party modules #
 import pandas
@@ -269,19 +272,19 @@ class Analysis(object):
         # Parse the results #
         with open(seq_to_gis, 'r') as handle: return pickle.load(handle)
 
-    @property_cached
-    def gi_to_text(self):
-        """A dictionary linking every gi identifier in NCBI to its isolation source
-        text, provided it has one. You will get a KeyError if you attempt to access
-        a GI that has no isolation source, so use self.gi_to_text.get(55831228)"""
-        print "--> STEP 5: Loading all NCBI isolation sources in RAM"
-        result = {}
-        with gzip.open(data_dir + 'gi_to_source.tsv.gz') as handle:
-            for i in tqdm(xrange(total_gis_with_source), total=total_gis_with_source):
-                gi, source = handle.next().lstrip('GI:').rstrip('\n').split('\t')
-                result[gi] = source
-        self.timer.print_elapsed()
-        return result
+    #@property_cached
+    #def gi_to_text(self):
+    #    """A dictionary linking every gi identifier in NCBI to its isolation source
+    #    text, provided it has one. You will get a KeyError if you attempt to access
+    #    a GI that has no isolation source, so use self.gi_to_text.get(55831228)"""
+    #    print "--> STEP 5: Loading all NCBI isolation sources in RAM"
+    #    result = {}
+    #    with gzip.open(data_dir + 'gi_to_source.tsv.gz') as handle:
+    #        for i in tqdm(xrange(total_gis_with_source), total=total_gis_with_source):
+    #            gi, source = handle.next().lstrip('GI:').rstrip('\n').split('\t')
+    #            result[gi] = source
+    #    self.timer.print_elapsed()
+    #    return result
 
     @property_cached
     def text_to_matches(self):

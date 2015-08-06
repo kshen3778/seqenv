@@ -13,7 +13,7 @@ $ ./generate.py
 """
 
 # Built-in modules #
-import os, time
+import os, time, sqlite3
 from shell_command import shell_output
 
 # Internal modules #
@@ -66,19 +66,29 @@ def record_to_source(record):
     for qualifier in qualifiers:
         if qualifier['GBQualifier_name'] == 'isolation_source':
             return qualifier['GBQualifier_value']
-    return '-'
 
 def record_to_pubmed_id(record):
     references = record['GBSeq_references'][0]
-    pubmed_id = references.get('GBReference_pubmed', '-')
+    pubmed_id = references.get('GBReference_pubmed')
     return pubmed_id
 
 ###############################################################################
-def result_dict_to_lines(result):
-    for gi, info in result.iteritems():
-        yield gi + '~' + info[0] + '~' + info[1] + '\n'
+def result_dict_to_lines(results):
+    for gi, info in results.iteritems():
+        yield gi + ',' + str(info[0]) + ',' + str(info[1]) + '\n'
 
-###############################################################################
+def serialize_results(results, sqlite_file):
+    if os.path.exists(sqlite_file): os.remove(sqlite_file)
+    with sqlite3.connect(sqlite_file) as connection:
+        cursor = connection.cursor()
+        cursor.execute("CREATE table 'data' (gi integer, source text, pubid integer)")
+        sql_command = "INSERT into 'data' values (?,?,?)"
+        values = ((gi, info[0], info[1]) for gi, info in results.iteritems())
+        cursor.executemany(sql_command, values)
+        cursor.execute("CREATE INDEX if not exists 'data_index' on 'data' (gi)")
+        connection.commit()
+        cursor.close()
+
 def test():
     """Test this script"""
     # Just a bunch GIs numbers #
@@ -86,25 +96,26 @@ def test():
                 '497', '429143984', '264670502', '74268401', '324498487']
     # The result we should get #
     template_result = """
-    74268401,-,-
-    6451693,-,-
+    74268401,None,None
+    6451693,None,None
     76365841,Everglades wetlands,16907754
-    324498487,bacterioplankton sample from lake,-
-    389043336,lake water at 5 m depth during dry season,-
-    22506766,-,-
-    127,-,-
-    429143984,downstream along river bank,-
-    497,-,3120795
-    264670502,aphotic layer; anoxic zone; tucurui hydroeletric power plant reservoir,-
+    324498487,bacterioplankton sample from lake,None
+    389043336,lake water at 5 m depth during dry season,None
+    22506766,None,None
+    127,None,None
+    429143984,downstream along river bank,None
+    497,None,3120795
+    264670502,aphotic layer; anoxic zone; tucurui hydroeletric power plant reservoir,None
     """
     # Make it pretty #
     template_result = '\n'.join(l.lstrip(' ') for l in template_result.split('\n') if l)
     # The result we got #
-    result = gis_to_records(test_gis)
-    result = result_dict_to_lines(result)
-    result = ''.join(result)
+    results = gis_to_records(test_gis)
     # Check #
-    assert result == template_result
+    text_version = ''.join(result_dict_to_lines(results))
+    assert text_version == template_result
+    # Return #
+    return results
 
 ###############################################################################
 if __name__ == '__main__':
@@ -120,32 +131,30 @@ if __name__ == '__main__':
     test()
 
     # Get all the G-ids from the current local NT database #
-    print 'STEP 1: Get all GIs from local nt database'
-    output_file = current_dir + 'all_gis.txt'
-    shell_output("blastdbcmd -db nt -entry all -outfmt '%g' > " + output_file)
+    print 'STEP 1: Get all GIs from local nt database into a file (about 2h)'
+    gids_file = current_dir + 'all_gis.txt'
+    shell_output("blastdbcmd -db nt -entry all -outfmt '%g' > " + gids_file)
     timer.print_elapsed()
 
     # Parse the file we created #
     print 'STEP 2: Parse file created'
-    with open(output_file, 'r') as handle: all_gis = list(handle)
+    with open(gids_file, 'r') as handle: all_gis = list(handle)
     timer.print_elapsed()
 
     # Now we query NCBI with the eutils to get every isolation source and pubmed ID #
     # This will run for very long #
-    print 'STEP 3: Query NCBI for all records (takes a shitload of time)'
-    result = gis_to_records(all_gis, progress=tqdm)
+    print 'STEP 3: Query NCBI for all records (about 1 or 2 days)'
+    results = gis_to_records(all_gis, progress=tqdm)
     timer.print_elapsed()
 
-    # Serialize the result to disk #
-    print 'STEP 4: Writing results from memory to disk'
-    result_file = current_dir + 'gi_to_source.tsv'
-    with open(result_file, 'w') as handle: handle.writelines(result_dict_to_lines(result))
+    # Serialize the result to disk in an sqlite databse #
+    print 'STEP 4: Writing results from memory to disk in an sqlite databse'
+    sqlite_file = current_dir + 'gi_to_source.tsv'
+    serialize_results(results, sqlite_file)
     timer.print_elapsed()
 
-    # Zip it #
-    print 'STEP 5: Zipping the result file'
-    zipped_file = current_dir + 'gi_to_source.tsv.gz'
-    timer.print_elapsed()
+    # Clean up #
+    #os.remove(gids_file)
 
     # End #
     print 'Done results are in "%s"' % os.path.abspath(current_dir)
