@@ -3,7 +3,8 @@
 
 """
 A script to parse and download information from the NCBI NT database
-useful for the seqenv project.
+useful for the seqenv project. We want isolation sources and PubMed pubmed_ids
+for all GI numbers found in the NT database.
 
 Written by Lucas Sinclair.
 Kopimi.
@@ -28,7 +29,7 @@ from shell_command import shell_output
 
 # Constants #
 Entrez.email = "I don't know who will be running this script"
-at_a_time = 40
+at_a_time = 100
 
 # Get current directory #
 current_dir = os.getcwd() + '/'
@@ -57,7 +58,7 @@ def all_gis(timer=None):
 def gis_to_records(gids_file, verbose=False):
     """Download information from NCBI in batch mode"""
     if verbose: print "-> Got %i GI numbers" % len(gids_file)
-    if verbose: print 'STEP 2: Querying NCBI and writing to database'
+    if verbose: print 'STEP 2: Querying NCBI and writing to database (about 300h)'
     progress = tqdm if verbose else lambda x:x
     generator = iter(gids_file)
     for i in progress(range(0, len(gids_file), at_a_time)):
@@ -65,7 +66,10 @@ def gis_to_records(gids_file, verbose=False):
         records    = chunk_to_records(chunk)
         sources    = map(record_to_source, records)
         pubmed_ids = map(record_to_pubmed_id, records)
-        yield (dict(zip(chunk, zip(sources, pubmed_ids))))
+        # Generate the result #
+        has_source = [i for i in xrange(len(chunk)) if sources[i]]
+        if not has_source: continue
+        yield {chunk[i]: (sources[i], pubmed_ids[i]) for i in has_source}
 
 def chunk_to_records(chunk):
     """Download from NCBI until it works. Will restart until reaching the python
@@ -86,29 +90,23 @@ def record_to_source(record):
             return qualifier['GBQualifier_value']
 
 def record_to_pubmed_id(record):
+    if 'GBSeq_references' not in record: return None
     references = record['GBSeq_references'][0]
     pubmed_id = references.get('GBReference_pubmed')
     return pubmed_id
 
 ###############################################################################
 def add_to_database(results):
-    if os.path.exists(sqlite_file): os.remove(sqlite_file)
-    with sqlite3.connect(sqlite_file) as connection:
-        cursor = connection.cursor()
-        cursor.execute("CREATE table 'data' (gi integer, source text, pubid integer)")
-        sql_command = "INSERT into 'data' values (?,?,?)"
-        try:
-            for chunk in results:
-                values = ((gi, info[0], info[1]) for gi, info in chunk.iteritems())
-                cursor.executemany(sql_command, values)
-        except KeyboardInterrupt as err:
-            print "You interrupted the creation of the database. Committing everything done up to this point."
-            connection.commit()
-            cursor.close()
-            raise err
-        cursor.execute("CREATE INDEX if not exists 'data_index' on 'data' (gi)")
-        connection.commit()
-        cursor.close()
+    connection = sqlite3.connect(sqlite_file, isolation_level=None)
+    cursor = connection.cursor()
+    cursor.execute("CREATE table 'data' (gi integer, source text, pubid integer)")
+    sql_command = "INSERT into 'data' values (?,?,?)"
+    for chunk in results:
+        values = [(gi, info[0], info[1]) for gi, info in chunk.iteritems()]
+        cursor.executemany(sql_command, values)
+    cursor.execute("CREATE INDEX if not exists 'data_index' on 'data' (gi)")
+    connection.commit()
+    cursor.close()
 
 ###############################################################################
 def test():
@@ -118,15 +116,10 @@ def test():
                 '497', '429143984', '264670502', '74268401', '324498487']
     # The result we should get #
     template_result = """
-    74268401,None,None
-    6451693,None,None
+    429143984,downstream along river bank,None
     76365841,Everglades wetlands,16907754
     324498487,bacterioplankton sample from lake,None
     389043336,lake water at 5 m depth during dry season,None
-    22506766,None,None
-    127,None,None
-    429143984,downstream along river bank,None
-    497,None,3120795
     264670502,aphotic layer; anoxic zone; tucurui hydroeletric power plant reservoir,None
     """
     # Make it pretty #
