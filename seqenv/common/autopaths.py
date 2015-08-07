@@ -23,7 +23,7 @@ class FilePath(str):
 
     @property_cached
     def count_lines(self):
-        return int(sh.wc('-l', self.path))
+        return int(sh.wc('-l', self.path).split()[0])
 
     @property
     def exists(self):

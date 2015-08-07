@@ -14,7 +14,6 @@ $ ./generate.py
 
 # Built-in modules #
 import os, time, sqlite3
-from itertools import islice
 
 # Internal modules #
 from seqenv.common.timer import Timer
@@ -31,7 +30,7 @@ Entrez.email = "I don't know who will be running this script"
 at_a_time = range(2)
 
 # Get current directory #
-current_dir = os.getcwd()
+current_dir = os.getcwd() + '/'
 current_dir = os.path.dirname(os.path.realpath(__file__)) + '/'
 
 # Files #
