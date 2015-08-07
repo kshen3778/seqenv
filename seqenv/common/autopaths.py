@@ -1,5 +1,8 @@
 # Built-in modules #
-import os
+import os, sh
+
+# Internal modules #
+from seqenv.common.cache import property_cached
 
 ################################################################################
 class FilePath(str):
@@ -16,6 +19,11 @@ class FilePath(str):
         self.path = path
 
     def __iter__(self): return open(self.path)
+    def __len__(self): return self.count_lines
+
+    @property_cached
+    def count_lines(self):
+        return int(sh.wc('-l', self.path))
 
     @property
     def exists(self):
