@@ -14,6 +14,7 @@ $ ./generate.py
 
 # Built-in modules #
 import os, time, sqlite3
+from itertools import islice
 
 # Internal modules #
 from seqenv.common.timer import Timer
@@ -27,7 +28,7 @@ from shell_command import shell_output
 
 # Constants #
 Entrez.email = "I don't know who will be running this script"
-at_a_time = range(2)
+at_a_time = 40
 
 # Get current directory #
 current_dir = os.getcwd() + '/'
@@ -35,7 +36,7 @@ current_dir = os.path.dirname(os.path.realpath(__file__)) + '/'
 
 # Files #
 gids_file = FilePath(current_dir + 'all_gis.txt')
-sqlite_file = FilePath(current_dir + 'gi_to_source.tsv')
+sqlite_file = FilePath(current_dir + 'gi_index.sqlite3')
 
 # Check #
 msg = 'The database "%s" already exists.' % sqlite_file
@@ -49,15 +50,18 @@ def all_gis(timer=None):
         shell_output("blastdbcmd -db nt -entry all -outfmt '%g' > " + gids_file)
         if timer is not None: timer.print_elapsed()
     else:
-        print 'All gi numbers already found in file "%s", skipping STEP 1.' % gids_file
+        print '-> All GI numbers already found in file "%s", skipping STEP 1.' % gids_file.filename
     return gids_file
 
 ###############################################################################
-def gis_to_records(gids_file):
+def gis_to_records(gids_file, verbose=False):
     """Download information from NCBI in batch mode"""
-    print 'STEP 2: Querying NCBI and writing to database'
-    for i in tqdm(range(0, len(gids_file), len(at_a_time))):
-        chunk      = [gids_file.next() for _ in at_a_time]
+    if verbose: print "-> Got %i GI numbers" % len(gids_file)
+    if verbose: print 'STEP 2: Querying NCBI and writing to database'
+    progress = tqdm if verbose else lambda x:x
+    generator = iter(gids_file)
+    for i in progress(range(0, len(gids_file), at_a_time)):
+        chunk      = list(islice(generator, 0, at_a_time))
         records    = chunk_to_records(chunk)
         sources    = map(record_to_source, records)
         pubmed_ids = map(record_to_pubmed_id, records)
@@ -93,9 +97,15 @@ def add_to_database(results):
         cursor = connection.cursor()
         cursor.execute("CREATE table 'data' (gi integer, source text, pubid integer)")
         sql_command = "INSERT into 'data' values (?,?,?)"
-        for chunk in results:
-            values = ((gi, info[0], info[1]) for gi, info in chunk.iteritems())
-            cursor.executemany(sql_command, values)
+        try:
+            for chunk in results:
+                values = ((gi, info[0], info[1]) for gi, info in chunk.iteritems())
+                cursor.executemany(sql_command, values)
+        except KeyboardInterrupt as err:
+            print "You interrupted the creation of the database. Committing everything done up to this point."
+            connection.commit()
+            cursor.close()
+            raise err
         cursor.execute("CREATE INDEX if not exists 'data_index' on 'data' (gi)")
         connection.commit()
         cursor.close()
@@ -122,14 +132,16 @@ def test():
     # Make it pretty #
     template_result = '\n'.join(l.lstrip(' ') for l in template_result.split('\n') if l)
     # The result we got #
-    results = gis_to_records(test_gis)
+    results = gis_to_records(test_gis).next()
     # Function #
     def result_dict_to_lines(results):
-        for gi, info in results.iteritems():
+        for gi, info in results.items():
             yield gi + ',' + str(info[0]) + ',' + str(info[1]) + '\n'
     # Check #
     text_version = ''.join(result_dict_to_lines(results))
     assert text_version == template_result
+    # Verbose #
+    print "-> Test OK !"
     # Return #
     return results
 
@@ -144,7 +156,7 @@ if __name__ == '__main__':
     test()
 
     # Do it #
-    add_to_database(gis_to_records(all_gis(timer)))
+    add_to_database(gis_to_records(all_gis(timer), verbose=True))
 
     # End #
     print 'Done. Results are in "%s"' % os.path.abspath(current_dir)
