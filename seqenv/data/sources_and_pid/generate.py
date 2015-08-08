@@ -3,8 +3,10 @@
 
 """
 A script to parse and download information from the NCBI NT database
-useful for the seqenv project. We want isolation sources and PubMed pubmed_ids
+useful for the seqenv project. We want isolation sources and pubmed_ids
 for all GI numbers found in the NT database.
+
+See https://biosupport.se/p/719/
 
 Written by Lucas Sinclair.
 Kopimi.
@@ -16,6 +18,7 @@ $ ./generate.py
 # Built-in modules #
 import os, time, sqlite3
 from itertools import islice
+import urllib2
 
 # Internal modules #
 from seqenv.common.timer import Timer
@@ -36,11 +39,11 @@ current_dir = os.getcwd() + '/'
 current_dir = os.path.dirname(os.path.realpath(__file__)) + '/'
 
 # Files #
-gids_file = FilePath(current_dir + 'all_gis.txt')
+gids_file   = FilePath(current_dir + 'all_gis.txt')
 sqlite_file = FilePath(current_dir + 'gi_index.sqlite3')
 
 # Check #
-msg = 'The database "%s" already exists.' % sqlite_file
+msg  = 'The database "%s" already exists.' % sqlite_file
 msg += ' Delete it before running this script to recreate it.'
 if sqlite_file.count_bytes > 0: raise Exception(msg)
 
@@ -61,7 +64,7 @@ def gis_to_records(gids_file, verbose=False):
     if verbose: print 'STEP 2: Querying NCBI and writing to database (about 300h)'
     progress = tqdm if verbose else lambda x:x
     generator = iter(gids_file)
-    for i in progress(range(0, len(gids_file), at_a_time)):
+    for i in progress(xrange(0, len(gids_file), at_a_time)):
         chunk      = list(islice(generator, 0, at_a_time))
         records    = chunk_to_records(chunk)
         sources    = map(record_to_source, records)
@@ -80,7 +83,8 @@ def chunk_to_records(chunk):
         response = Entrez.efetch(db="nucleotide", id=chunk, retmode="xml")
         records = list(Entrez.parse(response, validate=True))
         return records
-    except CorruptedXMLError:
+    except CorruptedXMLError, urllib2.HTTPError:
+        time.sleep(5)
         return chunk_to_records(chunk)
 
 def record_to_source(record):
@@ -102,7 +106,7 @@ def add_to_database(results):
     cursor.execute("CREATE table 'data' (gi integer, source text, pubid integer)")
     sql_command = "INSERT into 'data' values (?,?,?)"
     for chunk in results:
-        values = [(gi, info[0], info[1]) for gi, info in chunk.iteritems()]
+        values = ((gi, info[0], info[1]) for gi, info in chunk.iteritems())
         cursor.executemany(sql_command, values)
     cursor.execute("CREATE INDEX if not exists 'data_index' on 'data' (gi)")
     connection.commit()
@@ -150,6 +154,7 @@ if __name__ == '__main__':
 
     # Do it #
     add_to_database(gis_to_records(all_gis(timer), verbose=True))
+    timer.print_elapsed()
 
     # End #
     print 'Done. Results are in "%s"' % os.path.abspath(current_dir)
