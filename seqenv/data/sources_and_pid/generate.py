@@ -58,7 +58,7 @@ def all_gis(timer=None):
     return gids_file
 
 ###############################################################################
-def gis_to_records(gids_file, verbose=False):
+def gis_to_records(gids_file, verbose=True):
     """Download information from NCBI in batch mode"""
     if verbose: print "-> Got %i GI numbers" % len(gids_file)
     if verbose: print 'STEP 2: Querying NCBI and writing to database (about 300h)'
@@ -83,7 +83,7 @@ def chunk_to_records(chunk):
         response = Entrez.efetch(db="nucleotide", id=chunk, retmode="xml")
         records = list(Entrez.parse(response, validate=True))
         return records
-    except CorruptedXMLError, urllib2.HTTPError:
+    except (CorruptedXMLError, urllib2.HTTPError, urllib2.URLError):
         time.sleep(5)
         return chunk_to_records(chunk)
 
@@ -129,7 +129,7 @@ def test():
     # Make it pretty #
     template_result = '\n'.join(l.lstrip(' ') for l in template_result.split('\n') if l)
     # The result we got #
-    results = gis_to_records(test_gis).next()
+    results = gis_to_records(test_gis, verbose=False).next()
     # Function #
     def result_dict_to_lines(results):
         for gi, info in results.items():
@@ -137,8 +137,6 @@ def test():
     # Check #
     text_version = ''.join(result_dict_to_lines(results))
     assert text_version == template_result
-    # Verbose #
-    print "-> Test OK !"
     # Return #
     return results
 
@@ -151,9 +149,10 @@ if __name__ == '__main__':
     # Test the pipeline #
     print 'STEP 0: Testing the script and connection'
     test()
+    print "-> Test OK !"
 
     # Do it #
-    add_to_database(gis_to_records(all_gis(timer), verbose=True))
+    add_to_database(gis_to_records(all_gis(timer)))
     timer.print_elapsed()
 
     # End #
