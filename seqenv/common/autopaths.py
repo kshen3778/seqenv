@@ -63,9 +63,9 @@ class FilePath(str):
         return os.path.getsize(self.path)
 
     @property
-    def lines(self):
-        """An iterator on the lines of the file, without \n"""
-        for x in self: yield x.rstrip('\n')
+    def lines_int(self):
+        """An iterator on the lines of the file as integers"""
+        for x in self: yield int(x.rstrip('\n'))
 
     def must_exist(self):
         """Raise an exception if the path doesn't exist."""

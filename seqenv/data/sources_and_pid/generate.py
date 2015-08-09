@@ -54,7 +54,7 @@ def all_gis():
     # If the database doesn't exists #
     if sqlite_file.count_bytes < 1:
         print "-> The database doesn't exist. Creating it."
-        return gids_file.lines, len(gids_file)
+        return gids_file.lines_int, len(gids_file)
     else:
         print '-> The database seems to exist already. Attempting to restart where it was stopped.'
         connection = sqlite3.connect(sqlite_file)
@@ -64,7 +64,7 @@ def all_gis():
         cursor.close()
         connection.close()
         print '-> Last Gi number done was "%s".' % last_gi
-        generator = gids_file.lines
+        generator = gids_file.lines_int
         n = 0
         while True:
             gi = generator.next()
@@ -95,7 +95,7 @@ def chunk_to_records(chunk):
     a little pause at every function call."""
     time.sleep(0.2)
     try:
-        response = Entrez.efetch(db="nucleotide", id=chunk, retmode="xml")
+        response = Entrez.efetch(db="nucleotide", id=map(str,chunk), retmode="xml")
         records = list(Entrez.parse(response, validate=True))
         return records
     except (CorruptedXMLError, urllib2.HTTPError, urllib2.URLError):
@@ -111,8 +111,8 @@ def record_to_source(record):
 def record_to_pubmed_id(record):
     if 'GBSeq_references' not in record: return None
     references = record['GBSeq_references'][0]
-    pubmed_id = references.get('GBReference_pubmed')
-    return pubmed_id
+    if 'GBReference_pubmed' not in references: return None
+    return int(references.get('GBReference_pubmed'))
 
 ###############################################################################
 def add_to_database(results):
@@ -121,7 +121,7 @@ def add_to_database(results):
     cursor.execute("CREATE table 'data' (gi integer, source text, pubid integer)")
     sql_command = "INSERT into 'data' values (?,?,?)"
     for chunk in results:
-        values = ((int(gi), info[0], int(info[1])) for gi, info in chunk.iteritems())
+        values = ((gi, info[0], info[1]) for gi, info in chunk.iteritems())
         cursor.executemany(sql_command, values)
     cursor.execute("CREATE INDEX if not exists 'data_index' on 'data' (gi)")
     connection.commit()
