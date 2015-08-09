@@ -74,11 +74,11 @@ def all_gis():
         return generator, len(gids_file) - n
 
 ###############################################################################
-def gis_to_records(gids, verbose=True):
+def gis_to_records(gids, length, verbose=True):
     """Download information from NCBI in batch mode"""
     if verbose: print 'STEP 2: Querying NCBI and writing to database (about 300h)'
     progress = tqdm if verbose else lambda x:x
-    for i in progress(xrange(0, len(gids_file), at_a_time)):
+    for i in progress(xrange(0, length, at_a_time)):
         chunk      = list(islice(gids, 0, at_a_time))
         records    = chunk_to_records(chunk)
         sources    = map(record_to_source, records)
@@ -144,7 +144,7 @@ def test():
     # Make it pretty #
     template_result = '\n'.join(l.lstrip(' ') for l in template_result.split('\n') if l)
     # The result we got #
-    results = gis_to_records(iter(test_gis), verbose=False).next()
+    results = gis_to_records(iter(test_gis), length=len(test_gis), verbose=False).next()
     # Function #
     def result_dict_to_lines(results):
         for gi, info in results.items():
@@ -168,9 +168,9 @@ if __name__ == '__main__':
     timer.print_elapsed()
 
     # Do it #
-    gis, length = all_gis()
+    gis, remaining = all_gis()
     timer.print_elapsed()
-    add_to_database(gis_to_records(gis))
+    add_to_database(gis_to_records(gis, remaining))
     timer.print_elapsed()
 
     # End #
