@@ -63,6 +63,7 @@ def all_gis():
         last_gi = str(cursor.next()[0])
         cursor.close()
         connection.close()
+        print '-> Last Gi number done was "%s".' % last_gi
         generator = gids_file.lines
         n = 0
         while True:
@@ -120,7 +121,7 @@ def add_to_database(results):
     cursor.execute("CREATE table 'data' (gi integer, source text, pubid integer)")
     sql_command = "INSERT into 'data' values (?,?,?)"
     for chunk in results:
-        values = ((gi, info[0], info[1]) for gi, info in chunk.iteritems())
+        values = ((int(gi), info[0], int(info[1])) for gi, info in chunk.iteritems())
         cursor.executemany(sql_command, values)
     cursor.execute("CREATE INDEX if not exists 'data_index' on 'data' (gi)")
     connection.commit()

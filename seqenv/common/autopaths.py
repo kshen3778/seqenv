@@ -65,7 +65,7 @@ class FilePath(str):
     @property
     def lines(self):
         """An iterator on the lines of the file, without \n"""
-        for x in self: return x.rstrip('\n')
+        for x in self: yield x.rstrip('\n')
 
     def must_exist(self):
         """Raise an exception if the path doesn't exist."""
