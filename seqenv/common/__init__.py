@@ -11,3 +11,10 @@ def new_temp_path(**kwargs):
     path = handle.name
     handle.close()
     return path
+
+################################################################################
+class GenWithLength(object):
+    """A generator with a length attribute"""
+    def __init__(self, gen, length): self.gen, self.length = gen, length
+    def __iter__(self): return self.gen
+    def __len__(self): return self.length

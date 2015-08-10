@@ -7,6 +7,7 @@ useful for the seqenv project. We want isolation sources and pubmed_ids
 for all GI numbers found in the NT database.
 
 See https://biosupport.se/p/719/
+And https://www.biostars.org/p/153833/
 
 Written by Lucas Sinclair.
 Kopimi.
@@ -16,165 +17,213 @@ $ ./generate.py
 """
 
 # Built-in modules #
-import os, time, sqlite3, inspect
+import os, time, inspect, urllib2
 from itertools import islice
-import urllib2
+from collections import OrderedDict
 
 # Internal modules #
-from seqenv.common.timer import Timer
+from seqenv.common           import GenWithLength
+from seqenv.common.timer     import Timer
 from seqenv.common.autopaths import FilePath
+from seqenv.common.database  import Database
+from seqenv.common.cache     import property_cached
 
 # Third party modules #
 from Bio import Entrez
-from Bio.Entrez.Parser import CorruptedXMLError
 from tqdm import tqdm
 from shell_command import shell_output
+from Bio.Entrez.Parser import CorruptedXMLError, ValidationError
 
-# Constants #
-Entrez.email = "I don't know who will be running this script"
-at_a_time = 100
-
-# Get current directory #
+# Get the directory of this script #
 filename = inspect.getframeinfo(inspect.currentframe()).filename
 current_dir = os.path.dirname(os.path.abspath(filename))  + '/'
 
-# Files #
-gids_file   = FilePath(current_dir + 'all_gis.txt')
-sqlite_file = FilePath(current_dir + 'gi_index.sqlite3')
-
 ###############################################################################
-def all_gis():
-    # If the gi files doesn't exist #
-    if gids_file.count_bytes < 1:
-        print 'STEP 1: Get all GIs from local nt database into a file (about 6h).'
-        shell_output("blastdbcmd -db nt -entry all -outfmt '%g' > " + gids_file)
-    else:
-        print '-> All GI numbers already found in file "%s", skipping STEP 1.' % gids_file.filename
-    print "-> Got %i total GI numbers" % len(gids_file)
-    # If the database doesn't exists #
-    if sqlite_file.count_bytes < 1:
-        print "-> The database doesn't exist. Creating it."
-        return gids_file.lines_int, len(gids_file)
-    else:
-        print '-> The database seems to exist already. Attempting to restart where it was stopped.'
-        connection = sqlite3.connect(sqlite_file)
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM data ORDER BY ROWID DESC LIMIT 1;")
-        last_gi = str(cursor.next()[0])
-        cursor.close()
-        connection.close()
-        print '-> Last Gi number done was "%s".' % last_gi
-        generator = gids_file.lines_int
+class GenerateGIs(FilePath):
+    """Takes care of generating a suite of GI numbers."""
+
+    def retrieve_from_nt(self):
+        """Get all GI numbers from local NT database"""
+        shell_output("blastdbcmd -db nt -entry all -outfmt '%g' > " + self)
+
+    def check_retrieved(self):
+        """Check that we have retrieved the GI numbers, else do it."""
+        if self.count_bytes < 1: self.retrieve_from_nt()
+        else: print '-> All GI numbers already found in file "%s", skipping STEP 1.' % self.filename
+
+    def all(self):
+        """Iterate over all GI numbers."""
+        return GenWithLength(self.lines_int, len(self))
+
+    @property
+    def lines_int(self):
+        """An iterator on the lines of the file as integers"""
+        for x in self: yield int(x.rstrip('\n'))
+
+    def start_at(self, last_gi):
+        """Iterate over all GI numbers starting at a given GI number."""
+        generator = self.lines_int
         n = 0
         while True:
             gi = generator.next()
             n += 1
             if gi == last_gi: break
         else:
-            raise Exception("Didn't find the last GI in the all_gis.txt file")
-        return generator, len(gids_file) - n
+            raise Exception("Didn't find the GI '%s' in the all_gis.txt file" % last_gi)
+        return GenWithLength(generator, len(self) - n)
+
+def test_generate_gis():
+    """A small generator that yields a couple test GI numbers.
+    Useful for test cases."""
+    gis = ['6451693', '127', '76365841', '22506766', '389043336',
+           '497', '429143984', '264670502', '74268401', '324498487']
+    return GenWithLength((gi for gi in gis), len(gis))
 
 ###############################################################################
-def gis_to_records(gids, length, verbose=True):
-    """Download information from NCBI in batch mode"""
-    if verbose: print 'STEP 2: Querying NCBI and writing to database (about 300h)'
-    progress = tqdm if verbose else lambda x:x
-    for i in progress(xrange(0, length, at_a_time)):
-        chunk      = list(islice(gids, 0, at_a_time))
-        records    = chunk_to_records(chunk)
-        sources    = map(record_to_source, records)
-        pubmed_ids = map(record_to_pubmed_id, records)
-        # Generate the result #
-        has_source = [i for i in xrange(len(chunk)) if sources[i]]
-        if not has_source: continue
-        yield {chunk[i]: (sources[i], pubmed_ids[i]) for i in has_source}
+class QueryNCBI(object):
+    """Takes care of querying NCBI and restarting when errors occur"""
 
-def chunk_to_records(chunk):
-    """Download from NCBI until it works. Will restart until reaching the python
-    recursion limit. We don't want to get our IP banned from NCBI so we have
-    a little pause at every function call."""
-    time.sleep(0.2)
-    try:
-        response = Entrez.efetch(db="nucleotide", id=map(str,chunk), retmode="xml")
-        records = list(Entrez.parse(response, validate=True))
-        return records
-    except (CorruptedXMLError, urllib2.HTTPError, urllib2.URLError):
-        time.sleep(5)
-        return chunk_to_records(chunk)
+    email = "I don't know who will be running this script"
 
-def record_to_source(record):
-    qualifiers = record['GBSeq_feature-table'][0]['GBFeature_quals']
-    for qualifier in qualifiers:
-        if qualifier['GBQualifier_name'] == 'isolation_source':
-            return qualifier['GBQualifier_value']
+    def __init__(self, at_a_time=100, delay=0.2, progress=True):
+        """Give the number of records to retrieve at a time as well
+        as the delay to wait between requests"""
+        # Base parameters #
+        self.at_a_time = int(at_a_time)
+        self.delay     = float(delay)
+        # Display progress #
+        if progress is True:    self.progress = tqdm
+        elif progress is False: self.progress = lambda x:x
+        else:                   self.progress = progress
+        # Set the email #
+        Entrez.email = self.email
+        # Error logging #
+        self.http_errors  = 0
+        self.url_errors   = 0
+        self.xml_errors   = 0
+        self.parse_errors = 0
 
-def record_to_pubmed_id(record):
-    if 'GBSeq_references' not in record: return None
-    references = record['GBSeq_references'][0]
-    if 'GBReference_pubmed' not in references: return None
-    return int(references.get('GBReference_pubmed'))
+    def get(self, gi_nums):
+        """Download information from NCBI in batch mode.
+        Return `isolation_source` and `pubmed_id for an entry if it has an
+        isolation_source"""
+        for i in self.progress(xrange(0, len(gi_nums), self.at_a_time)):
+            chunk      = tuple(islice(gi_nums, 0, self.at_a_time))
+            records    = self.chunk_to_records(chunk)
+            sources    = map(self.record_to_source, records)
+            pubmed_ids = map(self.record_to_pubmed_id, records)
+            # Generate the result #
+            has_source = tuple(i for i in xrange(len(chunk)) if sources[i])
+            if not has_source: continue
+            yield ((chunk[i], sources[i], pubmed_ids[i]) for i in has_source)
+
+    def chunk_to_records(self, chunk):
+        """Download from NCBI until it works. Will restart until reaching the python
+        recursion limit. We don't want to get our IP banned from NCBI so we have
+        a little pause at every function call."""
+        time.sleep(self.delay)
+        # The web connection #
+        try:
+            response = Entrez.efetch(db="nucleotide", id=map(str,chunk), retmode="xml")
+        except urllib2.HTTPError:
+            self.http_errors += 1
+            time.sleep(5)
+            return self.chunk_to_records(chunk)
+        except urllib2.URLError:
+            self.url_errors += 1
+            time.sleep(5)
+            return self.chunk_to_records(chunk)
+        # The parsing xml #
+        try:
+            return list(Entrez.parse(response, validate=True))
+        except CorruptedXMLError:
+            self.xml_errors += 1
+            time.sleep(5)
+            return self.chunk_to_records(chunk)
+        except ValidationError:
+            self.parse_errors += 1
+            time.sleep(5)
+            return self.chunk_to_records(chunk)
+
+    def record_to_source(self, record):
+        qualifiers = record['GBSeq_feature-table'][0]['GBFeature_quals']
+        for qualifier in qualifiers:
+            if qualifier['GBQualifier_name'] == 'isolation_source':
+                return qualifier['GBQualifier_value']
+
+    def record_to_pubmed_id(self, record):
+        if 'GBSeq_references' not in record: return None
+        references = record['GBSeq_references'][0]
+        if 'GBReference_pubmed' not in references: return None
+        return int(references.get('GBReference_pubmed'))
+
+    def print_error_log(self):
+        """Print error logs"""
+        print "HTTP errors: %s"  % self.http_errors
+        print "URL errors: %s"   % self.url_errors
+        print "XML errors: %s"   % self.xml_errors
+        print "Parse errors: %s" % self.parse_errors
 
 ###############################################################################
-def add_to_database(results):
-    connection = sqlite3.connect(sqlite_file, isolation_level=None)
-    cursor = connection.cursor()
-    cursor.execute("CREATE table 'data' (gi integer, source text, pubid integer)")
-    sql_command = "INSERT into 'data' values (?,?,?)"
-    for chunk in results:
-        values = ((gi, info[0], info[1]) for gi, info in chunk.iteritems())
-        cursor.executemany(sql_command, values)
-    cursor.execute("CREATE INDEX if not exists 'data_index' on 'data' (gi)")
-    connection.commit()
-    cursor.close()
-    connection.close()
-
-###############################################################################
-def test():
-    """Test this script"""
-    # Just a bunch of random GI numbers #
-    test_gis = ['6451693', '127', '76365841', '22506766', '389043336',
-                '497', '429143984', '264670502', '74268401', '324498487']
-    # The result we should get #
-    template_result = """
-    429143984,downstream along river bank,None
-    76365841,Everglades wetlands,16907754
-    324498487,bacterioplankton sample from lake,None
-    389043336,lake water at 5 m depth during dry season,None
-    264670502,aphotic layer; anoxic zone; tucurui hydroeletric power plant reservoir,None
-    """
-    # Make it pretty #
-    template_result = '\n'.join(l.lstrip(' ') for l in template_result.split('\n') if l)
-    # The result we got #
-    results = gis_to_records(iter(test_gis), length=len(test_gis), verbose=False).next()
-    # Function #
-    def result_dict_to_lines(results):
-        for gi, info in results.items():
-            yield gi + ',' + str(info[0]) + ',' + str(info[1]) + '\n'
-    # Check #
-    text_version = ''.join(result_dict_to_lines(results))
-    assert text_version == template_result
-    # Return #
-    return results
-
-###############################################################################
-if __name__ == '__main__':
+def run():
+    """Run this script."""
     # Start timer #
     timer = Timer()
     timer.print_start()
-
-    # Test the pipeline #
-    print 'STEP 0: Testing the script and connection'
-    test()
-    print "-> Test OK !"
+    # Objects #
+    gi_generator = GenerateGIs(current_dir + 'all_gis.txt')
+    sqlite_db    = Database(current_dir + 'gi_db.sqlite3')
+    ncbi_worker  = QueryNCBI()
+    # Get the numbers #
+    print 'STEP 1: Get all GIs from local nt database into a file (about 6h).'
+    gi_generator.check_retrieved()
     timer.print_elapsed()
-
     # Do it #
-    gis, remaining = all_gis()
+    print 'STEP 2: Querying NCBI and writing to database (about 150h)'
+    if sqlite_db.count_bytes < 1:
+        print "-> The database doesn't exist. Creating it."
+        keys = OrderedDict((('id','integer'), ('source','text'), ('pubmed','integer')))
+        sqlite_db.create(keys)
+        sqlite_db.add_by_steps(ncbi_worker.get(gi_generator.all()))
+    else:
+        print '-> The database seems to exist already. Attempting to restart where it was stopped.'
+        last_gi = sqlite_db.last[0]
+        print '-> Last Gi number recorded was "%s".' % last_gi
+        sqlite_db.add_by_steps(ncbi_worker.get(gi_generator.start_at(last_gi)))
+    # End messages #
     timer.print_elapsed()
-    add_to_database(gis_to_records(gis, remaining))
-    timer.print_elapsed()
-
-    # End #
-    print 'Done. Results are in "%s"' % os.path.abspath(current_dir)
+    print 'Done. Results are in "%s"' % sqlite_db
     timer.print_end()
     timer.print_total_elapsed()
+    ncbi_worker.print_error_log()
+
+###############################################################################
+def test():
+    """Test this script."""
+    # Verbose #
+    print 'STEP 0: Testing the script and connection'
+    # The result we should get #
+    template_result = """
+    76365841,Everglades wetlands,16907754
+    389043336,lake water at 5 m depth during dry season,None
+    429143984,downstream along river bank,None
+    264670502,aphotic layer; anoxic zone; tucurui hydroeletric power plant reservoir,None
+    324498487,bacterioplankton sample from lake,None"""
+    # Make it pretty #
+    template_result = '\n'.join(l.lstrip(' ') for l in template_result.split('\n') if l)
+    # The result we got #
+    ncbi_worker = QueryNCBI(at_a_time=10, progress=False)
+    results = ncbi_worker.get(test_generate_gis()).next()
+    # Function #
+    def result_to_lines(results):
+        for gi, source, pubmed in results:
+            yield str(gi) + ',' + source + ',' + str(pubmed) + '\n'
+    # Check #
+    text_version = ''.join(result_to_lines(results))
+    assert text_version.strip('\n') == template_result.strip('\n')
+    print "-> Test OK !"
+
+###############################################################################
+if __name__ == '__main__':
+    test()
+    run()
