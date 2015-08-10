@@ -1,5 +1,5 @@
 # Built-in modules #
-import os, sh
+import os, sh, glob
 
 # Internal modules #
 from seqenv.common.cache import property_cached
@@ -9,14 +9,30 @@ class FilePath(str):
     """A file path somewhere in the file system. Useful methods for dealing
     with such paths are included. For instance, you can ask for `path.extension`"""
 
-    def __new__(cls, path, *args, **kwargs):
+    @classmethod
+    def clean_path(cls, path):
+        """Given a path, return a cleaned up version for initialization"""
+        # Conserve None object style #
         if path is None: return None
-        if isinstance(path, FilePath): path = path.path
-        return str.__new__(cls, path)
+        # Don't nest FilePaths or the like #
+        if hasattr(path, 'path'): path = path.path
+        # Expand tilda #
+        if "~" in path: path = os.path.expanduser(path)
+        # Expand star #
+        if "*" in path:
+            matches = glob.glob(path)
+            if len(matches) < 1: raise Exception("Found exactly no files matching '%s'" % path)
+            if len(matches) > 1: raise Exception("Found several files matching '%s'" % path)
+            path = matches[0]
+        # Return the result #
+        return path
+
+    def __new__(cls, path, *args, **kwargs):
+        """A FilePath is in fact a string"""
+        return str.__new__(cls, cls.clean_path(path))
 
     def __init__(self, path):
-        if isinstance(path, FilePath): path = path.path
-        self.path = path
+        self.path = self.clean_path(path)
 
     def __iter__(self): return open(self.path)
     def __len__(self): return self.count_lines
@@ -62,10 +78,10 @@ class FilePath(str):
         if not self.exists: return 0
         return os.path.getsize(self.path)
 
-    @property
-    def lines_int(self):
-        """An iterator on the lines of the file as integers"""
-        for x in self: yield int(x.rstrip('\n'))
+    def remove(self):
+        if not self.exists: return False
+        os.remove(self.path)
+        return True
 
     def must_exist(self):
         """Raise an exception if the path doesn't exist."""
