@@ -13,7 +13,7 @@ class Database(FilePath):
     def __init__(self, path, factory=None, isolation=None):
         self.path      = path
         self.factory   = factory
-        self.isolation = None
+        self.isolation = isolation
 
     def __repr__(self):
         """Called when evaluating ``print seqs``."""

@@ -26,7 +26,6 @@ from seqenv.common           import GenWithLength
 from seqenv.common.timer     import Timer
 from seqenv.common.autopaths import FilePath
 from seqenv.common.database  import Database
-from seqenv.common.cache     import property_cached
 
 # Third party modules #
 from Bio import Entrez
@@ -50,6 +49,7 @@ class GenerateGIs(FilePath):
         """Check that we have retrieved the GI numbers, else do it."""
         if self.count_bytes < 1: self.retrieve_from_nt()
         else: print '-> All GI numbers already found in file "%s", skipping STEP 1.' % self.filename
+        print '-> Got %i GI numbers.' % len(self)
 
     def all(self):
         """Iterate over all GI numbers."""
@@ -188,7 +188,7 @@ def run():
     else:
         print '-> The database seems to exist already. Attempting to restart where it was stopped.'
         last_gi = sqlite_db.last[0]
-        print '-> Last Gi number recorded was "%s".' % last_gi
+        print '-> Last GI number recorded was "%s".' % last_gi
         sqlite_db.add_by_steps(ncbi_worker.get(gi_generator.start_at(last_gi)))
     # End messages #
     timer.print_elapsed()
@@ -225,5 +225,6 @@ def test():
 
 ###############################################################################
 if __name__ == '__main__':
+    print "Generating the GI database (pid %i)" % os.getpid()
     test()
     run()
