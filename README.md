@@ -42,7 +42,7 @@ Several other options are possible. Here is a list describing them all:
    * `--seq_type`: Sequence type `nucl` or `prot`, for nucleotides or amino acids respectively (Default: `nucl`).
    * `--search_algo`: Search algorithm. Either `blast` or `vsearch` (Default: `blast`).
    * `--search_db`: The database to search against (Default: `nt`). You can specify the full path or make a `~/.ncbirc` file.
-   * `--normalization`: Can be either of `flat`, `ui` or `uim`. This option default to `ui`.
+   * `--normalization`: Can be either of `flat`, `ui` or `uim`. This option defaults to `ui`.
                         - If you choose `flat`, we will count every isolation source once,
                           even if the same text entry appears several time for the same inputs
                           sequence.

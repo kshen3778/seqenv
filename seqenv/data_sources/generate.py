@@ -20,6 +20,7 @@ $ ./generate.py
 import os, time, inspect, urllib2
 from itertools import islice
 from collections import OrderedDict
+from socket import error as SocketError
 
 # Internal modules #
 from seqenv.common           import GenWithLength
@@ -98,10 +99,11 @@ class QueryNCBI(object):
         # Set the email #
         Entrez.email = self.email
         # Error logging #
-        self.http_errors  = 0
-        self.url_errors   = 0
-        self.xml_errors   = 0
-        self.parse_errors = 0
+        self.http_errors   = 0
+        self.url_errors    = 0
+        self.xml_errors    = 0
+        self.parse_errors  = 0
+        self.socket_errors = 0
 
     def get(self, gi_nums):
         """Download information from NCBI in batch mode.
@@ -133,6 +135,10 @@ class QueryNCBI(object):
             self.url_errors += 1
             time.sleep(5)
             return self.chunk_to_records(chunk)
+        except SocketError:
+            self.socket_errors += 1
+            time.sleep(5)
+            return self.chunk_to_records(chunk)
         # The parsing xml #
         try:
             return list(Entrez.parse(response, validate=True))
@@ -159,10 +165,11 @@ class QueryNCBI(object):
 
     def print_error_log(self):
         """Print error logs"""
-        print "HTTP errors: %s"  % self.http_errors
-        print "URL errors: %s"   % self.url_errors
-        print "XML errors: %s"   % self.xml_errors
-        print "Parse errors: %s" % self.parse_errors
+        print "HTTP errors:   %s" % self.http_errors
+        print "URL errors:    %s" % self.url_errors
+        print "XML errors:    %s" % self.xml_errors
+        print "Parse errors:  %s" % self.parse_errors
+        print "Socket errors: %s" % self.socket_errors
 
 ###############################################################################
 def run():
@@ -225,6 +232,6 @@ def test():
 
 ###############################################################################
 if __name__ == '__main__':
-    print "Generating the GI database (pid %i)" % os.getpid()
+    print "* Generating the GI database (pid %i) *" % os.getpid()
     test()
     run()

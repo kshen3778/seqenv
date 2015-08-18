@@ -210,7 +210,7 @@
 			<key>Points</key>
 			<array>
 				<string>{440.10989957718959, 721.68677232703453}</string>
-				<string>{401.99999796323476, 691.74061865129386}</string>
+				<string>{401.99999796323476, 691.74059453718792}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -351,7 +351,7 @@
 			<integer>2720</integer>
 			<key>Points</key>
 			<array>
-				<string>{434.35711238344271, 495.17741231661489}</string>
+				<string>{434.35710597997047, 495.17742512355926}</string>
 				<string>{402.0000053201332, 544.35483260035642}</string>
 			</array>
 			<key>Style</key>
@@ -389,7 +389,7 @@
 			<key>Points</key>
 			<array>
 				<string>{397.50000400597793, 416.999987220913}</string>
-				<string>{434.35711238344271, 466.17741231661489}</string>
+				<string>{434.35710597997053, 466.1774251235592}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -533,7 +533,7 @@
 			<key>Points</key>
 			<array>
 				<string>{402.5, 208}</string>
-				<string>{419.20875962836351, 237.00000306555486}</string>
+				<string>{419.20876603183564, 237.00000306555486}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -1176,9 +1176,9 @@ This GI is 100% wetland\
 			<integer>39</integer>
 			<key>Points</key>
 			<array>
-				<string>{1697.8021488718314, 796.29668014583092}</string>
-				<string>{1702.1977531407554, -5.7032967983071332}</string>
-				<string>{1698.9010499390624, 0.98901067230957818}</string>
+				<string>{1698.9010499390624, 936.26370928077699}</string>
+				<string>{1698.9010499390624, -8.7912085378476377}</string>
+				<string>{1695.6043467373697, 6.6923075028339873}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -3215,7 +3215,7 @@ This document just describes a plan for processing data.}</string>
 			<key>Points</key>
 			<array>
 				<string>{205, 400}</string>
-				<string>{325.99999796323482, 677.24061865129386}</string>
+				<string>{325.99999796323482, 677.24059453718792}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -3605,8 +3605,8 @@ This document just describes a plan for processing data.}</string>
 			<integer>2632</integer>
 			<key>Points</key>
 			<array>
-				<string>{477.99999796323482, 677.24061865129386}</string>
-				<string>{583.516460296167, 677.24059233990567}</string>
+				<string>{477.99999796323482, 677.24059453718792}</string>
+				<string>{583.516460296167, 677.24056822579973}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -3644,8 +3644,8 @@ This document just describes a plan for processing data.}</string>
 			<integer>2631</integer>
 			<key>Points</key>
 			<array>
-				<string>{726.516460296167, 677.24059233990567}</string>
-				<string>{823.28567651141339, 677.24060778898297}</string>
+				<string>{726.516460296167, 677.24056822579973}</string>
+				<string>{823.28567651141339, 677.24062059592734}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -5931,7 +5931,7 @@ also called C1}</string>
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2015-08-06 16:19:07 +0000</string>
+	<string>2015-08-13 15:23:36 +0000</string>
 	<key>Modifier</key>
 	<string>Lucas Sinclair</string>
 	<key>NotesVisible</key>
@@ -5962,7 +5962,7 @@ also called C1}</string>
 		<key>NSPaperSize</key>
 		<array>
 			<string>size</string>
-			<string>{595, 842}</string>
+			<string>{595.29000473022461, 841.8900146484375}</string>
 		</array>
 		<key>NSPrintReverseOrientation</key>
 		<array>
@@ -6026,15 +6026,15 @@ also called C1}</string>
 		<key>SidebarWidth</key>
 		<integer>120</integer>
 		<key>VisibleRegion</key>
-		<string>{{0, 128.06593020217699}, {1294.5054571980695, 807.69228441475468}}</string>
+		<string>{{888.54168652712099, 54.541668086933626}, {1227.0833607607838, 765.62501711305265}}</string>
 		<key>Zoom</key>
-		<real>0.9100000262260437</real>
+		<real>0.95999997854232788</real>
 		<key>ZoomValues</key>
 		<array>
 			<array>
 				<string>Canvas 1</string>
-				<real>0.9100000262260437</real>
-				<real>0.94999998807907104</real>
+				<real>0.95999997854232788</real>
+				<real>0.97000002861022949</real>
 			</array>
 		</array>
 	</dict>

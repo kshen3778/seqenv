@@ -8,7 +8,7 @@ __version__ = '1.0.4'
 version_string = "seqenv version %s" % __version__
 
 # Built-in modules #
-import sys, os, multiprocessing, gzip, warnings, sqlite3
+import sys, os, multiprocessing, warnings
 from collections import defaultdict
 import cPickle as pickle
 
@@ -19,26 +19,22 @@ from seqenv.seqsearch.parallel import ParallelSeqSearch
 from seqenv.common.cache import property_cached
 from seqenv.common.timer import Timer
 from seqenv.common.autopaths import FilePath
+from seqenv.common.database import Database
 
 # Compiled modules #
-if sys.platform == 'darwin':
-    msg = "Usage on OS X is current disabled because of compliation of the tagger"
-    warnings.warn(msg, UserWarning)
-else:
+try:
     import tagger
+except ImportError:
+    msg = "Failed to import the tagger submodule, maybe it wasn't compiled correctly ?"
+    warnings.warn(msg + " Seqenv won't work until that is fixed.", UserWarning)
 
 # Third party modules #
 import pandas
-from tqdm import tqdm
-
-# Constants #
-total_gis_with_source = 13658791
 
 # Find the data dir #
 module     = sys.modules[__name__]
 module_dir = os.path.dirname(module.__file__) + '/'
 repos_dir  = os.path.abspath(module_dir + '../') + '/'
-data_dir   = module_dir + 'data/'
 
 ################################################################################
 class Analysis(object):
@@ -63,7 +59,7 @@ class Analysis(object):
                           we will uniquify the frequency counts based on the text entry of its
                           isolation source and the pubmed-ID from which the isolation text was
                           obtained.
-                       This option default to `ui`.
+                       This option defaults to `ui`.
 
     * `proportional`: Should we divide the counts of every input sequence by the
                       number of text entries that were associated to it.
@@ -124,7 +120,7 @@ class Analysis(object):
         self.proportional = bool(proportional)
         # Normalization parameters #
         options = ('flat', 'ui', 'upi')
-        message = 'Normalization has to be one of %s' % ','.join(options)
+        message = 'Normalization has to be one of %s' % (','.join(options))
         if normalization not in options: raise Exception(message)
         self.normalization = normalization
         # Search parameters #
@@ -146,19 +142,8 @@ class Analysis(object):
         else: self.out_dir = out_dir
         if not self.out_dir.endswith('/'): self.out_dir += '/'
         if not os.path.exists(self.out_dir): os.makedirs(self.out_dir)
-        # The object that can make the outputs #
+        # The object that can make the outputs for the user #
         self.outputs = OutputGenerator(self)
-
-    def run(self):
-        """A method to run the whole pipeline. As everything is coded in a functional
-        style, we just need to make a call to `outputs.make_all` and everything will be
-        generated automatically."""
-        print version_string + " (pid %i)" % os.getpid()
-        self.timer.print_start()
-        self.outputs.make_all()
-        print "------------\nSuccess. Outputs are in '%s'" % self.out_dir
-        self.timer.print_end()
-        self.timer.print_total_elapsed()
 
     #-------------------------------------------------------------------------#
     @property_cached
@@ -181,6 +166,13 @@ class Analysis(object):
         self.input_file.rename_sequences(renamed_fasta, self.orig_names_to_renamed)
         self.timer.print_elapsed()
         return renamed_fasta
+
+    @property_cached
+    def df_abundances(self):
+        """A pandas DataFrame object containing the abundance counts
+        with OTUs as rows and sample names as columns."""
+        assert self.abundances
+        return pandas.io.parsers.read_csv(self.abundances, sep='\t', index_col=0, encoding='utf-8')
 
     @property
     def only_top_sequences(self):
@@ -213,12 +205,10 @@ class Analysis(object):
     def filtering(self):
         """Return a dictionary with the filtering options for the sequence similarity
         search."""
-        return {
-            'min_identity': self.min_identity,
-            'e_value':      self.e_value,
-            'max_targets':  self.max_targets,
-            'min_coverage': self.min_coverage,
-        }
+        return {'min_identity': self.min_identity,
+                'e_value':      self.e_value,
+                'max_targets':  self.max_targets,
+                'min_coverage': self.min_coverage}
 
     @property_cached
     def search(self):
@@ -308,9 +298,10 @@ class Analysis(object):
             # Create the tagger #
             t = tagger.Tagger()
             # Load the dictionary #
-            t.LoadNames(data_dir + 'envo_entities.tsv', data_dir + 'envo_names.tsv')
+            t.LoadNames(module_dir + 'data_envo/envo_entities.tsv',
+                        module_dir + 'data_envo/envo_names.tsv')
             # Load a global blacklist #
-            t.LoadGlobal(data_dir + 'envo_global.tsv')
+            t.LoadGlobal(module_dir + 'data_envo/envo_global.tsv')
             # Tag all the texts #
             result = {}
             for text in unique_texts: result[text] = t.GetMatches(text, "", [-27])
@@ -376,16 +367,15 @@ class Analysis(object):
     @property_cached
     def serial_to_concept(self):
         """A dictionary linking every concept serial to its concept id.
-        Every line in the file contains three columns: serial, concept_type, concept_id
-        This could possibly overflow the memory when we add NCBI taxonomy etc."""
-        return dict(line.split()[0::2] for line in open(data_dir + 'envo_entities.tsv'))
+        Every line in the file contains three columns: serial, concept_type, concept_id."""
+        return dict(line.split()[0::2] for line in open(module_dir + 'data_envo/envo_entities.tsv'))
 
     @property_cached
     def child_to_parents(self):
         """A dictionary linking every concept id to a list of parent concept ids.
         Every line in the file contains two columns: child_serial, parent_serial"""
         result = defaultdict(list)
-        with open(data_dir + 'envo_groups.tsv') as handle:
+        with open(module_dir + 'data_envo/envo_groups.tsv') as handle:
             for line in handle:
                 child_serial, parent_serial = line.split()
                 child_concept = self.serial_to_concept[child_serial]
@@ -397,11 +387,22 @@ class Analysis(object):
     def concept_to_name(self):
         """A dictionary linking the concept id to relevant names. In this case ENVO terms.
         Hence, ENVO:00000095 would be linked to 'lava field'"""
-        return dict(line.strip('\n').split('\t') for line in open(data_dir + 'envo_preferred.tsv'))
+        return dict(line.strip('\n').split('\t') for line in open(module_dir + 'data_envo/envo_preferred.tsv'))
 
     @property_cached
-    def df_abundances(self):
-        """A pandas DataFrame object containing the abundance counts
-        with OTUs as rows and sample names as columns."""
-        assert self.abundances
-        return pandas.io.parsers.read_csv(self.abundances, sep='\t', index_col=0, encoding='utf-8')
+    def gi_db(self):
+        """The sqlite3 database containing every GI number that has an isolation_source
+        associated to it. In addition the pubmed-ID is listed too, if there is one."""
+        return Database(module_dir + 'data_sources/gi_db.sqlite3')
+
+    #-------------------------------------------------------------------------#
+    def run(self):
+        """A method to run the whole pipeline. As everything is coded in a functional
+        style, we just need to make a call to `outputs.make_all` and everything will be
+        generated automatically."""
+        print version_string + " (pid %i)" % os.getpid()
+        self.timer.print_start()
+        self.outputs.make_all()
+        print "------------\nSuccess. Outputs are in '%s'" % self.out_dir
+        self.timer.print_end()
+        self.timer.print_total_elapsed()
