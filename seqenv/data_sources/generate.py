@@ -17,7 +17,7 @@ $ ./generate.py
 """
 
 # Built-in modules #
-import os, time, inspect, urllib2
+import os, time, inspect, urllib2, datetime
 from itertools import islice
 from collections import OrderedDict
 from socket import error as SocketError
@@ -99,11 +99,11 @@ class QueryNCBI(object):
         # Set the email #
         Entrez.email = self.email
         # Error logging #
-        self.http_errors   = 0
-        self.url_errors    = 0
-        self.xml_errors    = 0
-        self.parse_errors  = 0
-        self.socket_errors = 0
+        self.http_errors   = []
+        self.url_errors    = []
+        self.xml_errors    = []
+        self.parse_errors  = []
+        self.socket_errors = []
 
     def get(self, gi_nums):
         """Download information from NCBI in batch mode.
@@ -128,26 +128,26 @@ class QueryNCBI(object):
         try:
             response = Entrez.efetch(db="nucleotide", id=map(str,chunk), retmode="xml")
         except urllib2.HTTPError:
-            self.http_errors += 1
+            self.http_errors += datetime.datetime.now()
             time.sleep(5)
             return self.chunk_to_records(chunk)
         except urllib2.URLError:
-            self.url_errors += 1
-            time.sleep(5)
-            return self.chunk_to_records(chunk)
-        except SocketError:
-            self.socket_errors += 1
+            self.url_errors += datetime.datetime.now()
             time.sleep(5)
             return self.chunk_to_records(chunk)
         # The parsing xml #
         try:
             return list(Entrez.parse(response, validate=True))
         except CorruptedXMLError:
-            self.xml_errors += 1
+            self.xml_errors += datetime.datetime.now()
             time.sleep(5)
             return self.chunk_to_records(chunk)
         except ValidationError:
-            self.parse_errors += 1
+            self.parse_errors += datetime.datetime.now()
+            time.sleep(5)
+            return self.chunk_to_records(chunk)
+        except SocketError:
+            self.socket_errors += datetime.datetime.now()
             time.sleep(5)
             return self.chunk_to_records(chunk)
 
@@ -232,6 +232,6 @@ def test():
 
 ###############################################################################
 if __name__ == '__main__':
-    print "* Generating the GI database (pid %i) *" % os.getpid()
+    print "*** Generating the GI database (pid %i) ***" % os.getpid()
     test()
     run()
