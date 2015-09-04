@@ -124,30 +124,32 @@ class QueryNCBI(object):
         recursion limit. We don't want to get our IP banned from NCBI so we have
         a little pause at every function call."""
         time.sleep(self.delay)
+        # Check that none of the sequences are above a certain threshold in length ? #
+        pass
         # The web connection #
         try:
             response = Entrez.efetch(db="nucleotide", id=map(str,chunk), retmode="xml")
         except urllib2.HTTPError:
-            self.http_errors += datetime.datetime.now()
+            self.http_errors += [datetime.datetime.now()]
             time.sleep(5)
             return self.chunk_to_records(chunk)
         except urllib2.URLError:
-            self.url_errors += datetime.datetime.now()
+            self.url_errors += [datetime.datetime.now()]
             time.sleep(5)
             return self.chunk_to_records(chunk)
         # The parsing xml #
         try:
             return list(Entrez.parse(response, validate=True))
         except CorruptedXMLError:
-            self.xml_errors += datetime.datetime.now()
+            self.xml_errors += [datetime.datetime.now()]
             time.sleep(5)
             return self.chunk_to_records(chunk)
         except ValidationError:
-            self.parse_errors += datetime.datetime.now()
+            self.parse_errors += [datetime.datetime.now()]
             time.sleep(5)
             return self.chunk_to_records(chunk)
         except SocketError:
-            self.socket_errors += datetime.datetime.now()
+            self.socket_errors += [datetime.datetime.now()]
             time.sleep(5)
             return self.chunk_to_records(chunk)
 
