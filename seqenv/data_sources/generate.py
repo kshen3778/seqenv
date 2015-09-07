@@ -99,6 +99,7 @@ class QueryNCBI(object):
         # Set the email #
         Entrez.email = self.email
         # Error logging #
+        self.chunk         = []
         self.http_errors   = []
         self.url_errors    = []
         self.xml_errors    = []
@@ -110,14 +111,14 @@ class QueryNCBI(object):
         Return `isolation_source` and `pubmed_id for an entry if it has an
         isolation_source"""
         for i in self.progress(xrange(0, len(gi_nums), self.at_a_time)):
-            chunk      = tuple(islice(gi_nums, 0, self.at_a_time))
-            records    = self.chunk_to_records(chunk)
+            self.chunk = tuple(islice(gi_nums, 0, self.at_a_time))
+            records    = self.chunk_to_records(self.chunk)
             sources    = map(self.record_to_source, records)
             pubmed_ids = map(self.record_to_pubmed_id, records)
             # Generate the result #
-            has_source = tuple(i for i in xrange(len(chunk)) if sources[i])
+            has_source = tuple(i for i in xrange(len(self.chunk)) if sources[i])
             if not has_source: continue
-            yield ((chunk[i], sources[i], pubmed_ids[i]) for i in has_source)
+            yield ((self.chunk[i], sources[i], pubmed_ids[i]) for i in has_source)
 
     def chunk_to_records(self, chunk):
         """Download from NCBI until it works. Will restart until reaching the python
@@ -167,11 +168,16 @@ class QueryNCBI(object):
 
     def print_error_log(self):
         """Print error logs"""
-        print "HTTP errors:   %s" % self.http_errors
-        print "URL errors:    %s" % self.url_errors
-        print "XML errors:    %s" % self.xml_errors
-        print "Parse errors:  %s" % self.parse_errors
-        print "Socket errors: %s" % self.socket_errors
+        print "HTTP errors:   %s" % len(self.http_errors)
+        print "URL errors:    %s" % len(self.url_errors)
+        print "XML errors:    %s" % len(self.xml_errors)
+        print "Parse errors:  %s" % len(self.parse_errors)
+        print "Socket errors: %s" % len(self.socket_errors)
+
+    def get_all_lengths(self, chunk):
+        """Given a list of GIDs return the length of each sequenence"""
+        gid_to_len = lambda x: Entrez.parse(Entrez.esummary(db="nucleotide", id=x))
+        return map(gid_to_len, chunk)
 
 ###############################################################################
 def run():
