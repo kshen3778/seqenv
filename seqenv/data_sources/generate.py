@@ -42,9 +42,14 @@ current_dir = os.path.dirname(os.path.abspath(filename))  + '/'
 class GenerateGIs(FilePath):
     """Takes care of generating a suite of GI numbers."""
 
+    length_cutoff = 4000
+
     def retrieve_from_nt(self):
-        """Get all GI numbers from local NT database"""
-        shell_output("blastdbcmd -db nt -entry all -outfmt '%g' > " + self)
+        """Get all GI numbers with their length from local NT database.
+        Then filter out the ones that are too large."""
+        shell_output("blastdbcmd -db nt -entry all -outfmt '%g %l' > " + self)
+        all_gis = [line.strip('\n').split() for line in self]
+        self.writelines(gid + '\n' for gid, length in all_gis if int(length) < self.length_cutoff)
 
     def check_retrieved(self):
         """Check that we have retrieved the GI numbers, else do it."""

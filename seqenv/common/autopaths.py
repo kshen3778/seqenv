@@ -83,6 +83,12 @@ class FilePath(str):
         os.remove(self.path)
         return True
 
+    def write(self, contents):
+        with open(self.path, 'w') as handle: handle.write(contents)
+
+    def writelines(self, contents):
+        with open(self.path, 'w') as handle: handle.writelines(contents)
+
     def must_exist(self):
         """Raise an exception if the path doesn't exist."""
         if not self.exists: raise Exception("The file path '%s' does not exist." % self.path)
