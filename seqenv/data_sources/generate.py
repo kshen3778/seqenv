@@ -180,7 +180,8 @@ class QueryNCBI(object):
 class Logger(FilePath):
     """Takes care of error logging for hte NCBI worker"""
 
-    def __init__(self):
+   def __init__(self, path):
+        self.path = self.clean_path(path)
         self.errors = defaultdict(list)
 
     def report_error(self, kind):
