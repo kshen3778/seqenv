@@ -19,9 +19,8 @@ $ ./generate.py
 # Built-in modules #
 import os, time, inspect, urllib2, datetime
 from itertools import islice
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from socket import error as SocketError
-from collection import defaultdict
 
 # Internal modules #
 from seqenv.common           import GenWithLength
