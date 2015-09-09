@@ -173,7 +173,7 @@ class QueryNCBI(object):
 
     def get_all_lengths(self, chunk):
         """Given a list of GIDs return the length of each sequenence"""
-        gid_to_len = lambda x: Entrez.parse(Entrez.esummary(db="nucleotide", id=x))
+        gid_to_len = lambda x: Entrez.parse(Entrez.esummary(db="nucleotide", id=x)).next()['Length']
         return map(gid_to_len, chunk)
 
 ###############################################################################
@@ -184,7 +184,7 @@ class Logger(FilePath):
         self.path = self.clean_path(path)
         self.errors = defaultdict(list)
 
-    def report_error(self, kind):
+    def report_error(self, kind, *args, **kwargs):
         self.errors[kind] += [datetime.datetime.now()]
         self.write(self.message)
 
