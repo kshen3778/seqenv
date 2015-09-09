@@ -21,6 +21,7 @@ import os, time, inspect, urllib2, datetime
 from itertools import islice
 from collections import OrderedDict
 from socket import error as SocketError
+from collection import defaultdict
 
 # Internal modules #
 from seqenv.common           import GenWithLength
@@ -107,12 +108,9 @@ class QueryNCBI(object):
         # Set the email #
         Entrez.email = self.email
         # Error logging #
-        self.chunk         = []
-        self.http_errors   = []
-        self.url_errors    = []
-        self.xml_errors    = []
-        self.parse_errors  = []
-        self.socket_errors = []
+        self.logger = Logger(current_dir + 'error_log.txt')
+        # Other #
+        self.chunk = []
 
     def get(self, gi_nums):
         """Download information from NCBI in batch mode.
@@ -139,26 +137,26 @@ class QueryNCBI(object):
         try:
             response = Entrez.efetch(db="nucleotide", id=map(str,chunk), retmode="xml")
         except urllib2.HTTPError:
-            self.http_errors += [datetime.datetime.now()]
+            self.logger.report_error('http', chunk)
             time.sleep(5)
             return self.chunk_to_records(chunk)
         except urllib2.URLError:
-            self.url_errors += [datetime.datetime.now()]
+            self.logger.report_error('url', chunk)
             time.sleep(5)
             return self.chunk_to_records(chunk)
         # The parsing xml #
         try:
             return list(Entrez.parse(response, validate=True))
         except CorruptedXMLError:
-            self.xml_errors += [datetime.datetime.now()]
+            self.logger.report_error('xml', chunk)
             time.sleep(5)
             return self.chunk_to_records(chunk)
         except ValidationError:
-            self.parse_errors += [datetime.datetime.now()]
+            self.logger.report_error('parse', chunk)
             time.sleep(5)
             return self.chunk_to_records(chunk)
         except SocketError:
-            self.socket_errors += [datetime.datetime.now()]
+            self.logger.report_error('socket', chunk)
             time.sleep(5)
             return self.chunk_to_records(chunk)
 
@@ -174,18 +172,33 @@ class QueryNCBI(object):
         if 'GBReference_pubmed' not in references: return None
         return int(references.get('GBReference_pubmed'))
 
-    def print_error_log(self):
-        """Print error logs"""
-        print "HTTP errors:   %s" % len(self.http_errors)
-        print "URL errors:    %s" % len(self.url_errors)
-        print "XML errors:    %s" % len(self.xml_errors)
-        print "Parse errors:  %s" % len(self.parse_errors)
-        print "Socket errors: %s" % len(self.socket_errors)
-
     def get_all_lengths(self, chunk):
         """Given a list of GIDs return the length of each sequenence"""
         gid_to_len = lambda x: Entrez.parse(Entrez.esummary(db="nucleotide", id=x))
         return map(gid_to_len, chunk)
+
+###############################################################################
+class Logger(FilePath):
+    """Takes care of error logging for hte NCBI worker"""
+
+    def __init__(self):
+        self.errors = defaultdict(list)
+
+    def report_error(self, kind):
+        self.errors[kind] += [datetime.datetime.now()]
+        self.write(self.message)
+
+    @property
+    def message(self):
+        message = ''
+        message += "HTTP errors:   %s\n" % len(self.errors['http'])
+        message += "URL errors:    %s\n" % len(self.errors['url'])
+        message += "XML errors:    %s\n" % len(self.errors['xml'])
+        message += "Parse errors:  %s\n" % len(self.errors['parse'])
+        message += "Socket errors: %s\n" % len(self.errors['socket'])
+        return message
+
+    def print_error_log(self): print self.message
 
 ###############################################################################
 def run():
@@ -218,7 +231,7 @@ def run():
     print 'Done. Results are in "%s"' % sqlite_db
     timer.print_end()
     timer.print_total_elapsed()
-    ncbi_worker.print_error_log()
+    ncbi_worker.logger.print_error_log()
 
 ###############################################################################
 def test():
