@@ -27,6 +27,7 @@ from seqenv.common           import GenWithLength
 from seqenv.common.timer     import Timer
 from seqenv.common.autopaths import FilePath
 from seqenv.common.database  import Database
+from seqenv.common.tmpstuff  import new_temp_file
 
 # Third party modules #
 from Bio import Entrez
@@ -46,10 +47,12 @@ class GenerateGIs(FilePath):
 
     def retrieve_from_nt(self):
         """Get all GI numbers with their length from local NT database.
-        Then filter out the ones that are too large."""
-        shell_output("blastdbcmd -db nt -entry all -outfmt '%g %l' > " + self)
-        all_gis = [line.strip('\n').split() for line in self]
-        self.writelines(gid + '\n' for gid, length in all_gis if int(length) < self.length_cutoff)
+        Then filter out the ones that are too long."""
+        temp_file = new_temp_file()
+        shell_output("blastdbcmd -db nt -entry all -outfmt '%g %l' > " + temp_file)
+        with_len = (map(int,line.strip('\n').split()) for line in temp_file)
+        self.writelines(str(gid) + '\n' for gid, length in with_len if length < self.length_cutoff)
+        temp_file.remove()
 
     def check_retrieved(self):
         """Check that we have retrieved the GI numbers, else do it."""
@@ -191,7 +194,7 @@ def run():
     timer = Timer()
     timer.print_start()
     # Objects #
-    gi_generator = GenerateGIs(current_dir + 'all_gis.txt')
+    gi_generator = GenerateGIs(current_dir + 'small_gis.txt')
     sqlite_db    = Database(current_dir + 'gi_db.sqlite3')
     ncbi_worker  = QueryNCBI()
     # Get the numbers #
