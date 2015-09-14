@@ -23,7 +23,7 @@ from collections import OrderedDict, defaultdict
 from socket import error as SocketError
 
 # Internal modules #
-from seqenv.common           import GenWithLength
+from seqenv.common           import GenWithLength, pretty_now
 from seqenv.common.timer     import Timer
 from seqenv.common.autopaths import FilePath
 from seqenv.common.database  import Database
@@ -203,6 +203,7 @@ class Logger(FilePath):
     @property
     def message(self):
         message = ''
+        message += "Last updated:  %s\n" % pretty_now()
         message += "HTTP errors:   %s\n" % len(self.errors['http'])
         message += "URL errors:    %s\n" % len(self.errors['url'])
         message += "XML errors:    %s\n" % len(self.errors['xml'])
@@ -213,15 +214,17 @@ class Logger(FilePath):
     def print_error_log(self): print self.message
 
 ###############################################################################
+# Objects #
+gi_generator = GenerateGIs(current_dir + 'small_gis.txt')
+sqlite_db    = Database(current_dir + 'gi_db.sqlite3')
+ncbi_worker  = QueryNCBI()
+
+###############################################################################
 def run():
     """Run this script."""
     # Start timer #
     timer = Timer()
     timer.print_start()
-    # Objects #
-    gi_generator = GenerateGIs(current_dir + 'small_gis.txt')
-    sqlite_db    = Database(current_dir + 'gi_db.sqlite3')
-    ncbi_worker  = QueryNCBI()
     # Get the numbers #
     print 'STEP 1: Get all GIs from local nt database into a file (about 6h).'
     gi_generator.check_retrieved()
@@ -272,7 +275,13 @@ def test():
     print "-> Test OK !"
 
 ###############################################################################
+def validate():
+    """Check that the database is good."""
+    pass
+
+###############################################################################
 if __name__ == '__main__':
     print "*** Generating the GI database (pid %i) ***" % os.getpid()
     test()
     run()
+    validate()
