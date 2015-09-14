@@ -120,8 +120,17 @@ class QueryNCBI(object):
             records    = self.chunk_to_records(self.chunk)
             sources    = map(self.record_to_source, records)
             pubmed_ids = map(self.record_to_pubmed_id, records)
+            # Strange bug here, adding some debug prints #
+            try:
+                has_source = tuple(i for i in xrange(len(self.chunk)) if sources[i])
+            except IndexError:
+                print "self.chunk: ", len(self.chunk), ':   ', self.chunk,           '\n------\n',
+                print "records: ",    len(records),    ':   ', records,              '\n------\n',
+                print "sources: ",    len(sources),    ':   ', sources,              '\n------\n',
+                print "in bool: ",    len(sources),    ':   ', map(bool,sources),    '\n------\n',
+                print "pubmed_ids: ", len(pubmed_ids), ':   ', pubmed_ids,           '\n------\n',
+                raise
             # Generate the result #
-            has_source = tuple(i for i in xrange(len(self.chunk)) if sources[i])
             if not has_source: continue
             yield ((self.chunk[i], sources[i], pubmed_ids[i]) for i in has_source)
 
@@ -145,7 +154,7 @@ class QueryNCBI(object):
             return self.chunk_to_records(chunk)
         # The parsing xml #
         try:
-            return list(Entrez.parse(response, validate=True))
+            result = list(Entrez.parse(response, validate=True))
         except CorruptedXMLError:
             self.logger.report_error('xml', chunk)
             time.sleep(5)
@@ -158,6 +167,9 @@ class QueryNCBI(object):
             self.logger.report_error('socket', chunk)
             time.sleep(5)
             return self.chunk_to_records(chunk)
+        # Return the result #
+        assert len(result) == len(chunk)
+        return result
 
     def record_to_source(self, record):
         qualifiers = record['GBSeq_feature-table'][0]['GBFeature_quals']
@@ -178,7 +190,7 @@ class QueryNCBI(object):
 
 ###############################################################################
 class Logger(FilePath):
-    """Takes care of error logging for hte NCBI worker"""
+    """Takes care of error logging for the NCBI worker."""
 
     def __init__(self, path):
         self.path = self.clean_path(path)
