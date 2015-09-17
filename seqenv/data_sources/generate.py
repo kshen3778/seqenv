@@ -120,16 +120,7 @@ class QueryNCBI(object):
             records    = self.chunk_to_records(self.chunk)
             sources    = map(self.record_to_source, records)
             pubmed_ids = map(self.record_to_pubmed_id, records)
-            # Strange bug here, adding some debug prints #
-            try:
-                has_source = tuple(i for i in xrange(len(self.chunk)) if sources[i])
-            except IndexError:
-                print "self.chunk: ", len(self.chunk), ':   ', self.chunk,           '\n------\n',
-                print "records: ",    len(records),    ':   ', records,              '\n------\n',
-                print "sources: ",    len(sources),    ':   ', sources,              '\n------\n',
-                print "in bool: ",    len(sources),    ':   ', map(bool,sources),    '\n------\n',
-                print "pubmed_ids: ", len(pubmed_ids), ':   ', pubmed_ids,           '\n------\n',
-                raise
+            has_source = tuple(i for i in xrange(len(self.chunk)) if sources[i])
             # Generate the result #
             if not has_source: continue
             yield ((self.chunk[i], sources[i], pubmed_ids[i]) for i in has_source)
@@ -165,6 +156,11 @@ class QueryNCBI(object):
             return self.chunk_to_records(chunk)
         except SocketError:
             self.logger.report_error('socket', chunk)
+            time.sleep(5)
+            return self.chunk_to_records(chunk)
+        # Sometimes it's one short xD #
+        if len(result) != len(chunk):
+            self.logger.report_error('length', chunk)
             time.sleep(5)
             return self.chunk_to_records(chunk)
         # Return the result #
@@ -203,12 +199,13 @@ class Logger(FilePath):
     @property
     def message(self):
         message = ''
-        message += "Last updated:  %s\n" % pretty_now()
-        message += "HTTP errors:   %s\n" % len(self.errors['http'])
-        message += "URL errors:    %s\n" % len(self.errors['url'])
-        message += "XML errors:    %s\n" % len(self.errors['xml'])
-        message += "Parse errors:  %s\n" % len(self.errors['parse'])
-        message += "Socket errors: %s\n" % len(self.errors['socket'])
+        message += "Last updated:       %s\n" % pretty_now()
+        message += "HTTP errors:        %s\n" % len(self.errors['http'])
+        message += "URL errors:         %s\n" % len(self.errors['url'])
+        message += "XML errors:         %s\n" % len(self.errors['xml'])
+        message += "Parse errors:       %s\n" % len(self.errors['parse'])
+        message += "Socket errors:      %s\n" % len(self.errors['socket'])
+        message += "Freak length error: %s\n" % len(self.errors['length'])
         return message
 
     def print_error_log(self): print self.message
