@@ -97,7 +97,7 @@ class QueryNCBI(object):
     def __init__(self, at_a_time=100, delay=0.2, progress=True):
         """Give the number of records to retrieve at a time as well
         as the delay to wait between requests"""
-        # Base parameters #
+        # Base parameters #
         self.at_a_time = int(at_a_time)
         self.delay     = float(delay)
         # Display progress #
@@ -106,7 +106,7 @@ class QueryNCBI(object):
         else:                   self.progress = progress
         # Set the email #
         Entrez.email = self.email
-        # Error logging #
+        # Error logging #
         self.logger = Logger(current_dir + 'error_log.txt')
         # Other #
         self.chunk = []
@@ -139,7 +139,7 @@ class QueryNCBI(object):
         recursion limit. We don't want to get our IP banned from NCBI so we have
         a little pause at every function call."""
         time.sleep(self.delay)
-        # Check that none of the sequences are above a certain threshold in length ? #
+        # Check that none of the sequences are above a certain threshold in length ? #
         pass
         # The web connection #
         try:
@@ -226,7 +226,7 @@ def run():
     timer = Timer()
     timer.print_start()
     # Get the numbers #
-    print 'STEP 1: Get all GIs from local nt database into a file (about 6h).'
+    print 'STEP 1: Get all GIs from the local nt database into a file (about 6h).'
     gi_generator.check_retrieved()
     timer.print_elapsed()
     # Do it #
@@ -260,11 +260,11 @@ def test():
     429143984,downstream along river bank,None
     264670502,aphotic layer; anoxic zone; tucurui hydroeletric power plant reservoir,None
     324498487,bacterioplankton sample from lake,None"""
-    # Make it pretty #
+    # Make it pretty #
     template_result = '\n'.join(l.lstrip(' ') for l in template_result.split('\n') if l)
     # The result we got #
-    ncbi_worker = QueryNCBI(at_a_time=10, progress=False)
-    results = ncbi_worker.get(test_generate_gis()).next()
+    test_ncbi_worker = QueryNCBI(at_a_time=10, progress=False)
+    results = test_ncbi_worker.get(test_generate_gis()).next()
     # Function #
     def result_to_lines(results):
         for gi, source, pubmed in results:
