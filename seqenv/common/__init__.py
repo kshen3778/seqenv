@@ -1,5 +1,5 @@
 # Built-in modules #
-import tempfile, datetime
+import tempfile, datetime, dateutil
 
 # One liners #
 flatter = lambda x: [item for sublist in x for item in sublist]
