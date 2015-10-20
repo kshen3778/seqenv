@@ -160,7 +160,7 @@ This work would not have been possible without the advice and support of many pe
 ### News
 * **August 2013**: Chris Quince presented a talk on `seqenv` at [STAMPS2013](https://stamps.mbl.edu/index.php/Main_Page). You can download the PDF of the presentation: [C Quince et. al., SeqEnv: Annotating sequences with environments (STAMPS 2013)](https://stamps.mbl.edu/images/4/44/Quince_SeqEnvSTAMPS2013.pdf)
 
-### Publication using seqenv
+### Publications that have used seqenv
 * Bacterial diversity along a 2600 km river continuum. `doi:10.1111/1462-2920.12886`
 * Can marine bacteria be recruited from freshwater sources and the air? `doi:10.1038/ismej.2014.89`
 
@@ -216,4 +216,4 @@ Having to compile code is a liability to installation unfortunately, but we don'
     $ make
 
 ##### Step 7: Get a local copy of the NT database
-You can choose the database you want to BLAST against. By default we will search against `nt. So check your `~/.ncbirc` file for the adequate references.
+You can choose the database you want to BLAST against. By default we will search against `nt`. So check your `~/.ncbirc` file for the adequate references.
