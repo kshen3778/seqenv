@@ -168,7 +168,7 @@ This work would not have been possible without the advice and support of many pe
 This chapter will be removed once the simple `pip install seqenv` is fully operational. In the meantime, no automated installation has been developed for the `seqenv` package. But following this document and typing these commands on your bash prompt should get you started. If you cannot get a functional installation set up, contact the authors.
 
 ##### Step 1: Cloning the repository
-Here you will download a copy of the code from bitbucket and place it somewhere in your home directory.
+Here you will download a copy of the code from bitbucket and place it somewhere in your home directory. To do this, as the repository is still private, you will need to be added to the list of collaborators in the "biohackers" team on bitbucket.
 
     $ cd ~
     $ mkdir repos
@@ -184,10 +184,20 @@ Here you will edit your ``~/.bashrc`` or ``~/.bash_profile`` to add a reference 
     $ vim ~/.bash_profile
     export PATH="$HOME/repos/seqenv/seqenv":$PATH
 
+And finally source your `.bash_profile` file if you haven't already.
+
 ##### Step 3 (optional): Install your own version of python
 Your system probably comes with a version of python installed. But the variations from system to system are too great to rely on any available python. We strongly suggest to just install our own version in your home directory. Otherwise make sure that you are using version 2.7.x of python.
 
-##### Step 4: Install all required python packages
+##### Step 4: Check you have all the required executables
+`seqenv` will search for several different binaries as it processes your data. Please check all of these are available in your `$PATH`:
+
+    $ which blastn
+
+##### Step 5: Get a local copy of the NT database
+You can choose the database you want to BLAST against. By default we will search against `nt`. So check your `~/.ncbirc` file for the adequate references. If you don't have a copy of such a database, you need to download one to your machine.
+
+##### Step 6: Install all required python packages
 `seqenv` uses several third party python libraries. You can get them by running these commands:
 
     $ pip install biopython
@@ -196,24 +206,32 @@ Your system probably comes with a version of python installed. But the variation
     $ pip install tqdm
     $ pip install biom-format
 
+If you are on a machine that does not authorize you to install packages like that you can try to install them only for your user:
+
+    $ pip install --user biopython
+    $ pip install --user sh
+    $ pip install --user pandas
+    $ pip install --user tqdm
+    $ pip install --user biom-format
+
 If you are using a python manager such as pyenv, don't forget to rehash the binary links at the end:
 
     $ pyenv rehash
 
-You can check that it all works like this:
+Now, you can check that it all works like this, if it doesn't go to the "Troubleshooting" section:
 
     $ python -c "import seqenv"
 
-##### Step 5: Check you have all the required executables
-`seqenv` will search for several different binaries as it processes your data. Please check all of these are available in your `$PATH`:
-
-    $ which blastn
-
-##### Step 6: Compile the tagger if on OS X
+### Troubleshooting
+##### Compiling the tagger
 Having to compile code is a liability to installation unfortunately, but we don't have any other solution for the moment. I remember that there were some complicated tricks to compile it on OS X, so you will have to figure that out if you are using a Mac. But with Linux hopefully it shouldn't be too difficult because we have a precompiled binary bundled now so you can skip this step ! Unless it's a 32-bit processor, than again it's going to be difficult.
+
+In the case you get an error such as `ImportError: libboost_regex.so.5: cannot open shared object file` it means that `seqenv` tried using the precompiled version of the tagger but it didn't find the needed libraries installed on your system. In such a case you need to compile the tagger:
 
     $ cd ~/repos/seqenv/tagger
     $ make
 
-##### Step 7: Get a local copy of the NT database
-You can choose the database you want to BLAST against. By default we will search against `nt`. So check your `~/.ncbirc` file for the adequate references.
+In the case you get an error such as `/usr/bin/ld: cannot find -lpython` it means you are missing some python development c library header file thingies. You can try the following:
+
+    $ lorem ipsum
+
