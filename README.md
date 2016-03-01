@@ -76,7 +76,7 @@ The `seqenv` pipeline can be applied to any set of nucleotide or protein sequenc
 The pipeline has already been applied to a range of datasets (e.g Greek lagoon, Swedish lake/river, African and Asian pitlatrine datasets, Black Sea sediment sample datasets have been processed).
 
 ### What does it do exactly ?
- Given a set of DNA sequences, `seqenv` first retrieves highly similar sequences from public repositories (e.g. NCBI GenBank) using BLAST or similar algorithm. Subsequently, from each of these homologous records, text fields carrying environmental context information such as the reference title and the **isolation source** field found in the metadata of each entry are extracted. Once the relevant pieces of text from each matching sequence have been gathered, they are processed by a text mining module capable of identifying any EnvO terms they contain (e.g. the word "glacier", or "pelagic", "forest", etc.). The identified EnvO terms along with their frequencies of occurrence are then subjected to multivariate statistics, producing matrices XXXXXX as well as other useful outputs.
+ Given a set of DNA sequences, `seqenv` first retrieves highly similar sequences from public repositories (e.g. NCBI GenBank) using BLAST or similar algorithm. Subsequently, from each of these homologous records, text fields carrying environmental context information such as the reference title and the **isolation source** field found in the metadata are extracted. Once the relevant pieces of text from each matching sequence have been gathered, they are processed by a text mining module capable of identifying any EnvO terms they contain (e.g. the word "glacier", or "pelagic", "forest", etc.). The identified EnvO terms along with their frequencies of occurrence are then subjected to multivariate statistics, producing matrices XXXXXX as well as other useful outputs.
 
 ### Pipeline overview
 [![seqenv](documentation/frequencies.png)](documentation/frequencies.png)
@@ -237,7 +237,10 @@ In the case you get an error such as `ImportError: libboost_regex.so.5: cannot o
     $ cd ~/repos/seqenv/tagger
     $ make
 
-In the case you get an error such as `/usr/bin/ld: cannot find -lpython` it means you are missing some python development c library header file thingies. You can try the following:
+In the case you get an error such as `/usr/bin/ld: cannot find -lpython` it means you are missing some libraries. You can try changing the following line in the makefile:
 
-    $ lorem ipsum
+    LFLAGS = -fpic -shared -lboost_regex -lpython2.7
 
+You might also need to install the boost libraries. for CentOS and RedHat the following works, otherwise use `apt-get`.
+
+    $ sudo yum install boost-devel
