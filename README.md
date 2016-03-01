@@ -150,7 +150,7 @@ This work would not have been possible without the advice and support of many pe
 
 - [Umer Zeeshan Ijaz](http://userweb.eng.gla.ac.uk/umer.ijaz/) (umer.ijaz@glasgow.ac.uk)
 - [Lucas Sinclair](https://github.com/xapple) (lucas.sinclair@me.com) [1]
-- [Chris Quince](http://www2.warwick.ac.uk/fac/med/staff/cquince/) (c.quince@warwick.ac.uk )
+- [Chris Quince](http://www2.warwick.ac.uk/fac/med/staff/cquince/) (c.quince@warwick.ac.uk)
 - Christina Pavloudi (cpavloud@hcmr.gr)
 - Anastasis Oulas (oulas@hcmr.gr)
 - Julia Schnetzer (jschnetz@mpi-bremen.de)

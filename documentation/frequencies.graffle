@@ -65,7 +65,7 @@
 	<array>
 		<dict>
 			<key>Bounds</key>
-			<string>{{827.3742467019091, 707.02395288036257}, {126, 70}}</string>
+			<string>{{827.37429782045137, 692.90749553100727}, {126, 70}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -111,7 +111,7 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{595.99998032705287, 848.87563968584925}, {126, 56}}</string>
+			<string>{{596.41203858351059, 840.4489680838127}, {126, 56}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -1861,7 +1861,7 @@ This GI is 100% wetland\
 			<integer>2681</integer>
 			<key>Points</key>
 			<array>
-				<string>{734.50002725859611, 187.00000640347216}</string>
+				<string>{734.49997614005383, 187.00000640347216}</string>
 				<string>{829.47324626495652, 158.09676652011689}</string>
 			</array>
 			<key>Style</key>
@@ -1902,7 +1902,7 @@ This GI is 100% wetland\
 			<integer>2680</integer>
 			<key>Points</key>
 			<array>
-				<string>{734.50002725859611, 187.00000640347216}</string>
+				<string>{734.49997614005383, 187.00000640347216}</string>
 				<string>{827.37429805850581, 236.50000753910612}</string>
 			</array>
 			<key>Style</key>
@@ -3144,7 +3144,7 @@ ENVO:00000020}</string>
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{2015.9724788101428, 74.19765033731187}, {96, 14}}</string>
+			<string>{{2015.9724788101428, 74.19765033731187}, {91, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -4928,7 +4928,7 @@ ENVO:00000447}</string>
 			<key>Points</key>
 			<array>
 				<string>{474, 187}</string>
-				<string>{591.50002725859622, 187.00000640347216}</string>
+				<string>{591.49997614005383, 187.00000640347216}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -6185,7 +6185,7 @@ also called C1}</string>
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2015-12-30 19:31:00 +0000</string>
+	<string>2016-03-01 19:55:36 +0000</string>
 	<key>Modifier</key>
 	<string>Lucas Sinclair</string>
 	<key>NotesVisible</key>
@@ -6216,7 +6216,7 @@ also called C1}</string>
 		<key>NSPaperSize</key>
 		<array>
 			<string>size</string>
-			<string>{595, 842}</string>
+			<string>{595.29000473022461, 841.8900146484375}</string>
 		</array>
 		<key>NSPrintReverseOrientation</key>
 		<array>
@@ -6266,7 +6266,7 @@ also called C1}</string>
 			</dict>
 		</array>
 		<key>Frame</key>
-		<string>{{4, -0}, {1436, 877}}</string>
+		<string>{{72, 334}, {2166, 1058}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
@@ -6280,7 +6280,7 @@ also called C1}</string>
 		<key>SidebarWidth</key>
 		<integer>120</integer>
 		<key>VisibleRegion</key>
-		<string>{{499.99999168307295, 88.674416979949143}, {1653.4883445891392, 854.65114857455501}}</string>
+		<string>{{-174, -65}, {2502.3255397720304, 1065.1162613527786}}</string>
 		<key>Zoom</key>
 		<real>0.86000001430511475</real>
 		<key>ZoomValues</key>
