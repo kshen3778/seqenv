@@ -301,7 +301,6 @@ class Analysis(object):
         drop_box = "ts5at7sISLFe9HxAyVjyemywNL78dMecTrNdoYmuD7DqSLUFxfpixCaPtvMZAOLB"
         retrieve = "https://dl.dropboxusercontent.com/content_link/%s/file?dl=1" % drop_box
         md5      = "0c1790e88df60e8aeac10a6485927e87"
-        print "--> STEP 5: Loading database with all NCBI isolation sources"
         database = Database(path, retrieve=retrieve, md5=md5)
         self.timer.print_elapsed()
         return database
@@ -330,9 +329,11 @@ class Analysis(object):
         text_to_matches = FilePath(self.out_dir + 'text_to_matches.pickle')
         # Check that it was run #
         if not text_to_matches.exists:
+            print "--> STEP 5: Loading database with all NCBI isolation sources"
             print "Got %i unique GIs from search results" % len(self.unique_gis)
             print "Got %i unique GIs with an isolation source" % len(self.gis_with_text)
             print "Got %i unique isolation source texts" % len(self.unique_texts)
+            self.timer.print_elapsed()
             print "--> STEP 6: Run the text mining tagger on all blobs."
             # Create the tagger #
             t = tagger.Tagger()

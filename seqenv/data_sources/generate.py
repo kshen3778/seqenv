@@ -238,6 +238,9 @@ def run():
         last_gi = sqlite_db.last[0]
         print '-> Last GI number recorded was "%s".' % last_gi
         sqlite_db.add_by_steps(ncbi_worker.get(gi_generator.start_at(last_gi)))
+    # Make the index #
+    print 'STEP 3: Creating database index.'
+    sqlite_db.index()
     # End messages #
     timer.print_elapsed()
     print 'Done. Results are in "%s"' % sqlite_db
