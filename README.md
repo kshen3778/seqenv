@@ -2,11 +2,11 @@
 Assign environment ontology (EnvO) terms to short DNA sequences. More information at: http://environments.hcmr.gr/seqenv.html
 
 ### Installing
-To install `seqenv` onto your machine, use the python package manager:
+~To install `seqenv` onto your machine, use the python package manager:~
 
     $ pip install seqenv
 
-You might be installing this onto a computer server which you don't own and thus don't have sufficient privileges. In that case you can install everything in your home directory like this:
+---You might be installing this onto a computer server which you don't own and thus don't have sufficient privileges. In that case you can install everything in your home directory like this:---
 
     $ pip install --user seqenv
 
