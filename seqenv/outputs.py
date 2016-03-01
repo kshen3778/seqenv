@@ -96,13 +96,13 @@ class OutputGenerator(object):
         """
         with open(self.a.out_dir + 'list_concepts_found.tsv', 'w') as handle:
             for seq, gis in self.a.seq_to_gis.items():
-                gis = [gi for gi in gis if gi in self.a.gi_to_text and self.a.gi_to_text[gi] in self.a.text_to_counts]
-                texts = set(self.a.gi_to_text[gi] for gi in gis)
+                gis = [gi for gi in gis if gi in self.a.source_db and self.a.source_db[gi][1] in self.a.text_to_counts]
+                texts = set(self.a.source_db[gi][1] for gi in gis)
                 concepts = set(flatter(self.a.text_to_counts[t].keys() for t in texts))
                 for concept in concepts:
                     seq_name     = self.a.renamed_to_orig[seq]
                     concept_name = self.a.concept_to_name.get(concept, concept)
-                    concept_gis  = [gi for gi in gis if concept in self.a.text_to_counts[self.a.gi_to_text[gi]]]
+                    concept_gis  = [gi for gi in gis if concept in self.a.text_to_counts[self.a.source_db[gi][1]]]
                     count_gis    = len(concept_gis)
                     line         = (seq_name, concept, concept_name, str(count_gis), str(concept_gis))
                     handle.write('\t'.join(line) + '\n')
