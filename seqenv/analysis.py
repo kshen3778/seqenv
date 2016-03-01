@@ -300,7 +300,7 @@ class Analysis(object):
         path     = module_dir + 'data_sources/gi_db.sqlite3'
         drop_box = "ts5at7sISLFe9HxAyVjyemywNL78dMecTrNdoYmuD7DqSLUFxfpixCaPtvMZAOLB"
         retrieve = "https://dl.dropboxusercontent.com/content_link/%s/file?dl=1" % drop_box
-        md5      = "0c1790e88df60e8aeac10a6485927e87"
+        md5      = "e02d307bb099caced9f50843172fca26"
         database = Database(path, retrieve=retrieve, md5=md5)
         self.timer.print_elapsed()
         return database
