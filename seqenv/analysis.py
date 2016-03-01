@@ -206,7 +206,7 @@ class Analysis(object):
             warnings.warn(msg, UserWarning)
             N = self.input_file.count
         # Do it #
-        ids = self.df_abundances.sum(axis=1).sort(inplace=False, ascending=False).index[0:N]
+        ids = self.df_abundances.sum(axis=1).sort_values(ascending=False).index[0:N]
         ids = set([self.orig_names_to_renamed[x] for x in ids])
         self.renamed_fasta.extract_sequences(only_top_fasta, ids)
         self.timer.print_elapsed()
@@ -302,7 +302,7 @@ class Analysis(object):
         retrieve = "https://dl.dropboxusercontent.com/content_link/%s/file?dl=1" % drop_box
         md5      = "0c1790e88df60e8aeac10a6485927e87"
         print "--> STEP 5: Loading database with all NCBI isolation sources"
-        database = Database(path, retrieve=retrieve, md5=None) #, md5=md5)
+        database = Database(path, retrieve=retrieve, md5=md5)
         self.timer.print_elapsed()
         return database
 
