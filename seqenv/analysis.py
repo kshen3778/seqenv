@@ -38,7 +38,7 @@ class Analysis(object):
 
     * `search_db`: The path to the database to search against. Defaults to `nt`.
 
-    * `normalization`: Can be either of `flat`, `ui` or `uim`.
+    * `normalization`: Can be either of `flat`, `ui` or `upui`.
                         - If you choose `flat`, we will count every isolation source once,
                           even if the same text entry appears several time for the same inputs
                           sequence.
@@ -109,7 +109,7 @@ class Analysis(object):
         self.backtracking = bool(backtracking)
         self.proportional = bool(proportional)
         # Normalization parameters #
-        options = ('flat', 'ui', 'upi')
+        options = ('flat', 'ui', 'upui')
         message = 'Normalization has to be one of %s' % (','.join(options))
         if normalization not in options: raise Exception(message)
         self.normalization = normalization
@@ -138,7 +138,7 @@ class Analysis(object):
     def run(self):
         """A method to run the whole pipeline. As everything is coded in a functional
         style, we just need to make a call to `outputs.make_all` and everything will be
-        generated automatically."""
+        generated automatically, in a reverse fashion."""
         print version_string + " (pid %i)" % os.getpid()
         self.timer.print_start()
         self.outputs.make_all()
@@ -161,6 +161,7 @@ class Analysis(object):
         """A dictionary linking every sequence's name in the input FASTA to a
         new name following the scheme "C1", "C2", "C3" etc."""
         return {seq.id:"C%i"%i for i, seq in enumerate(self.input_file)}
+
     @property_cached
     def renamed_to_orig(self):
         """The opposite of the above dictionary"""
@@ -251,7 +252,12 @@ class Analysis(object):
 
     #---------------------------- In this section ----------------------------#
     # seq_to_gis
+    # unique_gis
     # source_database
+    # gis_with_text
+    # unique_texts
+    # text_to_matches
+    # text_to_counts
     # seq_to_counts
 
     @property_cached
@@ -277,33 +283,38 @@ class Analysis(object):
         with open(seq_to_gis, 'r') as handle: return pickle.load(handle)
 
     @property_cached
+    def unique_gis(self):
+        """A set containing every GI that was found, considering all sequences combined."""
+        return set(gi for gis in self.seq_to_gis.values() for gi in gis)
+
+    @property_cached
     def source_database(self):
-        """The sqlite3 database containing every GI number that has an isolation source
-        associated to it. In addition, the pubmed-ID is listed too if there is one.
-        The database containing three columns:
+        """The sqlite3 database containing every GI number in all NCBI that has an
+        isolation source associated to it. In addition, the pubmed-ID is listed too
+        if there is one. Thus, the database containing three columns:
         - The GI number of a sequence. (id INTEGER)
         - The isolation source text of that sequence. (source TEXT)
         - The pubmed id if it has one. 44%% of entries have one. (pubmed INTEGER)
-        If we don't have it locally already, we will go get it."""
+        If we don't have it locally already, we will go download it.
+        If you attempt to access a GI that has no isolation source then XXXXXX."""
         path     = module_dir + 'data_sources/gi_db.sqlite3'
-        retrieve = "http://dropbox.com/chris/gi_db.sqlite3.zip"
+        drop_box = "ts5at7sISLFe9HxAyVjyemywNL78dMecTrNdoYmuD7DqSLUFxfpixCaPtvMZAOLB"
+        retrieve = "https://dl.dropboxusercontent.com/content_link/%s/file?dl=1" % drop_box
         md5      = "0c1790e88df60e8aeac10a6485927e87"
-        database = Database(path, retrieve=retrieve, md5=md5)
+        print "--> STEP 5: Loading database with all NCBI isolation sources"
+        database = Database(path, retrieve=retrieve, md5=None) #, md5=md5)
+        self.timer.print_elapsed()
         return database
 
-    #@property_cached
-    #def gi_to_text(self):
-    #    """A dictionary linking every gi identifier in NCBI to its isolation source
-    #    text, provided it has one. You will get a KeyError if you attempt to access
-    #    a GI that has no isolation source, so use self.gi_to_text.get(55831228)"""
-    #    print "--> STEP 5: Loading all NCBI isolation sources in RAM"
-    #    result = {}
-    #    with gzip.open(data_dir + 'gi_to_source.tsv.gz') as handle:
-    #        for i in tqdm(xrange(total_gis_with_source), total=total_gis_with_source):
-    #            gi, source = handle.next().lstrip('GI:').rstrip('\n').split('\t')
-    #            result[gi] = source
-    #    self.timer.print_elapsed()
-    #    return result
+    @property_cached
+    def gis_with_text(self):
+        """A set containing every GI that was found and that had a source text associated."""
+        return set(gi for gi in self.unique_gis if gi in self.source_database)
+
+    @property_cached
+    def unique_texts(self):
+        """A set containing every unique isolation source text as unicode strings."""
+        return set(self.source_database[gi][1] for gi in self.gis_with_text)
 
     @property_cached
     def text_to_matches(self):
@@ -315,14 +326,13 @@ class Analysis(object):
         The result is something like:
         - [(53, 62, ((-27, 'ENVO:00002001'),)), (64, 69, ((-27, 'ENVO:00002044'),))]
         The number -27 is ENVO terms, -26 could be tissues, etc.
-        Sometimes, one word can link to two concepts such as with the word 'marine'.
-        """
+        Sometimes, one word can link to two concepts such as with the word 'marine'."""
         text_to_matches = FilePath(self.out_dir + 'text_to_matches.pickle')
         # Check that it was run #
         if not text_to_matches.exists:
-            unique_gis = set(gi for gis in self.seq_to_gis.values() for gi in gis)
-            print "Got %i GIs from search results" % len(unique_gis)
-            unique_texts = set(self.gi_to_text[gi] for gi in unique_gis if gi in self.gi_to_text)
+            print "Got %i unique GIs from search results" % len(self.unique_gis)
+            print "Got %i unique GIs with an isolation source" % len(self.gis_with_text)
+            print "Got %i unique isolation source texts" % len(self.unique_texts)
             print "--> STEP 6: Run the text mining tagger on all blobs."
             # Create the tagger #
             t = tagger.Tagger()
@@ -333,7 +343,7 @@ class Analysis(object):
             t.LoadGlobal(module_dir + 'data_envo/envo_global.tsv')
             # Tag all the texts #
             result = {}
-            for text in unique_texts: result[text] = t.GetMatches(text, "", [-27])
+            for text in self.unique_texts: result[text] = t.GetMatches(text, "", [-27])
             with open(text_to_matches, 'w') as handle: pickle.dump(result, handle)
             self.timer.print_elapsed()
             return result
@@ -351,7 +361,7 @@ class Analysis(object):
         text_to_counts = FilePath(self.out_dir + 'text_to_counts.pickle')
         # Check that it was run #
         if not text_to_counts.exists:
-            print "Using %i different isolation sources" % len(self.text_to_matches)
+            print "Got %i environmental term matches" % sum(map(len,self.text_to_matches.values()))
             print "--> STEP 7: Parsing the tagger results and counting terms."
             result = {}
             for text, matches in self.text_to_matches.items():
@@ -359,10 +369,11 @@ class Analysis(object):
                 counts = defaultdict(float)
                 for start_pos, end_pos, concepts in matches:
                     # This is the first place where the normalization technique used
-                    # has to be thought about e.g. at some point we had decided that
-                    # every gi adds up to one unless we have backtracking, not anymore
+                    # has to be thought about. For instance, at some point we had decided that
+                    # every gi should adds up to 1.0 unless we have turned on backtracking.
+                    # But this is not the case anymore in the current version!
                     ids = [concept_id for concept_type, concept_id in concepts]
-                    score = 1 / len(ids) # Most of the time score is 1
+                    score = 1 / len(ids) # Most of the time score is thus equal to 1
                     if self.backtracking: ids.extend([p for c in ids for p in self.child_to_parents[c]])
                     for concept_id in ids: counts[concept_id] += score
                 result[text] = dict(counts)
@@ -375,21 +386,39 @@ class Analysis(object):
     @property_cached
     def seq_to_counts(self):
         """A dictionary linking every input sequence to its summed normalized concept
-        counts dict, provided the input sequence had some hits, and a hit had a match,
-        otherwise it is empty. NB: What we want to account for is the fact that two GIs
-        originating from the same sequence could be pointing to the same isolation source.
-        In such case, we shall count the concepts from that isolation source only once."""
+        counts dict, provided the input sequence had some hits, and at least one hit had
+        a match. Otherwise it is empty.
+        NB: What we want to account for is the fact that two GIs originating from the
+        same sequence could be pointing to the same isolation source.
+        In such case, we shall count the concepts from that isolation source only once.
+        We can also avoid counting two GIs that are coming from the same study, if a pubmed
+        number is available."""
         result = {}
-        for seq, gis in self.seq_to_gis.items():
-            texts = set(self.gi_to_text.get(gi) for gi in gis if self.gi_to_text.get(gi))
-            counts = defaultdict(float)
-            for text in texts:
-                if text not in self.text_to_counts: continue
-                for c,i in self.text_to_counts[text].items(): counts[c] += i
-            if self.proportional:
-                tot_matches = sum([len(self.text_to_matches[text]) for text in texts])
-                for k in counts: counts[k] /= tot_matches
-            result[seq] = counts
+        # Flat #
+        if self.normalization == 'flat':
+            for seq, gis in self.seq_to_gis.items():
+                texts = list(self.source_database[gi][1] for gi in gis if gi in self.source_database)
+                counts = defaultdict(float)
+                for text in texts:
+                    if text not in self.text_to_counts: continue
+                    for c,i in self.text_to_counts[text].items(): counts[c] += i
+        # Unique source #
+        if self.normalization == 'ui':
+            for seq, gis in self.seq_to_gis.items():
+                texts = set(self.source_database[gi][1] for gi in gis if gi in self.source_database)
+                counts = defaultdict(float)
+                for text in texts:
+                    if text not in self.text_to_counts: continue
+                    for c,i in self.text_to_counts[text].items(): counts[c] += i
+        # Unique source and pubmed #
+        if self.normalization == 'uiup':
+            pass
+        # Proportional option #
+        if self.proportional:
+            tot_matches = sum([len(self.text_to_matches[text]) for text in texts])
+            for k in counts: counts[k] /= tot_matches
+        result[seq] = counts
+        # Return #
         return result
 
     #---------------------------- In this section ----------------------------#

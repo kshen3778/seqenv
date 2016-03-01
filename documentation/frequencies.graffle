@@ -14,7 +14,7 @@
 	<key>BackgroundGraphic</key>
 	<dict>
 		<key>Bounds</key>
-		<string>{{0, 0}, {2154.330810546875, 935.43304443359375}}</string>
+		<string>{{0, 0}, {2069.291259765625, 935.43304443359375}}</string>
 		<key>Class</key>
 		<string>SolidGraphic</string>
 		<key>ID</key>
@@ -48,7 +48,7 @@
 	<key>CanvasOrigin</key>
 	<string>{0, 0}</string>
 	<key>CanvasSize</key>
-	<string>{2154.330810546875, 935.43304443359375}</string>
+	<string>{2069.291259765625, 935.43304443359375}</string>
 	<key>ColumnAlign</key>
 	<integer>1</integer>
 	<key>ColumnSpacing</key>
@@ -769,7 +769,7 @@
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{1228.5891398202104, 828.04163959258619}, {108.064453125, 14}}</string>
+					<string>{{1228.5891398202104, 812.36722094925187}, {108.064453125, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -839,8 +839,8 @@
 			<integer>2709</integer>
 			<key>Points</key>
 			<array>
-				<string>{1163.3311045618693, 835.04163054119283}</string>
-				<string>{1228.5891398202104, 835.04163054119283}</string>
+				<string>{1163.3311045618693, 819.36721189785851}</string>
+				<string>{1228.5891398202104, 819.36721189785851}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -866,7 +866,7 @@
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{1228.5891398202104, 655.45158644612809}, {108.064453125, 14}}</string>
+					<string>{{1228.5891398202104, 671.12600508946241}, {108.064453125, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -936,8 +936,8 @@
 			<integer>2706</integer>
 			<key>Points</key>
 			<array>
-				<string>{1163.3310548338745, 662.45157739473473}</string>
-				<string>{1228.5891398202102, 662.45157739473473}</string>
+				<string>{1163.3310548338745, 678.12599603806905}</string>
+				<string>{1228.5891398202102, 678.12599603806905}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -1270,32 +1270,6 @@ This GI is 100% wetland\
 				<string>{1, 0}</string>
 				<string>{-1, 0}</string>
 			</array>
-		</dict>
-		<dict>
-			<key>Class</key>
-			<string>LineGraphic</string>
-			<key>ID</key>
-			<integer>39</integer>
-			<key>Points</key>
-			<array>
-				<string>{1698.9010499390624, 936.26370928077699}</string>
-				<string>{1698.9010499390624, -8.7912085378476377}</string>
-				<string>{1695.6043467373697, 6.6923075028339873}</string>
-			</array>
-			<key>Style</key>
-			<dict>
-				<key>stroke</key>
-				<dict>
-					<key>HeadArrow</key>
-					<string>0</string>
-					<key>Legacy</key>
-					<true/>
-					<key>Pattern</key>
-					<integer>3</integer>
-					<key>TailArrow</key>
-					<string>0</string>
-				</dict>
-			</dict>
 		</dict>
 		<dict>
 			<key>Bounds</key>
@@ -2194,62 +2168,6 @@ This GI is 100% wetland\
 			</dict>
 		</dict>
 		<dict>
-			<key>Bounds</key>
-			<string>{{1857.1428036203206, 287.91207961451124}, {152, 28}}</string>
-			<key>Class</key>
-			<string>ShapedGraphic</string>
-			<key>FitText</key>
-			<string>Vertical</string>
-			<key>Flow</key>
-			<string>Resize</string>
-			<key>FontInfo</key>
-			<dict>
-				<key>Color</key>
-				<dict>
-					<key>w</key>
-					<string>0</string>
-				</dict>
-				<key>Font</key>
-				<string>Helvetica</string>
-				<key>Size</key>
-				<real>12</real>
-			</dict>
-			<key>ID</key>
-			<integer>2672</integer>
-			<key>Shape</key>
-			<string>Rectangle</string>
-			<key>Style</key>
-			<dict>
-				<key>fill</key>
-				<dict>
-					<key>Draws</key>
-					<string>NO</string>
-				</dict>
-				<key>shadow</key>
-				<dict>
-					<key>Draws</key>
-					<string>NO</string>
-				</dict>
-				<key>stroke</key>
-				<dict>
-					<key>Draws</key>
-					<string>NO</string>
-				</dict>
-			</dict>
-			<key>Text</key>
-			<dict>
-				<key>Text</key>
-				<string>{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf340
-\cocoascreenfonts1{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc
-
-\f0\b\fs24 \cf0 \ul \ulc0 Dictionaries in the pipeline once run}</string>
-				<key>VerticalPad</key>
-				<integer>0</integer>
-			</dict>
-		</dict>
-		<dict>
 			<key>Class</key>
 			<string>TableGroup</string>
 			<key>Graphics</key>
@@ -2527,7 +2445,7 @@ This GI is 100% wetland\
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{1782.4176290048217, 613.73626371555463}, {257.7569580078125, 14}}</string>
+					<string>{{1776.2794905759904, 222.00000708595527}, {257.7569580078125, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -2563,7 +2481,7 @@ This GI is 100% wetland\
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{1782.4176290048217, 627.73626371555463}, {257.7569580078125, 70}}</string>
+					<string>{{1776.2794905759904, 236.0000070859553}, {257.7569580078125, 70}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -2615,220 +2533,6 @@ This OTU is 25% wetlandish\
 			<string>YES</string>
 			<key>ID</key>
 			<integer>2655</integer>
-			<key>Magnets</key>
-			<array>
-				<string>{1, 1}</string>
-				<string>{1, -1}</string>
-				<string>{-1, -1}</string>
-				<string>{-1, 1}</string>
-				<string>{0, 1}</string>
-				<string>{0, -1}</string>
-				<string>{1, 0}</string>
-				<string>{-1, 0}</string>
-			</array>
-		</dict>
-		<dict>
-			<key>Class</key>
-			<string>TableGroup</string>
-			<key>Graphics</key>
-			<array>
-				<dict>
-					<key>Bounds</key>
-					<string>{{1782.4175739029315, 483.51648984134124}, {257.7568359375, 14}}</string>
-					<key>Class</key>
-					<string>ShapedGraphic</string>
-					<key>FitText</key>
-					<string>Vertical</string>
-					<key>Flow</key>
-					<string>Resize</string>
-					<key>ID</key>
-					<integer>2653</integer>
-					<key>Shape</key>
-					<string>Rectangle</string>
-					<key>Style</key>
-					<dict>
-						<key>fill</key>
-						<dict>
-							<key>GradientCenter</key>
-							<string>{-0.29411799, -0.26470599}</string>
-						</dict>
-					</dict>
-					<key>Text</key>
-					<dict>
-						<key>Text</key>
-						<string>{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf340
-\cocoascreenfonts1{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
-
-\f0\b\fs24 \cf0 seq_to_counts}</string>
-						<key>VerticalPad</key>
-						<integer>0</integer>
-					</dict>
-					<key>TextPlacement</key>
-					<integer>0</integer>
-				</dict>
-				<dict>
-					<key>Bounds</key>
-					<string>{{1782.4175739029315, 497.51648984134124}, {257.7568359375, 70}}</string>
-					<key>Class</key>
-					<string>ShapedGraphic</string>
-					<key>FitText</key>
-					<string>Vertical</string>
-					<key>Flow</key>
-					<string>Resize</string>
-					<key>ID</key>
-					<integer>2654</integer>
-					<key>Shape</key>
-					<string>Rectangle</string>
-					<key>Style</key>
-					<dict>
-						<key>fill</key>
-						<dict>
-							<key>GradientCenter</key>
-							<string>{-0.29411799, -0.26470599}</string>
-						</dict>
-					</dict>
-					<key>Text</key>
-					<dict>
-						<key>Align</key>
-						<integer>0</integer>
-						<key>Text</key>
-						<string>{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf340
-\cocoascreenfonts1{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
-{\colortbl;\red255\green255\blue255;}
-\deftab720
-\pard\pardeftab720\ri0
-
-\f0\fs24 \cf0 lake         -&gt; 2.0\
-marine biome -&gt; 0.5\
-marine habit -&gt; 0.5\
-wetland      -&gt; 1.0\
-}</string>
-						<key>VerticalPad</key>
-						<integer>0</integer>
-					</dict>
-					<key>TextPlacement</key>
-					<integer>0</integer>
-				</dict>
-			</array>
-			<key>GridH</key>
-			<array>
-				<integer>2653</integer>
-				<integer>2654</integer>
-				<array/>
-			</array>
-			<key>GroupConnect</key>
-			<string>YES</string>
-			<key>ID</key>
-			<integer>2652</integer>
-			<key>Magnets</key>
-			<array>
-				<string>{1, 1}</string>
-				<string>{1, -1}</string>
-				<string>{-1, -1}</string>
-				<string>{-1, 1}</string>
-				<string>{0, 1}</string>
-				<string>{0, -1}</string>
-				<string>{1, 0}</string>
-				<string>{-1, 0}</string>
-			</array>
-		</dict>
-		<dict>
-			<key>Class</key>
-			<string>TableGroup</string>
-			<key>Graphics</key>
-			<array>
-				<dict>
-					<key>Bounds</key>
-					<string>{{1782.4177004415408, 353.29669876833412}, {320.86798095703125, 14}}</string>
-					<key>Class</key>
-					<string>ShapedGraphic</string>
-					<key>FitText</key>
-					<string>Vertical</string>
-					<key>Flow</key>
-					<string>Resize</string>
-					<key>ID</key>
-					<integer>2650</integer>
-					<key>Shape</key>
-					<string>Rectangle</string>
-					<key>Style</key>
-					<dict>
-						<key>fill</key>
-						<dict>
-							<key>GradientCenter</key>
-							<string>{-0.29411799, -0.26470599}</string>
-						</dict>
-					</dict>
-					<key>Text</key>
-					<dict>
-						<key>Text</key>
-						<string>{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf340
-\cocoascreenfonts1{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
-
-\f0\b\fs24 \cf0 text_to_counts}</string>
-						<key>VerticalPad</key>
-						<integer>0</integer>
-					</dict>
-					<key>TextPlacement</key>
-					<integer>0</integer>
-				</dict>
-				<dict>
-					<key>Bounds</key>
-					<string>{{1782.4177004415408, 367.29669876833412}, {320.86798095703125, 70}}</string>
-					<key>Class</key>
-					<string>ShapedGraphic</string>
-					<key>FitText</key>
-					<string>Vertical</string>
-					<key>Flow</key>
-					<string>Resize</string>
-					<key>ID</key>
-					<integer>2651</integer>
-					<key>Shape</key>
-					<string>Rectangle</string>
-					<key>Style</key>
-					<dict>
-						<key>fill</key>
-						<dict>
-							<key>GradientCenter</key>
-							<string>{-0.29411799, -0.26470599}</string>
-						</dict>
-					</dict>
-					<key>Text</key>
-					<dict>
-						<key>Align</key>
-						<integer>0</integer>
-						<key>Text</key>
-						<string>{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf340
-\cocoascreenfonts1{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
-{\colortbl;\red255\green255\blue255;}
-\deftab720
-\pard\pardeftab720\ri0
-
-\f0\fs24 \cf0 "the deepest.." -&gt; (lake         -&gt; 2.0)\
-"marine wat..." -&gt; (marine biome -&gt; 0.5,\
-                    marine habit -&gt; 0.5,\
-                    wetland      -&gt; 1.0)\
-"My bath"       -&gt; ()}</string>
-						<key>VerticalPad</key>
-						<integer>0</integer>
-					</dict>
-					<key>TextPlacement</key>
-					<integer>0</integer>
-				</dict>
-			</array>
-			<key>GridH</key>
-			<array>
-				<integer>2650</integer>
-				<integer>2651</integer>
-				<array/>
-			</array>
-			<key>GroupConnect</key>
-			<string>YES</string>
-			<key>ID</key>
-			<integer>2649</integer>
 			<key>Magnets</key>
 			<array>
 				<string>{1, 1}</string>
@@ -2986,7 +2690,7 @@ ENVO:00000020}</string>
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{1903.9724270216423, 34.256359721553153}, {205, 14}}</string>
+			<string>{{1822.6077216143067, 34.256359721553153}, {205, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -3034,7 +2738,7 @@ ENVO:00000020}</string>
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{1829.4724748050869, 14.285713874002466}, {277, 14}}</string>
+			<string>{{1748.1077693977513, 14.285713874002466}, {277, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -3089,7 +2793,7 @@ ENVO:00000020}</string>
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{2033.9724764982848, 54.227006274242896}, {75, 14}}</string>
+			<string>{{1952.6077710909492, 54.227006274242896}, {75, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -3144,7 +2848,7 @@ ENVO:00000020}</string>
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{2015.9724788101428, 74.19765033731187}, {91, 14}}</string>
+			<string>{{1934.6077734028072, 74.19765033731187}, {91, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -3199,7 +2903,7 @@ ENVO:00000020}</string>
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{1863.2224311753419, 96.70040144791227}, {252.17857360839844, 91.835319519042969}}</string>
+			<string>{{1781.8577257680063, 96.70040144791227}, {252.17857360839844, 91.835319519042969}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FontInfo</key>
@@ -6185,7 +5889,7 @@ also called C1}</string>
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2016-03-01 19:55:36 +0000</string>
+	<string>2016-03-01 21:29:08 +0000</string>
 	<key>Modifier</key>
 	<string>Lucas Sinclair</string>
 	<key>NotesVisible</key>
@@ -6280,7 +5984,7 @@ also called C1}</string>
 		<key>SidebarWidth</key>
 		<integer>120</integer>
 		<key>VisibleRegion</key>
-		<string>{{-174, -65}, {2502.3255397720304, 1065.1162613527786}}</string>
+		<string>{{-216, -64}, {2502.32553977203, 1063.953470674446}}</string>
 		<key>Zoom</key>
 		<real>0.86000001430511475</real>
 		<key>ZoomValues</key>

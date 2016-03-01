@@ -42,7 +42,7 @@ Several other options are possible. Here is a list describing them all:
    * `--seq_type`: Sequence type `nucl` or `prot`, for nucleotides or amino acids respectively (Default: `nucl`).
    * `--search_algo`: Search algorithm. Either `blast` or `vsearch` (Default: `blast`).
    * `--search_db`: The database to search against (Default: `nt`). You can specify the full path or make a `~/.ncbirc` file.
-   * `--normalization`: Can be either of `flat`, `ui` or `uim`. This option defaults to `ui`.
+   * `--normalization`: Can be either of `flat`, `ui` or `upui`. This option defaults to `ui`.
                         - If you choose `flat`, we will count every isolation source once,
                           even if the same text entry appears several time for the same input
                           sequence.
@@ -211,6 +211,7 @@ You can choose the database you want to BLAST against. By default we will search
     $ pip install pandas
     $ pip install tqdm
     $ pip install biom-format
+    $ pip install requests
 
 If you are on a machine that does not authorize you to install packages like that you can try to install them only for your user:
 
@@ -219,12 +220,13 @@ If you are on a machine that does not authorize you to install packages like tha
     $ pip install --user pandas
     $ pip install --user tqdm
     $ pip install --user biom-format
+    $ pip install --user requests
 
 If you are using a python manager such as pyenv, don't forget to rehash the binary links at the end:
 
     $ pyenv rehash
 
-Now, you can check that it all works like this, if it doesn't go to the "Troubleshooting" section:
+Now, you can check that it all works like this, if it doesn't, go to the "Troubleshooting" section:
 
     $ python -c "import seqenv"
 
@@ -241,6 +243,15 @@ In the case you get an error such as `/usr/bin/ld: cannot find -lpython` it mean
 
     LFLAGS = -fpic -shared -lboost_regex -lpython2.7
 
-You might also need to install the boost libraries. for CentOS and RedHat the following works, otherwise use `apt-get`.
+You might also need to install the boost libraries. For CentOS and RedHat the following yum command works, otherwise try with `apt-get`.
 
     $ sudo yum install boost-devel
+
+If you are trying to compile on OS X you might need to change another line in the makefile (assuming you have python installed via homebrew):
+
+    PYTHON = -I/usr/local/Cellar/python/2.7.9/Frameworks/Python.framework/Versions/2.7/include/python2.7
+
+Then you might run into other problems on OS X and need to add other includes such as:
+
+    -I/usr/local/Cellar/boost/1.57.0/include/boost/tr1
+
