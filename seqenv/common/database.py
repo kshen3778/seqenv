@@ -3,6 +3,7 @@ import sqlite3
 from itertools import islice
 
 # Internal modules #
+from seqenv.common           import download_from_url, md5sum
 from seqenv.common.color     import Color
 from seqenv.common.autopaths import FilePath
 from seqenv.common.cache     import property_cached
@@ -10,10 +11,20 @@ from seqenv.common.cache     import property_cached
 ################################################################################
 class Database(FilePath):
 
-    def __init__(self, path, factory=None, isolation=None):
+    def __init__(self, path, factory=None, isolation=None, retrieve=None, md5=None):
+        """
+        * The path of the database comes first.
+        * The factory option enables you to change how results are returned.
+        * The Isolation source can be `None` for autocommit mode or one of:
+        'DEFERRED', 'IMMEDIATE' or 'EXCLUSIVE'.
+        * The retrieve option is an URL at which the database will be downloaded
+        if it was not found at the `path` given.
+        * The md5 option is used to check the integrety of a database."""
         self.path      = path
         self.factory   = factory
         self.isolation = isolation
+        self.retrieve  = retrieve
+        self.md5       = md5
 
     def __repr__(self):
         """Called when evaluating ``print seqs``."""
@@ -37,7 +48,8 @@ class Database(FilePath):
 
     def __contains__(self, key):
         """Called when evaluating ``"P81239A" in seqs``."""
-        self.own_cursor.execute("SELECT EXISTS(SELECT 1 FROM '%s' WHERE id=='%s' LIMIT 1);" % (self.main_table, key))
+        command = "SELECT EXISTS(SELECT 1 FROM '%s' WHERE id=='%s' LIMIT 1);"
+        self.own_cursor.execute(command % (self.main_table, key))
         return bool(self.own_cursor.fetchone())
 
     def __len__(self):
@@ -62,7 +74,7 @@ class Database(FilePath):
     @property_cached
     def connection(self):
         """To be used externally by the user."""
-        self.check_format()
+        self.prepare()
         con = sqlite3.connect(self.path, isolation_level=self.isolation)
         con.row_factory = self.factory
         return con
@@ -75,7 +87,7 @@ class Database(FilePath):
     @property_cached
     def own_connection(self):
         """To be used internally in this object."""
-        self.check_format()
+        self.prepare()
         return sqlite3.connect(self.path, isolation_level=self.isolation)
 
     @property_cached
@@ -105,15 +117,31 @@ class Database(FilePath):
 
     @property
     def first(self):
-        """Just the first entry"""
+        """Just the first entry."""
         return self[0]
 
     @property
     def last(self):
-        """Just the last entry"""
+        """Just the last entry."""
         return self.own_cursor.execute("SELECT * FROM data ORDER BY ROWID DESC LIMIT 1;").fetchone()
 
+    @property
+    def frame(self):
+        """The main table as a blaze data structure. Not ready yet."""
+        pass
+        #return blaze.Data('sqlite:///%s::%s') % (self.path, self.main_table)
+
     #-------------------------------- Methods --------------------------------#
+    def prepare(self):
+        """Check that the file exists, optionally downloads it.
+        Checks that the file is indeed an SQLite3 database.
+        Optionally check the MD5."""
+        if not os.path.exists(self.path):
+            if self.retrieve: download_from_url(self.retrieve, self.path, progress=True)
+            else: raise Exception("The file '" + self.path + "' does not exist.")
+        self.check_format()
+        if self.md5: assert self.md5 == md5sum(self.path)
+
     def check_format(self):
         if self.count_bytes == 0: return
         with open(self.path, 'r') as f: header = f.read(15)
@@ -161,7 +189,7 @@ class Database(FilePath):
 
     def add(self, entries):
         """Add entries to the main table.
-        The *entries* variable should be an iterable"""
+        The *entries* variable should be an iterable."""
         question_marks = '(' + ','.join(['?' for x in self.fields]) + ')'
         sql_command = "INSERT into 'data' values " + question_marks
         try:
@@ -174,7 +202,8 @@ class Database(FilePath):
             message2 = message2 % (Color.b_ylw, len(self.fields), Color.end, self.fields, Color.b_ylw, Color.end, entries)
             message3 = "\n * %sFirst element (%i)%s: %s \n"
             message3 = message3 % (Color.b_ylw, len(first_elem) if first_elem else 0, Color.end, first_elem)
-            raise Exception(message1 + message2 + message3)
+            message4 = "\n The original error was: '%s'" % err
+            raise Exception(message1 + message2 + message3 + message4)
         except KeyboardInterrupt as err:
             print "You interrupted the data insertion. Committing everything done up to this point."
             self.own_connection.commit()

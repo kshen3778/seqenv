@@ -17,9 +17,9 @@ else: readme_contents = "" #TODO
 # Get the different paragraphs #
 doc_params = re.findall('^### All parameters(.+?)###', readme_contents, flags=re.M|re.DOTALL)[0]
 doc_usage = re.findall('^### Usage(.+?)###', readme_contents, flags=re.M|re.DOTALL)[0]
+desc = seqenv.version_string + "\n\n" + doc_usage + "\n\n" + doc_params
 
 # Make a shell arguments parser #
-desc = seqenv.version_string + "\n\n" + doc_usage + "\n\n" + doc_params
 parser = argparse.ArgumentParser(description=desc, formatter_class=RawTextHelpFormatter)
 
 # All the required arguments #
