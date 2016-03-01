@@ -2,7 +2,7 @@
 from __future__ import division
 
 # Built-in modules #
-import os, multiprocessing, warnings
+import os, multiprocessing, warnings, unicodedata
 from collections import defaultdict
 import cPickle as pickle
 
@@ -342,9 +342,11 @@ class Analysis(object):
                         module_dir + 'data_envo/envo_names.tsv')
             # Load a global blacklist #
             t.LoadGlobal(module_dir + 'data_envo/envo_global.tsv')
-            # Tag all the texts #
+            # Tag all the texts, but the tagger only supports ascii #
             result = {}
-            for text in self.unique_texts: result[text] = t.GetMatches(text, "", [-27])
+            for text in self.unique_texts:
+                ascii = unicodedata.normalize('NFKD', text).encode('ascii','ignore')
+                result[text] = t.GetMatches(ascii, "", [-27])
             with open(text_to_matches, 'w') as handle: pickle.dump(result, handle)
             self.timer.print_elapsed()
             return result
