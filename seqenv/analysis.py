@@ -309,12 +309,12 @@ class Analysis(object):
     @property_cached
     def gis_with_text(self):
         """A set containing every GI that was found and that had a source text associated."""
-        return set(gi for gi in self.unique_gis if gi in self.source_database)
+        return set(gi for gi in self.unique_gis if gi in self.source_db)
 
     @property_cached
     def unique_texts(self):
         """A set containing every unique isolation source text as unicode strings."""
-        return set(self.source_database[gi][1] for gi in self.gis_with_text)
+        return set(self.source_db[gi][1] for gi in self.gis_with_text)
 
     @property_cached
     def text_to_matches(self):
@@ -394,25 +394,55 @@ class Analysis(object):
         We can also avoid counting two GIs that are coming from the same study, if a pubmed
         number is available."""
         result = {}
-        # Flat #
-        if self.normalization == 'flat':
+        # Flat or Unique source are quite similar #
+        if self.normalization == 'flat': set_or_list = list
+        if self.normalization == 'ui':   set_or_list = set
+        # It's just about using a list or a set in the right place #
+        if self.normalization == 'flat' or self.normalization == 'ui':
             for seq, gis in self.seq_to_gis.items():
-                texts = list(self.source_database[gi][1] for gi in gis if gi in self.source_database)
+                texts = set_or_list(self.source_db[gi][1] for gi in gis if gi in self.source_db)
                 counts = defaultdict(float)
                 for text in texts:
                     if text not in self.text_to_counts: continue
                     for c,i in self.text_to_counts[text].items(): counts[c] += i
-        # Unique source #
-        if self.normalization == 'ui':
-            for seq, gis in self.seq_to_gis.items():
-                texts = set(self.source_database[gi][1] for gi in gis if gi in self.source_database)
-                counts = defaultdict(float)
-                for text in texts:
-                    if text not in self.text_to_counts: continue
-                    for c,i in self.text_to_counts[text].items(): counts[c] += i
-        # Unique source and pubmed #
+        # Unique source and unique pubmed #
         if self.normalization == 'uiup':
-            pass
+            for seq, gis in self.seq_to_gis.items():
+                gis_w_text = [gi for gi in gis if gi in self.source_db]
+                gi_to_tnp  = {gi: (self.source_db[gi][1], self.source_db[gi][2]) for gi in gis_w_text}
+                texts      = set(text for text, pubmed in gi_to_tnp.values())
+                find_first = lambda d,t: [(gi, tnp) for gi, tnp in d.values() if tnp[0]==t][0]
+                gi_tnp_ut  = dict(find_first_matching(gi_to_tnp, text) for text in texts)
+                pubmeds    = set(pubmed for text, pubmed in gi_tnp_ut.values())
+                find_first = lambda d,p: [(gi, tnp) for gi, tnp in d.values() if tnp[1]==p][0]
+                gi_tnp_up  = dict(find_first_matching(gi_to_tnp, pubmed) for pubmed in pubmeds)
+
+                {gi: find_first_matching() for gi in gi_to_tnp}
+
+                gi_tnp_ut = {gi: find_first_matching() for gi in gi_to_tnp}
+                for gi in gis:
+                    if gi not in self.source_db: continue
+                pubmeds = set()
+
+        # Unique source and unique pubmed #
+        if self.normalization == 'uiup':
+            for seq, gis in self.seq_to_gis.items():
+                text_and_pubmed = []
+                for gi in gis:
+                    if gi not in self.source_db: continue
+                    gi, text, pubmed = self.source_db[gi]
+                    text_and_pubmed.append((text, pubmed))
+                unique_texts = set(text for text, pubmed in text_and_pubmed)
+                unique_texts = [text_and_pubmed[text_and_pubmed.index(t)] for t in unique_texts]
+                for text, pubmed in text_and_pubmed:
+                    pass
+                unique_pubmed = []
+                for text, pubmed in unique_text:
+                    pass
+                counts = defaultdict(float)
+                for text, pubmed in unique_pubmed:
+                    if text not in self.text_to_counts: continue
+                    for c,i in self.text_to_counts[text].items(): counts[c] += i
         # Proportional option #
         if self.proportional:
             tot_matches = sum([len(self.text_to_matches[text]) for text in texts])

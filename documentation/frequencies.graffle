@@ -450,11 +450,11 @@
 				<integer>6</integer>
 			</dict>
 			<key>ID</key>
-			<integer>2720</integer>
+			<integer>2733</integer>
 			<key>Points</key>
 			<array>
-				<string>{434.35710597997047, 495.17742512355926}</string>
-				<string>{402.0000053201332, 544.35483260035642}</string>
+				<string>{434.35710597997053, 512.51647157784691}</string>
+				<string>{402.60444638909092, 554.84339840918437}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -484,14 +484,14 @@
 			<key>Head</key>
 			<dict>
 				<key>ID</key>
-				<integer>2716</integer>
+				<integer>2712</integer>
 			</dict>
 			<key>ID</key>
 			<integer>2719</integer>
 			<key>Points</key>
 			<array>
-				<string>{397.50000400597793, 416.999987220913}</string>
-				<string>{434.35710597997053, 466.1774251235592}</string>
+				<string>{397.50000400597793, 374.999987220913}</string>
+				<string>{434.35712036024279, 305.99997860192605}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -513,8 +513,6 @@
 			<dict>
 				<key>ID</key>
 				<integer>2574</integer>
-				<key>Info</key>
-				<integer>5</integer>
 			</dict>
 		</dict>
 		<dict>
@@ -524,7 +522,7 @@
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{375.56587673192365, 466.1774251235592}, {117.58245849609375, 14}}</string>
+					<string>{{375.56587673192365, 483.51648226219714}, {117.58245849609375, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -560,7 +558,7 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{375.56587673192365, 480.1774251235592}, {117.58245849609375, 15}}</string>
+					<string>{{375.56587673192365, 497.51648226219714}, {117.58245849609375, 15}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -635,7 +633,7 @@
 			<key>Points</key>
 			<array>
 				<string>{402.5, 208}</string>
-				<string>{419.20876603183564, 237.00000306555486}</string>
+				<string>{434.35712036024279, 276.99997860192605}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -666,7 +664,7 @@
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{360.41753678378876, 237.00000306555486}, {117.58245849609375, 14}}</string>
+					<string>{{375.56589111219591, 276.99999920289019}, {117.58245849609375, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -702,7 +700,7 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{360.41753678378876, 251.00000306555489}, {117.58245849609375, 15}}</string>
+					<string>{{375.56589111219591, 290.99999920289019}, {117.58245849609375, 15}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -3793,7 +3791,7 @@ This document just describes a plan for processing data.}</string>
 			<key>Points</key>
 			<array>
 				<string>{205.08331922969469, 394.35167423480499}</string>
-				<string>{326.00000532013325, 558.85483260035642}</string>
+				<string>{326.60444638909092, 569.34339840918437}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -3833,7 +3831,7 @@ This document just describes a plan for processing data.}</string>
 			<integer>2620</integer>
 			<key>Points</key>
 			<array>
-				<string>{478.0000053201332, 558.85483260035642}</string>
+				<string>{478.60444638909092, 569.34339840918437}</string>
 				<string>{587.91207096856306, 462.99999297897807}</string>
 			</array>
 			<key>Style</key>
@@ -3867,7 +3865,7 @@ This document just describes a plan for processing data.}</string>
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{326.0000053201332, 544.35483260035642}, {152, 14}}</string>
+					<string>{{326.60442578812678, 554.84335720725608}, {152, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -3903,7 +3901,7 @@ This document just describes a plan for processing data.}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{326.0000053201332, 558.35483260035642}, {152, 15}}</string>
+					<string>{{326.60442578812678, 568.84335720725608}, {152, 15}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -5889,7 +5887,7 @@ also called C1}</string>
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2016-03-01 21:29:08 +0000</string>
+	<string>2016-03-01 22:06:07 +0000</string>
 	<key>Modifier</key>
 	<string>Lucas Sinclair</string>
 	<key>NotesVisible</key>
