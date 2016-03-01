@@ -1,5 +1,5 @@
 # Built-in modules #
-import sqlite3
+import os, sqlite3
 from itertools import islice
 
 # Internal modules #
@@ -137,7 +137,9 @@ class Database(FilePath):
         Checks that the file is indeed an SQLite3 database.
         Optionally check the MD5."""
         if not os.path.exists(self.path):
-            if self.retrieve: download_from_url(self.retrieve, self.path, progress=True)
+            if self.retrieve:
+                print "Downloading SQLite3 database..."
+                download_from_url(self.retrieve, self.path, progress=True)
             else: raise Exception("The file '" + self.path + "' does not exist.")
         self.check_format()
         if self.md5: assert self.md5 == md5sum(self.path)

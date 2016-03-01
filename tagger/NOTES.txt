@@ -4,7 +4,3 @@ If you recompile the tagger, but don't want to see the changes in git and accide
     git update-index --assume-unchanged tagger/libtagger.so
     git update-index --assume-unchanged tagger/makefile
     git update-index --assume-unchanged tagger/tagger.o
-
-
-
-

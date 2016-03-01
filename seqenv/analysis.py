@@ -279,7 +279,7 @@ class Analysis(object):
     @property_cached
     def source_database(self):
         """The sqlite3 database containing every GI number that has an isolation source
-        associated to it. In addition the pubmed-ID is listed too, if there is one.
+        associated to it. In addition, the pubmed-ID is listed too if there is one.
         The database containing three columns:
         - The GI number of a sequence. (id INTEGER)
         - The isolation source text of that sequence. (source TEXT)
@@ -287,7 +287,8 @@ class Analysis(object):
         If we don't have it locally already, we will go get it."""
         path     = module_dir + 'data_sources/gi_db.sqlite3'
         retrieve = "http://dropbox.com/chris/gi_db.sqlite3.zip"
-        database = Database(path, retrieve=retrieve)
+        md5      = "0c1790e88df60e8aeac10a6485927e87"
+        database = Database(path, retrieve=retrieve, md5=md5)
         return database
 
     #@property_cached
