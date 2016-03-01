@@ -95,32 +95,32 @@ $ seqenv centers.fasta --abundances abundance.tsv --seq_type nucl --out_dir outp
 The output you will receive should look something like this:
 
 ~~~
-seqenv version 1.0.4 (pid 20539)
-Start at: 2015-07-24 03:50:37.982581
+seqenv version 1.0.4 (pid 52169)
+Start at: 2016-03-02 00:22:09.727377
 --> STEP 1: Parse the input FASTA file.
-Elapsed time: 0:00:02.345551
+Elapsed time: 0:00:00.005811
 Using: output/renamed.fasta
---> STEP 1B: Get the top 1000 sequences (in terms of their abundances).
-Elapsed time: 0:00:00.504347
-Using: output/top_seqs.fasta
---> STEP 2: Similarity search against the 'nt' database with 24 processes
-Elapsed time: 0:38:30.489685
+--> STEP 2: Similarity search against the 'nt' database with 5 processes
+Elapsed time: 0:02:11.215829
 --> STEP 3: Filter out bad hits from the search results
-Elapsed time: 0:00:00.022893
+Elapsed time: 0:00:00.002071
 --> STEP 4: Parsing the search results
-Elapsed time: 0:00:00.069423
---> STEP 5: Loading all NCBI isolation sources in RAM
-Elapsed time: 0:02:18.169891
-Got 5654 GIs from search results
+Elapsed time: 0:00:00.002099
+Elapsed time: 0:00:00.000156
+--> STEP 5: Loading database with all NCBI isolation sources
+Got 60 unique GIs from search results
+Got 56 unique GIs with an isolation source
+Got 24 unique isolation source texts
+Elapsed time: 0:00:01.496406
 --> STEP 6: Run the text mining tagger on all blobs.
-Elapsed time: 0:00:00.269561
-Using 853 different isolation sources
+Elapsed time: 0:00:00.025384
+Got 28 environmental term matches
 --> STEP 7: Parsing the tagger results and counting terms.
-Elapsed time: 0:00:00.014824
+Elapsed time: 0:00:00.001027
 ------------
 Success. Outputs are in 'output/'
-End at: 2015-07-24 04:31:42.324913
-Total elapsed time: 0:41:04.342529
+End at: 2016-03-02 00:24:22.504485
+Total elapsed time: 0:02:12.777297
 ~~~
 
 Once the pipeline has finished processing, you will have the following contents in the output folder:
