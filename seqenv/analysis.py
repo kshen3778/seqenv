@@ -288,7 +288,7 @@ class Analysis(object):
         return set(gi for gis in self.seq_to_gis.values() for gi in gis)
 
     @property_cached
-    def source_database(self):
+    def source_db(self):
         """The sqlite3 database containing every GI number in all NCBI that has an
         isolation source associated to it. In addition, the pubmed-ID is listed too
         if there is one. Thus, the database containing three columns:
