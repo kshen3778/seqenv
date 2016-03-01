@@ -35,7 +35,9 @@ class FilePath(str):
         self.path = self.clean_path(path)
 
     def __iter__(self): return open(self.path)
-    def __len__(self): return self.count_lines
+    def __len__(self):
+        if self.path is None: return 0
+        return self.count_lines
 
     @property_cached
     def count_lines(self):
