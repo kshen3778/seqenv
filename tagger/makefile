@@ -1,7 +1,7 @@
 CC     = g++
 CFLAGS = -fpic -Wall -O3
-LFLAGS = -fpic -shared -lboost_regex -lpython2.7
-PYTHON = -I/usr/local/Cellar/python/2.7.9/Frameworks/Python.framework/Versions/2.7/include/python2.7 -I/usr/local/Cellar/boost/1.60.0_1/include/boost/tr1
+LFLAGS = -fpic -shared -lboost_regex -lpython
+PYTHON = -I/usr/include/python2.7
 
 all: tagger_swig.py _tagger_swig.so libtagger.so
 
