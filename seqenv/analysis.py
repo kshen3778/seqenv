@@ -412,35 +412,12 @@ class Analysis(object):
                 gi_to_tnp  = {gi: (self.source_db[gi][1], self.source_db[gi][2]) for gi in gis_w_text}
                 texts      = set(text for text, pubmed in gi_to_tnp.values())
                 find_first = lambda d,t: [(gi, tnp) for gi, tnp in d.values() if tnp[0]==t][0]
-                gi_tnp_ut  = dict(find_first_matching(gi_to_tnp, text) for text in texts)
+                gi_tnp_ut  = dict(find_first(gi_to_tnp, text) for text in texts)
                 pubmeds    = set(pubmed for text, pubmed in gi_tnp_ut.values())
                 find_first = lambda d,p: [(gi, tnp) for gi, tnp in d.values() if tnp[1]==p][0]
-                gi_tnp_up  = dict(find_first_matching(gi_to_tnp, pubmed) for pubmed in pubmeds)
-
-                {gi: find_first_matching() for gi in gi_to_tnp}
-
-                gi_tnp_ut = {gi: find_first_matching() for gi in gi_to_tnp}
-                for gi in gis:
-                    if gi not in self.source_db: continue
-                pubmeds = set()
-
-        # Unique source and unique pubmed #
-        if self.normalization == 'uiup':
-            for seq, gis in self.seq_to_gis.items():
-                text_and_pubmed = []
-                for gi in gis:
-                    if gi not in self.source_db: continue
-                    gi, text, pubmed = self.source_db[gi]
-                    text_and_pubmed.append((text, pubmed))
-                unique_texts = set(text for text, pubmed in text_and_pubmed)
-                unique_texts = [text_and_pubmed[text_and_pubmed.index(t)] for t in unique_texts]
-                for text, pubmed in text_and_pubmed:
-                    pass
-                unique_pubmed = []
-                for text, pubmed in unique_text:
-                    pass
+                gi_tnp_up  = dict(find_first(gi_to_tnp, pubmed) for pubmed in pubmeds)
                 counts = defaultdict(float)
-                for text, pubmed in unique_pubmed:
+                for text, pubmed in gi_tnp_up:
                     if text not in self.text_to_counts: continue
                     for c,i in self.text_to_counts[text].items(): counts[c] += i
         # Proportional option #
