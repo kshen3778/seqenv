@@ -7,3 +7,6 @@
 \#*
 .#*
 ._*
+
+# The big database #
+seqenv/data_sources/gi_db.sqlite3
