@@ -48,7 +48,7 @@ def download_from_url(source, destination, progress=False, uncompress=True):
         else:
             for data in response.iter_content(): handle.write(data)
     if uncompress:
-        with open(destination, 'r') as f: header = f.read(4)
+        with open(destination) as f: header = f.read(4)
         if header == "PK\x03\x04": unzip(destination, inplace=True)
         # Add other compression formats here
 

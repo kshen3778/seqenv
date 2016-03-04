@@ -28,7 +28,7 @@ class Timer(object):
 
     @property
     def color(self):
-        """Should be use color or not ? If we are not in a shell like ipython then not"""
+        """Should we use color or not ? If we are not in a shell like ipython then not"""
         import __main__ as main
         if not hasattr(main, '__file__'): return True
         return False

@@ -23,6 +23,7 @@ import pandas
 try:
     import tagger
 except ImportError:
+    tagger = None
     msg = "Failed to import the tagger submodule, maybe it wasn't compiled correctly ?"
     warnings.warn(msg + " Seqenv won't work until that is fixed.", UserWarning)
 
@@ -199,7 +200,7 @@ class Analysis(object):
         # Print status #
         print "Using: " + self.renamed_fasta
         print "--> STEP 1B: Get the top %i sequences (in terms of their abundances)." % N
-        # Check the user inputed value #
+        # Check the user inputted value #
         if self.N is not None and N > self.input_file.count:
             msg = "You asked for the top %i sequences"
             msg += ", but your input file only contains %i sequences!"
@@ -281,7 +282,7 @@ class Analysis(object):
             self.timer.print_elapsed()
             return result
         # Parse the results #
-        with open(seq_to_gis, 'r') as handle: return pickle.load(handle)
+        with open(seq_to_gis) as handle: return pickle.load(handle)
 
     @property_cached
     def unique_gis(self):
@@ -352,7 +353,7 @@ class Analysis(object):
             self.timer.print_elapsed()
             return result
         # Parse the results #
-        with open(text_to_matches, 'r') as handle: return pickle.load(handle)
+        with open(text_to_matches) as handle: return pickle.load(handle)
 
     @property_cached
     def text_to_counts(self):
@@ -385,7 +386,7 @@ class Analysis(object):
             self.timer.print_elapsed()
             return result
         # Parse the results #
-        with open(text_to_counts, 'r') as handle: return pickle.load(handle)
+        with open(text_to_counts) as handle: return pickle.load(handle)
 
     @property_cached
     def seq_to_counts(self):

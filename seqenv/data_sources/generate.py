@@ -145,7 +145,7 @@ class QueryNCBI(object):
             return self.chunk_to_records(chunk)
         # The parsing xml #
         try:
-            result = list(Entrez.parse(response, validate=True))
+            result = list(Entrez.parse(response))
         except CorruptedXMLError:
             self.logger.report_error('xml', chunk)
             time.sleep(5)
@@ -180,7 +180,7 @@ class QueryNCBI(object):
         return int(references.get('GBReference_pubmed'))
 
     def get_all_lengths(self, chunk):
-        """Given a list of GIDs return the length of each sequenence"""
+        """Given a list of GIDs return the length of each sequence"""
         gid_to_len = lambda x: Entrez.parse(Entrez.esummary(db="nucleotide", id=x)).next()['Length']
         return map(gid_to_len, chunk)
 
