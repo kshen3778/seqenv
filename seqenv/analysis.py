@@ -190,7 +190,7 @@ class Analysis(object):
     @property
     def only_top_sequences(self):
         """Make a new fasta file where only the top N sequences are included
-        (in terms of their abundance)."""
+        (in terms of their abundance). Skipped if no abundance info is given."""
         if not self.abundances: return self.renamed_fasta
         only_top_fasta = FASTA(self.out_dir + 'top_seqs.fasta')
         if only_top_fasta.exists: return only_top_fasta

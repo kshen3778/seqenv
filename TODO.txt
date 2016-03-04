@@ -1,16 +1,12 @@
 Add tagging result into SQL database
 
-Bug with blast
+Bug with blast, with symlinks
 
-Bug with tagger
+Bug with tagger, with chris' file
 
-Uniquify the isolation sources with dates ? Better idea: uniquify based on PubMed IDs !
+Add the dot files back
 
 Extract information only for a subset of envo terms (such as biome feature) (i.e. the masking feature)
-
-Have the setup.py compile the tagger (swig is a new dependency in that case) (problematic other libraries)
-
-Or replace the tagger with an online service, but this can be detrimental to the pipeline to rely on custom services.
 
 Once this is done test that seqenv can easily be installed on a different university cluster easily through one pip command
 
