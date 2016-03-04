@@ -7,7 +7,7 @@ from collections import defaultdict
 import cPickle as pickle
 
 # Internal modules #
-from seqenv                    import module_dir, version_string
+from seqenv                    import module_dir, version_string, git_repo
 from seqenv.fasta              import FASTA
 from seqenv.outputs            import OutputGenerator
 from seqenv.seqsearch.parallel import ParallelSeqSearch
@@ -140,6 +140,7 @@ class Analysis(object):
         style, we just need to make a call to `outputs.make_all` and everything will be
         generated automatically, in a reverse fashion."""
         print version_string + " (pid %i)" % os.getpid()
+        print "The exact version of the code is: " + git_repo.short_hash
         self.timer.print_start()
         self.outputs.make_all()
         print "------------\nSuccess. Outputs are in '%s'" % self.out_dir
