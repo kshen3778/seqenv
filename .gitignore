@@ -10,3 +10,6 @@
 
 # The big database #
 seqenv/data_sources/gi_db.sqlite3
+
+# IDE #
+.idea
