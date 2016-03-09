@@ -1,4 +1,4 @@
-# seqenv version 1.0.4
+# `seqenv` version 1.0.4
 * Assign environment ontology (EnvO) terms to short DNA sequences.
 * More information at: http://environments.hcmr.gr/seqenv.html
 * Code written by [Lucas Sinclair](http://envonautics.com/#lucas).
@@ -45,13 +45,13 @@ Several other options are possible. Here is a list describing them all:
    * `--search_algo`: Search algorithm. Either `blast` or `vsearch` (Default: `blast`).
    * `--search_db`: The database to search against (Default: `nt`). You can specify the full path or make a `~/.ncbirc` file.
    * `--normalization`: Can be either of `flat`, `ui` or `upui`. This option defaults to `ui`.
-                        - If you choose `flat`, we will count every isolation source once,
+                      ..* If you choose `flat`, we will count every isolation source once,
                           even if the same text entry appears several time for the same input
                           sequence.
-                        - If you choose `ui`, standing for unique isolation, we will uniquify
+                      ..* If you choose `ui`, standing for unique isolation, we will uniquify
                           every frequency count depending on the text entry of its isolation
                           source.
-                        - If you choose `upui`, standing for unique isolation and unique pubmed-ID,
+                      ..* If you choose `upui`, standing for unique isolation and unique pubmed-ID,
                           we will uniquify the frequency counts based on the text entry of its
                           isolation source and the pubmed-ID from which the isolation text was
                           obtained.
