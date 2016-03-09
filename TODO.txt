@@ -4,7 +4,7 @@ Bug with blast, with symlinks
 
 Bug with tagger, with chris' file
 
-Add the dot files back
+Add the dot files back, use package for reading ovo files.
 
 Extract information only for a subset of envo terms (such as biome feature) (i.e. the masking feature)
 

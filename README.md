@@ -135,7 +135,7 @@ samples_to_names.tsv     text_to_counts.pickle  top_seqs.fasta.parts
 
 The most interesting files are probably:
 
-* `list_concepts_found.tsv` links every OTU to all its relevent BLAST hits and linked ENVO terms.
+* `list_concepts_found.tsv` links every OTU to all its relevant BLAST hits and linked ENVO terms.
 * `seq_to_names.tsv` a matrix linking every OTU to its "composition" in terms of ENVO identifiers translated to readable names.
 * `samples_to_names.tsv` if an abundance file was provided, this is a a matrix linking every one of your samples to its "composition" in terms of ENVO identifiers translated to readable names.
 
@@ -146,22 +146,23 @@ The most interesting files are probably:
 - **From Signals to Environmentally Tagged Sequences II** (Ref: ECOST-MEETING-ES1103-100613-031037), June 10th-13th 2013, Hellenic Centre for Marine Research, Crete, Greece.
 - **From Signals to Environmentally Tagged Sequences III** (Ref: ECOST-MEETING-ES1103-220914-047036), September 22nd-25th 2014, Hellenic Centre for Marine Research, Crete, Greece.
 
-This work would not have been possible without the advice and support of many people who attended the hackathons:
+This work would not have been possible without the advice and support of many people who attended the hackathons, in alphabetical order:
 
-- [Umer Zeeshan Ijaz](http://userweb.eng.gla.ac.uk/umer.ijaz/) (umer.ijaz@glasgow.ac.uk)
-- [Lucas Sinclair](https://github.com/xapple) (lucas.sinclair@me.com) [1]
-- [Chris Quince](http://www2.warwick.ac.uk/fac/med/staff/cquince/) (c.quince@warwick.ac.uk)
-- Christina Pavloudi (cpavloud@hcmr.gr)
-- Anastasis Oulas (oulas@hcmr.gr)
-- Julia Schnetzer (jschnetz@mpi-bremen.de)
-- Aaron Weimann (aaron.weimann@uni-duesseldorf.de)
-- Alica Chronakova (alicach@upb.cas.cz)
-- Ali Zeeshan Ijaz (alizeeshanijaz@gmail.com)
 - Simon Berger (simon.berger@h-its.org)
+- Alica Chronakova (alicach@upb.cas.cz)
+- Anastasis Oulas (oulas@hcmr.gr)
 - [Evangelos Pafilis](http://epafilis.info/) (pafilis@hcmr.gr) [2]
+- Christina Pavloudi (cpavloud@hcmr.gr)
+- [Chris Quince](http://www2.warwick.ac.uk/fac/med/staff/cquince/) (c.quince@warwick.ac.uk) [3]
+- Julia Schnetzer (jschnetz@mpi-bremen.de)
+- [Lucas Sinclair](http://envonautics.com/#lucas) (lucas.sinclair@me.com) [1]
+- Aaron Weimann (aaron.weimann@uni-duesseldorf.de)
+- Ali Zeeshan Ijaz (alizeeshanijaz@gmail.com)
+- [Umer Zeeshan Ijaz](http://userweb.eng.gla.ac.uk/umer.ijaz/) (umer.ijaz@glasgow.ac.uk) [3]
 
-[1] Main developers
+[1] Main developer
 [2] Contact for correspondence
+[3] Original idea
 
 ### News
 * **August 2013**: Chris Quince presented a talk on `seqenv` at [STAMPS2013](https://stamps.mbl.edu/index.php/Main_Page). You can download the PDF of the presentation: [C Quince et. al., SeqEnv: Annotating sequences with environments (STAMPS 2013)](https://stamps.mbl.edu/images/4/44/Quince_SeqEnvSTAMPS2013.pdf)
@@ -174,12 +175,12 @@ This work would not have been possible without the advice and support of many pe
 This chapter will be removed once the simple `pip install seqenv` is fully operational. In the meantime, no automated installation has been developed for the `seqenv` package. But following this document and typing these commands on your bash prompt should get you started. If you cannot get a functional installation set up, contact the authors.
 
 ##### Step 1: Cloning the repository
-Here you will download a copy of the code from bitbucket and place it somewhere in your home directory. To do this, as the repository is still private, you will need to be added to the list of collaborators in the "biohackers" team on bitbucket.
+Here you will download a copy of the code and place it somewhere in your home directory.
 
     $ cd ~
     $ mkdir repos
     $ cd repos
-    $ git clone git@bitbucket.org:biohackers/seqenv.git
+    $ git clone https://github.com/xapple/seqenv.git
 
 ##### Step 2: Modify your search paths
 Here you will edit your ``~/.bashrc`` or ``~/.bash_profile`` to add a reference to the code you just downloaded.
