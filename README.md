@@ -45,6 +45,7 @@ Several other options are possible. Here is a list describing them all:
    * `--search_algo`: Search algorithm. Either `blast` or `vsearch` (Default: `blast`).
    * `--search_db`: The database to search against (Default: `nt`). You can specify the full path or make a `~/.ncbirc` file.
    * `--normalization`: Can be either of `flat`, `ui` or `upui`. This option defaults to `ui`.
+
                         * If you choose `flat`, we will count every isolation source once,
                           even if the same text entry appears several time for the same input
                           sequence.
@@ -55,6 +56,7 @@ Several other options are possible. Here is a list describing them all:
                           we will uniquify the frequency counts based on the text entry of its
                           isolation source and the pubmed-ID from which the isolation text was
                           obtained.
+
    * `--proportional`: Should we divide the counts of every input sequence by the number of text entries that were associated to it. Defaults to `True`.
    * `--backtracking`: For every term identified by the tagger, we will propagate frequency counts up the acyclic directed graph described by the ontology. Defaults to `False`.
    * `--num_threads`: Number of cores to use (Defaults to the total number of cores). Use `1` for non-parallel processing.
