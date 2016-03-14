@@ -12,15 +12,15 @@ $ ./add_tagger_results.py
 """
 
 # Built-in modules #
-import os, inspect, marshal
+import os, inspect, marshal, unicodedata
 
 # Internal modules #
 from seqenv.common.timer import Timer
 from seqenv.common.database import Database
-import seqenv.tagger as api
+import tagger as tagger_api
 
 # Third party modules #
-from tqdm import tqdm
+from tqdm import trange
 
 # Get the directory of this script #
 filename = inspect.getframeinfo(inspect.currentframe()).filename
@@ -33,7 +33,7 @@ db_path = "gi_db.sqlite3"
 ###############################################################################
 class Tagger(object):
     """Interface to the C-coded tagger. Randomly segfaults last
-    time I tried it on a new machine."""
+    time I recomplied it and then tried it on a new machine."""
 
     def __init__(self, entities=None, names=None, globs=None, data_dir=None):
         # Defaults #
@@ -42,7 +42,7 @@ class Tagger(object):
         if names is None:    names    = data_dir + 'envo_names.tsv'
         if globs is None:    globs    = data_dir + 'envo_global.tsv'
         # Make an instance of the API #
-        self.api = api.Tagger()
+        self.api = tagger_api.Tagger()
         self.api.LoadNames(entities, names)
         self.api.LoadGlobal(globs)
 
@@ -56,39 +56,42 @@ class Tagger(object):
         return self.api.GetMatches(text, "", [-27])
 
 ###############################################################################
-def run():
+def run(database, start_again=True):
     """Run this script."""
     # Start timer #
     timer = Timer()
     timer.print_start()
 
+    # STEP 0 #
+    if start_again: database.execute('DROP TABLE IF EXISTS "isolation"')
+
     # STEP 1 #
     print 'STEP 1: Adding new table if not exists.'
-    database = Database(db_path)
     query = """
-    CREATE TABLE IF NOT EXISTS isolation
+    CREATE TABLE IF NOT EXISTS "isolation"
     (
-      source INTEGER AUTO_INCREMENT PRIMARY KEY,
-      text TEXT,
-      envo BLOB
-    );
-    """
+      "source" INTEGER AUTO_INCREMENT PRIMARY KEY,
+      "text" TEXT,
+      "envos" BLOB
+    );"""
     database.execute(query)
     timer.print_elapsed()
 
     # STEP 2 #
-    print 'STEP 2: Loading all distinct isolation sources in RAM.'
+    print 'STEP 2: Loading all distinct isolation sources in RAM (1min).'
     def gen_sources():
-        query = "SELECT DISTINCT source FROM data;"
-        for x in tqdm(database.execute(query)): yield x
+        command = 'SELECT DISTINCT "source" FROM "data";'
+        database.execute(command)
+        for x in tqdm(database.cursor): yield x[0]
     all_sources = list(gen_sources())
     timer.print_elapsed()
+    print "Total sources: %i" % len(all_sources)
 
     # STEP 3 #
     print 'STEP 3: Finding resume point.'
     if database.count_entries('isolation') != 0:
         last = database.get_last('isolation')
-        index = all_sources.index(last)
+        index = all_sources.index(last) + 1
     else:
         index = 0
     timer.print_elapsed()
@@ -97,21 +100,25 @@ def run():
     print 'STEP 4: Adding all isolation sources and tags in the new table.'
     tagger = Tagger()
     def gen_rows(sources, i):
-        for i in tqdm(xrange(index,len(sources))):
-            text = sources[i]
-            matches = tagger.match(text)
-            blob = marshal.dumps((m for m in matches))
-            yield i, text, blob
-    database.add(gen_rows(all_sources, index))
+        for i in trange(index,len(sources)):
+            text    = sources[i]
+            ascii   = unicodedata.normalize('NFKD', text).encode('ascii','ignore')
+            matches = tagger.match(ascii)
+            if not matches: continue
+            envos   = (int(n[1][5:]) for m in matches for n in m[2])
+            blob    = marshal.dumps(tuple(envos))
+            yield text, blob
+    database.add(gen_rows(all_sources, index), 'isolation', ('text', 'envos'))
     timer.print_elapsed()
+    total = database.count_entries('isolation')
+    print "Total sources that had at least one match: %i" % total
 
     # End messages #
-    timer.print_elapsed()
-    print 'Done. Results are in "%s"' % 'a'
+    print 'Done. Results are in "%s"' % database.path
     timer.print_end()
     timer.print_total_elapsed()
 
 ###############################################################################
 if __name__ == '__main__':
     print "*** Adding tagger results to database (pid %i) ***" % os.getpid()
-    pass
+    with Database(db_path) as db: run(db)
