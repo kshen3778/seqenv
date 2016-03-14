@@ -11,20 +11,28 @@ from seqenv.common.cache     import property_cached
 ################################################################################
 class Database(FilePath):
 
-    def __init__(self, path, factory=None, isolation=None, retrieve=None, md5=None):
+    def __init__(self, path,
+                       factory   = None,
+                       text_fact = None,
+                       isolation = None,
+                       retrieve  = None,
+                       md5       = None):
         """
         * The path of the database comes first.
         * The factory option enables you to change how results are returned.
+        * The text_fact option enables you to change text factory (useful for BLOB).
         * The Isolation source can be `None` for autocommit mode or one of:
         'DEFERRED', 'IMMEDIATE' or 'EXCLUSIVE'.
         * The retrieve option is an URL at which the database will be downloaded
         if it was not found at the `path` given.
         * The md5 option is used to check the integrety of a database."""
         self.path      = path
+        self.text_fact = text_fact
         self.factory   = factory
         self.isolation = isolation
         self.retrieve  = retrieve
         self.md5       = md5
+        self.prepared  = False
 
     def __repr__(self):
         """Called when evaluating ``print database``."""
@@ -73,21 +81,17 @@ class Database(FilePath):
     @property_cached
     def connection(self):
         """To be used externally by the user."""
-        self.prepare()
-        con = sqlite3.connect(self.path, isolation_level=self.isolation)
-        con.row_factory = self.factory
-        return con
+        return self.new_connection()
+
+    @property_cached
+    def own_connection(self):
+        """To be used internally in this object."""
+        return self.new_connection()
 
     @property_cached
     def cursor(self):
         """To be used externally by the user."""
         return self.connection.cursor()
-
-    @property_cached
-    def own_connection(self):
-        """To be used internally in this object."""
-        self.prepare()
-        return sqlite3.connect(self.path, isolation_level=self.isolation)
 
     @property_cached
     def own_cursor(self):
@@ -131,6 +135,14 @@ class Database(FilePath):
         #return blaze.Data('sqlite:///%s::%s') % (self.path, self.main_table)
 
     # ------------------------------- Methods ------------------------------- #
+    def new_connection(self):
+        """Make a new connection."""
+        if not self.prepared: self.prepare()
+        con = sqlite3.connect(self.path, isolation_level=self.isolation)
+        con.row_factory = self.factory
+        if self.text_fact: con.text_factory = self.text_fact
+        return con
+
     def prepare(self):
         """Check that the file exists, optionally downloads it.
         Checks that the file is indeed an SQLite3 database.
@@ -142,6 +154,7 @@ class Database(FilePath):
             else: raise Exception("The file '" + self.path + "' does not exist.")
         self.check_format()
         if self.md5: assert self.md5 == md5sum(self.path)
+        self.prepared = True
 
     def check_format(self):
         if self.count_bytes == 0: return
@@ -243,6 +256,10 @@ class Database(FilePath):
         if table is None: table = self.main_table
         query = "SELECT * FROM %s ORDER BY ROWID DESC LIMIT 1;" % table
         return self.own_cursor.execute(query).fetchone()
+
+    def vacuum(self):
+        """Compact the database, remove old transactions."""
+        self.own_cursor.execute("VACUUM")
 
     def close(self):
         self.cursor.close()

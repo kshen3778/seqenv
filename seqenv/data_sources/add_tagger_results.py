@@ -56,6 +56,25 @@ class Tagger(object):
         return self.api.GetMatches(text, "", [-27])
 
 ###############################################################################
+def restore_database():
+    pass
+
+###############################################################################
+def pre_test(database, n=20):
+    print '-'*50
+    database.execute('SELECT * from data')
+    tagger = Tagger()
+    for i in range(n):
+        gi, text, pubmed = database.cursor.next()
+        matches = tagger.match(text)
+        if not matches: continue
+        envos = tuple(int(n[1][5:]) for m in matches for n in m[2])
+        msg = 'GI: %s, SOURCE: "%s…", ENVOS: %s'
+        msg = msg % (gi, text[:15], envos)
+        print msg
+    print '-'*50
+
+###############################################################################
 def run(database, start_again=True):
     """Run this script."""
     # Start timer #
@@ -63,55 +82,62 @@ def run(database, start_again=True):
     timer.print_start()
 
     # STEP 0 #
-    if start_again: database.execute('DROP TABLE IF EXISTS "isolation"')
+    if start_again:
+        print 'STEP 0: Starting over. Droping table.'
+        database.execute('DROP TABLE IF EXISTS "isolation"')
 
     # STEP 1 #
     print 'STEP 1: Adding new table if not exists.'
     query = """
     CREATE TABLE IF NOT EXISTS "isolation"
     (
-      "source" INTEGER AUTO_INCREMENT PRIMARY KEY,
-      "text" TEXT,
-      "envos" BLOB
+      "id"     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+      "source" TEXT NOT NULL,
+      "envos"  BLOB NOT NULL
     );"""
     database.execute(query)
     timer.print_elapsed()
 
     # STEP 2 #
-    print 'STEP 2: Loading all distinct isolation sources in RAM (1min).'
+    print 'STEP 2: Loading all distinct isolation sources in RAM (~1min).'
     def gen_sources():
-        command = 'SELECT DISTINCT "source" FROM "data";'
+        command = 'SELECT DISTINCT "source" FROM "data" order by min(rowid);'
         database.execute(command)
-        for x in tqdm(database.cursor): yield x[0]
+        for x in database.cursor: yield x[0]
     all_sources = list(gen_sources())
     timer.print_elapsed()
     print "Total sources: %i" % len(all_sources)
 
     # STEP 3 #
-    print 'STEP 3: Finding resume point.'
-    if database.count_entries('isolation') != 0:
-        last = database.get_last('isolation')
-        index = all_sources.index(last) + 1
-    else:
-        index = 0
-    timer.print_elapsed()
-
-    # STEP 4 #
-    print 'STEP 4: Adding all isolation sources and tags in the new table.'
+    print 'STEP 3: Adding all isolation sources and tags in the new table (~2min).'
     tagger = Tagger()
-    def gen_rows(sources, i):
-        for i in trange(index,len(sources)):
+    def gen_rows(sources):
+        for i in trange(len(sources)):
             text    = sources[i]
-            ascii   = unicodedata.normalize('NFKD', text).encode('ascii','ignore')
-            matches = tagger.match(ascii)
+            matches = tagger.match(text)
             if not matches: continue
             envos   = (int(n[1][5:]) for m in matches for n in m[2])
             blob    = marshal.dumps(tuple(envos))
             yield text, blob
-    database.add(gen_rows(all_sources, index), 'isolation', ('text', 'envos'))
+    database.add(gen_rows(all_sources), 'isolation', ('source', 'envos'))
     timer.print_elapsed()
     total = database.count_entries('isolation')
     print "Total sources that had at least one match: %i" % total
+
+    # STEP 4 #
+    print 'STEP 4: Removing the source text column and removing matchless entries.'
+    pass
+    timer.print_elapsed()
+
+    # STEP 4 #
+    print 'STEP 4: Removing the source text column and removing matchless entries.'
+    pass
+    timer.print_elapsed()
+
+    # STEP 5 #
+    print 'STEP 5: Vacuuming.'
+    database.vacuum()
+    timer.print_elapsed()
 
     # End messages #
     print 'Done. Results are in "%s"' % database.path
@@ -119,6 +145,24 @@ def run(database, start_again=True):
     timer.print_total_elapsed()
 
 ###############################################################################
+def post_test(database, n=20):
+    print '-'*50
+    database.execute('SELECT * from "isolation"')
+    for i in range(n/2):
+        num, source, envos = database.cursor.next()
+        envos = marshal.loads(envos)
+        msg = 'NUM: %s, SOURCE: "%s…", ENVOS: %s'
+        msg = msg % (num, source[:15], envos)
+        print msg
+    print '-'*50
+    pass
+    print '-'*50
+
+###############################################################################
 if __name__ == '__main__':
     print "*** Adding tagger results to database (pid %i) ***" % os.getpid()
-    with Database(db_path) as db: run(db)
+    restore_database()
+    with Database(db_path, text_fact=bytes) as db:
+        pre_test(db)
+        run(db)
+        post_test(db)

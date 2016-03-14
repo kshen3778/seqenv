@@ -303,7 +303,7 @@ class Analysis(object):
         drop_box = "ts5at7sISLFe9HxAyVjyemywNL78dMecTrNdoYmuD7DqSLUFxfpixCaPtvMZAOLB"
         retrieve = "https://dl.dropboxusercontent.com/content_link/%s/file?dl=1" % drop_box
         md5      = "e02d307bb099caced9f50843172fca26"
-        database = Database(path, retrieve=retrieve, md5=md5)
+        database = Database(path, retrieve=retrieve, md5=md5, text_fact=bytes)
         self.timer.print_elapsed()
         return database
 

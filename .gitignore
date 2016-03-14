@@ -8,8 +8,9 @@
 .#*
 ._*
 
-# The big database #
+# The big database and the backup #
 seqenv/data_sources/gi_db.sqlite3
+seqenv/data_sources/restore_gi_db.zip
 
 # IDE #
 .idea
