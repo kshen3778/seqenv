@@ -321,13 +321,7 @@ class Analysis(object):
     def text_to_matches(self):
         """A dictionary linking every isolation source found in this analysis
         to zero, one or several matches. You will not get a KeyError if you attempt to
-        get the matches for an isolation source that had none.
-        When you call `t.GetMatches(text, "", [-27])` you get a list back.
-        The second argument can be left empty in our case (per document blacklisting)
-        The result is something like:
-        - [(53, 62, ((-27, 'ENVO:00002001'),)), (64, 69, ((-27, 'ENVO:00002044'),))]
-        The number -27 is ENVO terms, -26 could be tissues, etc.
-        Sometimes, one word can link to two concepts such as with the word 'marine'."""
+        get the matches for an isolation source that had none."""
         text_to_matches = FilePath(self.out_dir + 'text_to_matches.pickle')
         # Check that it was run #
         if not text_to_matches.exists:
