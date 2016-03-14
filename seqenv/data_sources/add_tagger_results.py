@@ -12,7 +12,7 @@ $ ./add_tagger_results.py
 """
 
 # Built-in modules #
-import os, inspect
+import os, inspect, marshal
 
 # Internal modules #
 from seqenv.common.timer import Timer
@@ -81,29 +81,28 @@ def run():
     def gen_sources():
         query = "SELECT DISTINCT source FROM data;"
         for x in tqdm(database.execute(query)): yield x
-    all_sources = set(gen_sources())
+    all_sources = list(gen_sources())
     timer.print_elapsed()
 
     # STEP 3 #
     print 'STEP 3: Finding resume point.'
-    iter_sources = iter(all_sources)
     if database.count_entries('isolation') != 0:
         last = database.get_last('isolation')
-        entry = None
-        while entry != last:
-            try: entry = iter_sources.next()
-            except StopIteration:
-                raise Exception("Exhausted source iterator.")
+        index = all_sources.index(last)
+    else:
+        index = 0
     timer.print_elapsed()
 
     # STEP 4 #
     print 'STEP 4: Adding all isolation sources and tags in the new table.'
     tagger = Tagger()
-    def gen_rows(sources):
-        for x in tqdm(iter_sources): yield x
-
-    iter_rows = gen_rows(iter_sources)
-    database.add(iter_rows)
+    def gen_rows(sources, i):
+        for i in tqdm(xrange(index,len(sources))):
+            text = sources[i]
+            matches = tagger.match(text)
+            blob = marshal.dumps((m for m in matches))
+            yield i, text, blob
+    database.add(gen_rows(all_sources, index))
     timer.print_elapsed()
 
     # End messages #
