@@ -37,7 +37,7 @@ from Bio.Entrez.Parser import CorruptedXMLError, ValidationError
 
 # Get the directory of this script #
 filename = inspect.getframeinfo(inspect.currentframe()).filename
-current_dir = os.path.dirname(os.path.abspath(filename))  + '/'
+current_dir = os.path.dirname(os.path.abspath(filename)) + '/'
 
 ###############################################################################
 class GenerateGIs(FilePath):

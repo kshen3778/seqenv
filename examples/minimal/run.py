@@ -7,11 +7,15 @@ Run the minimal example
 # Modules #
 from seqenv import Analysis
 
+# Change directory #
+import inspect, os
+filename = inspect.getframeinfo(inspect.currentframe()).filename
+current_dir = os.path.dirname(os.path.abspath(filename)) + '/'
+os.chdir(current_dir)
+
 ################################################################################
-analysis = Analysis("test.fasta", out_dir='output/', num_threads=5)
+# Main object #
+analysis = Analysis("test.fasta", out_dir='output/', num_threads=1)
 
 # Run #
-analysis.timer.print_start()
-analysis.outputs.make_all()
-analysis.timer.print_end()
-analysis.timer.print_total_elapsed()
+analysis.run()

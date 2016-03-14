@@ -1,5 +1,5 @@
 # Built-in modules #
-import os, sh, glob, shutil
+import os, sh, glob, shutil, stat
 
 # Internal modules #
 from seqenv.common.cache import property_cached
@@ -39,6 +39,26 @@ class DirectoryPath(str):
     def exists(self):
         """Does it exist in the file system?"""
         return os.path.lexists(self.path) # Include broken symlinks
+
+    @property
+    def absolute_path(self):
+        """The absolute path starting with a `/`"""
+        return os.path.abspath(self.path) + '/'
+
+    @property
+    def is_symlink(self):
+        """Is this directory a symbolic link to an other directory?"""
+        return os.path.islink(self.path.rstrip('/'))
+
+    @property
+    def directory(self):
+        """The full path of directory containing this one"""
+        return DirectoryPath(os.path.dirname(os.path.dirname(self.path)))
+
+    @property
+    def permissions(self):
+        """Convenience object for dealing with permissions."""
+        return FilePermissions(self.path)
 
     def remove(self):
         if not self.exists: return False
@@ -136,6 +156,11 @@ class FilePath(str):
         return os.path.splitext(self.path)[1]
 
     @property
+    def absolute_path(self):
+        """The absolute path starting with a `/`"""
+        return os.path.abspath(self.path)
+
+    @property
     def directory(self):
         """The directory containing this file"""
         if os.path.dirname(self.path) == "": return DirectoryPath(self)
@@ -165,23 +190,53 @@ class FilePath(str):
     def link_from(self, path, safe=False):
         """Make a link here pointing to another file somewhere else.
         The destination is hence self.path and the source is *path*."""
+        # Get source and destination #
+        source      = path
+        destination = self.path
+        # Do it #
         if not safe:
-            self.remove()
-            return os.symlink(path, self.path)
+            if os.path.exists(destination): os.remove(destination)
+            os.symlink(source, destination)
+        # Do it safely #
         if safe:
-            try: os.remove(self.path)
+            try: os.remove(destination)
             except OSError: pass
-            try: os.symlink(path, self.path)
+            try: os.symlink(source, destination)
             except OSError: pass
 
-    def link_to(self, path, safe=False):
+    def link_to(self, path, safe=False, absolute=True):
         """Create a link somewhere else pointing to this file.
         The destination is hence *path* and the source is self.path."""
+        # Get source and destination #
+        if absolute: source = self.absolute_path
+        else:        source = self.path
+        destination = path
+        # Do it #
         if not safe:
-            if os.path.exists(path): os.remove(path)
-            os.symlink(self.path, path)
+            if os.path.exists(destination): os.remove(destination)
+            os.symlink(source, destination)
+        # Do it safely #
         if safe:
-            try: os.remove(path)
+            try: os.remove(destination)
             except OSError: pass
-            try: os.symlink(self.path, path)
+            try: os.symlink(source, destination)
             except OSError: pass
+
+################################################################################
+class FilePermissions(object):
+    """Container for reading and setting a files permissions"""
+
+    def __init__(self, path):
+        self.path = path
+
+    @property
+    def number(self):
+        """The permission bits as an octal integer"""
+        return os.stat(self.path).st_mode & 0777
+
+    def make_executable(self):
+        return os.chmod(self.path, os.stat(self.path).st_mode | stat.S_IEXEC)
+
+    def only_readable(self):
+        """Remove all writing privileges"""
+        return os.chmod(self.path, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)

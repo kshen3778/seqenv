@@ -148,7 +148,7 @@ class Analysis(object):
         self.timer.print_end()
         self.timer.print_total_elapsed()
 
-    #---------------------------- In this section ----------------------------#
+    # --------------------------- In this section --------------------------- #
     # orig_names_to_renamed
     # renamed_to_orig
     # renamed_fasta
@@ -252,7 +252,7 @@ class Analysis(object):
         # Parse the results #
         return self.search.results
 
-    #---------------------------- In this section ----------------------------#
+    # --------------------------- In this section --------------------------- #
     # seq_to_gis
     # unique_gis
     # source_database
@@ -433,7 +433,7 @@ class Analysis(object):
         # Return #
         return result
 
-    #---------------------------- In this section ----------------------------#
+    # --------------------------- In this section --------------------------- #
     # serial_to_concept
     # child_to_parents
     # concept_to_name

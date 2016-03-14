@@ -5,7 +5,8 @@ from __future__ import division
 import os, sys, math, shutil
 
 # Internal modules #
-from fasta import FASTA
+from seqenv.common.autopaths import DirectoryPath
+from seqenv.fasta import FASTA
 
 # Third party modules #
 
@@ -19,8 +20,8 @@ class SplitableFASTA(FASTA):
         # Basic #
         self.path = path
         # Directory #
-        if base_dir is None: self.base_dir = path + '.parts/'
-        else:                self.base_dir = base_dir
+        if base_dir is None: self.base_dir = DirectoryPath(path + '.parts/')
+        else:                self.base_dir = DirectoryPath(base_dir)
         # Num parts #
         if num_parts is not None: self.num_parts = num_parts
         # Evaluate size #
