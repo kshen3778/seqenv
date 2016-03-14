@@ -15,12 +15,12 @@ $ ./add_tagger_results.py
 import os, inspect
 
 # Internal modules #
-from seqenv import Analysis, repos_dir
 from seqenv.common.timer import Timer
 from seqenv.common.database import Database
 import seqenv.tagger as api
 
 # Third party modules #
+from tqdm import tqdm
 
 # Get the directory of this script #
 filename = inspect.getframeinfo(inspect.currentframe()).filename
@@ -31,50 +31,20 @@ default_data_dir = current_dir + '../data_envo/'
 db_path = "gi_db.sqlite3"
 
 ###############################################################################
-def modify_the_database():
-    """Run this only once."""
-    # Start timer #
-    timer = Timer()
-    timer.print_start()
-    # Do it #
-    print 'STEP 1: Adding new table.'
-    database = Database(db_path)
-    query = """
-    CREATE TABLE isolation
-    (
-      source INTEGER AUTO_INCREMENT PRIMARY KEY,
-      text TEXT
-      tagged TEXT
-    );
-    """
-    database.execute(query)
-    timer.print_elapsed()
-    # Do it #
-    print 'STEP 2: Adding all isolation sources.'
-    analysis = Analysis(repos_dir + "examples/minimal/test.fasta")
-    analysis.add
-    timer.print_elapsed()
-    # End messages #
-    timer.print_elapsed()
-    print 'Done. Results are in "%s"' % 'a'
-    timer.print_end()
-    timer.print_total_elapsed()
-
-###############################################################################
 class Tagger(object):
     """Interface to the C-coded tagger. Randomly segfaults last
     time I tried it on a new machine."""
 
-    def __init__(self, entities=None, names=None, globals=None, data_dir=None):
+    def __init__(self, entities=None, names=None, globs=None, data_dir=None):
         # Defaults #
         if data_dir is None: data_dir = default_data_dir
         if entities is None: entities = data_dir + 'envo_entities.tsv'
-        if names is None:    names = data_dir + 'envo_names.tsv'
-        if globals is None:  globals = data_dir + 'envo_global.tsv'
+        if names is None:    names    = data_dir + 'envo_names.tsv'
+        if globs is None:    globs    = data_dir + 'envo_global.tsv'
         # Make an instance of the API #
         self.api = api.Tagger()
         self.api.LoadNames(entities, names)
-        self.api.LoadGlobal(globals)
+        self.api.LoadGlobal(globs)
 
     def match(self, text):
         """When you call `t.GetMatches(text, "", [-27])` you get a list back.
@@ -91,14 +61,51 @@ def run():
     # Start timer #
     timer = Timer()
     timer.print_start()
-    # Do it #
-    print 'STEP 1: Finding resume point.'
+
+    # STEP 1 #
+    print 'STEP 1: Adding new table if not exists.'
     database = Database(db_path)
-    database.cursor("")
+    query = """
+    CREATE TABLE IF NOT EXISTS isolation
+    (
+      source INTEGER AUTO_INCREMENT PRIMARY KEY,
+      text TEXT,
+      envo BLOB
+    );
+    """
+    database.execute(query)
     timer.print_elapsed()
-    # Do it #
-    print 'STEP 2: Adding tagger results.'
+
+    # STEP 2 #
+    print 'STEP 2: Loading all distinct isolation sources in RAM.'
+    def gen_sources():
+        query = "SELECT DISTINCT source FROM data;"
+        for x in tqdm(database.execute(query)): yield x
+    all_sources = set(gen_sources())
     timer.print_elapsed()
+
+    # STEP 3 #
+    print 'STEP 3: Finding resume point.'
+    iter_sources = iter(all_sources)
+    if database.count_entries('isolation') != 0:
+        last = database.get_last('isolation')
+        entry = None
+        while entry != last:
+            try: entry = iter_sources.next()
+            except StopIteration:
+                raise Exception("Exhausted source iterator.")
+    timer.print_elapsed()
+
+    # STEP 4 #
+    print 'STEP 4: Adding all isolation sources and tags in the new table.'
+    tagger = Tagger()
+    def gen_rows(sources):
+        for x in tqdm(iter_sources): yield x
+
+    iter_rows = gen_rows(iter_sources)
+    database.add(iter_rows)
+    timer.print_elapsed()
+
     # End messages #
     timer.print_elapsed()
     print 'Done. Results are in "%s"' % 'a'

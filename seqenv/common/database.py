@@ -27,7 +27,7 @@ class Database(FilePath):
         self.md5       = md5
 
     def __repr__(self):
-        """Called when evaluating ``print seqs``."""
+        """Called when evaluating ``print database``."""
         return '<%s object on "%s">' % (self.__class__.__name__, self.path)
 
     def __enter__(self):
@@ -41,28 +41,28 @@ class Database(FilePath):
         self.close()
 
     def __iter__(self):
-        """Called when evaluating ``for x in seqs: pass``."""
+        """Called when evaluating ``for x in database: pass``."""
         new_cursor = self.own_connection.cursor()
         new_cursor.execute("SELECT * from '%s'" % self.main_table)
         return new_cursor
 
     def __contains__(self, key):
-        """Called when evaluating ``"P81239A" in seqs``."""
+        """Called when evaluating ``"P81239A" in database``."""
         command = "SELECT EXISTS(SELECT 1 FROM '%s' WHERE id=='%s' LIMIT 1);"
         self.own_cursor.execute(command % (self.main_table, key))
         return bool(self.own_cursor.fetchone()[0])
 
     def __len__(self):
-        """Called when evaluating ``len(seqs)``."""
+        """Called when evaluating ``len(database)``."""
         self.own_cursor.execute("SELECT COUNT(1) FROM '%s';" % self.main_table)
         return int(self.own_cursor.fetchone())
 
     def __nonzero__(self):
-        """Called when evaluating ``if seqs: pass``."""
+        """Called when evaluating ``if database: pass``."""
         return True if len(self) != 0 else False
 
     def __getitem__(self, key):
-        """Called when evaluating ``seqs[0] or seqs['P81239A']``."""
+        """Called when evaluating ``database[0] or database['P81239A']``."""
         if isinstance(key, int):
             self.own_cursor.execute("SELECT * from '%s' LIMIT 1 OFFSET %i;" % (self.main_table, key))
         else:
@@ -70,7 +70,7 @@ class Database(FilePath):
             self.own_cursor.execute("SELECT * from '%s' where id=='%s' LIMIT 1;" % (self.main_table, key))
         return self.own_cursor.fetchone()
 
-    #------------------------------- Properties ------------------------------#
+    # ------------------------------ Properties ----------------------------- #
     @property_cached
     def connection(self):
         """To be used externally by the user."""
@@ -123,7 +123,8 @@ class Database(FilePath):
     @property
     def last(self):
         """Just the last entry."""
-        return self.own_cursor.execute("SELECT * FROM data ORDER BY ROWID DESC LIMIT 1;").fetchone()
+        query = "SELECT * FROM %s ORDER BY ROWID DESC LIMIT 1;" % self.main_table
+        return self.own_cursor.execute(query).fetchone()
 
     @property
     def frame(self):
@@ -131,7 +132,7 @@ class Database(FilePath):
         pass
         #return blaze.Data('sqlite:///%s::%s') % (self.path, self.main_table)
 
-    #-------------------------------- Methods --------------------------------#
+    # ------------------------------- Methods ------------------------------- #
     def prepare(self):
         """Check that the file exists, optionally downloads it.
         Checks that the file is indeed an SQLite3 database.
@@ -146,14 +147,38 @@ class Database(FilePath):
 
     def check_format(self):
         if self.count_bytes == 0: return
-        with open(self.path) as f: header = f.read(15)
+        with open(self.path, 'r') as f: header = f.read(15)
         if header != 'SQLite format 3':
             raise Exception("The file '" + self.path + "' is not an SQLite database.")
 
-    def get_fields_of_table(self, table):
+    def create(self, columns, type_map=None, overwrite=False):
+        """Create a new database with a certain schema."""
+        # Check already exists #
+        if self.count_bytes > 0:
+            if overwrite: self.remove()
+            else: raise Exception("File exists already at '%s'" % self)
+        # Make the table #
+        self.add_table(self.main_table, columns=columns, type_map=type_map)
+
+    def add_table(self, name, columns, type_map=None):
+        """Add add a new table to the database.  For instance you could do this:
+        self.add_table('data', {'id':'integer', 'source':'text', 'pubmed':'integer'})"""
+        # Check types mapping #
+        if type_map is None and isinstance(columns, dict): types = columns
+        if type_map is None:                               types = {}
+        # Do it #
+        query = ','.join(['"' + c + '"' + ' ' + types.get(c, 'text') for c in columns])
+        self.own_cursor.execute("CREATE table '%s' (%s)" % (self.main_table, query))
+
+    def execute(self, *args, **kwargs):
+        """Convenience shortcut."""
+        return self.cursor.execute(*args, **kwargs)
+
+    def get_fields_of_table(self, table=None):
         """Return the list of fields for a particular table
         by querying the SQL for the complete list of column names."""
         # Check the table exists #
+        if table is None: table = self.main_table
         if not table in self.tables: return []
         # A PRAGMA statement will implicitly issue a commit, don't use #
         self.own_cursor.execute("SELECT * from '%s' LIMIT 1" % table)
@@ -161,27 +186,8 @@ class Database(FilePath):
         self.cursor.fetchall()
         return fields
 
-    def close(self):
-        self.cursor.close()
-        self.connection.close()
-        self.own_cursor.close()
-        self.own_connection.close()
-
-    def create(self, fields, types=None, overwrite=False):
-        """Create a new database with a certain schema. For instance you could do this:
-        self.create({'id':'integer', 'source':'text', 'pubmed':'integer'})"""
-        # Check already exists #
-        if self.count_bytes > 0:
-            if overwrite: self.remove()
-            else: raise Exception("File exists already at '%s'" % self)
-        # Check types #
-        if types is None and isinstance(fields, dict): types=fields
-        if types is None: types = {}
-        # Do it #
-        fields = ','.join(['"' + f + '"' + ' ' + types.get(f, 'text') for f in fields])
-        self.own_cursor.execute("CREATE table '%s' (%s)" % (self.main_table, fields))
-
-    def index(self, column='id'):
+    def index(self, column='id', table=None):
+        if table is None: table = self.main_table
         try:
             command = "CREATE INDEX if not exists 'main_index' on '%s' (%s)"
             self.own_cursor.execute(command % (self.main_table, column))
@@ -189,11 +195,12 @@ class Database(FilePath):
             print "You interrupted the creation of the index. Not committing."
             raise err
 
-    def add(self, entries):
-        """Add entries to the main table.
+    def add(self, entries, table=None):
+        """Add entries to a table.
         The *entries* variable should be an iterable."""
+        if table is None: table = self.main_table
         question_marks = '(' + ','.join(['?' for x in self.fields]) + ')'
-        sql_command = "INSERT into 'data' values " + question_marks
+        sql_command = "INSERT into '%s' values " % table + question_marks
         try:
             self.own_cursor.executemany(sql_command, entries)
         except (ValueError, sqlite3.OperationalError, sqlite3.ProgrammingError, sqlite3.InterfaceError) as err:
@@ -211,7 +218,18 @@ class Database(FilePath):
             self.own_connection.commit()
             raise err
 
-    def add_by_steps(self, entries_by_step):
+    def add_by_steps(self, entries_by_step, table=None):
         """Add entries to the main table.
         The *entries* variable should be an iterable yielding iterables."""
-        for entries in entries_by_step: self.add(entries)
+        for entries in entries_by_step: self.add(entries, table=table)
+
+    def close(self):
+        self.cursor.close()
+        self.connection.close()
+        self.own_cursor.close()
+        self.own_connection.close()
+
+    # ------------------------------- Extended ------------------------------- #
+    def add_column(self, name, kind=None, table=None):
+        """Add add a new column to a table."""
+        pass
