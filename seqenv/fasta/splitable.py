@@ -2,10 +2,10 @@
 from __future__ import division
 
 # Built-in modules #
-import os, sys, math
+import os, sys, math, shutil
 
 # Internal modules #
-from seqenv.fasta import FASTA
+from fasta import FASTA
 
 # Third party modules #
 
@@ -20,8 +20,7 @@ class SplitableFASTA(FASTA):
         self.path = path
         # Directory #
         if base_dir is None: self.base_dir = path + '.parts/'
-        else: self.base_dir = base_dir
-        if not os.path.exists(self.base_dir): os.makedirs(self.base_dir)
+        else:                self.base_dir = base_dir
         # Num parts #
         if num_parts is not None: self.num_parts = num_parts
         # Evaluate size #
@@ -29,11 +28,10 @@ class SplitableFASTA(FASTA):
             self.bytes_target = part_size #humanfriendly.parse_size(part_size)
             self.num_parts = int(math.ceil(self.count_bytes / self.bytes_target))
         # Make parts #
-        self.parts = [FASTA(self.make_part_paths(i)) for i in range(self.num_parts)]
-
-    def make_part_paths(self, i):
-        """Generate the paths for the different parts"""
-        return self.base_dir + "%s%03d.fasta" % (self.prefix, i)
+        self.make_name = lambda i: self.base_dir + "%03d/part.fasta" % i
+        self.parts = [FASTA(self.make_name(i)) for i in range(1, self.num_parts+1)]
+        # Give a number to each part #
+        for i, part in enumerate(self.parts): part.num = i
 
     @property
     def status(self):
@@ -42,13 +40,15 @@ class SplitableFASTA(FASTA):
         return False
 
     def split(self):
-        # Clean #
-        for i in xrange(sys.maxint):
-            if os.path.exists(self.make_part_paths(i)): os.remove(self.make_part_paths(i))
+        # Clean up #
+        for i in xrange(1, sys.maxint):
+            dir_path = self.base_dir + "%03d/" % i
+            if os.path.exists(dir_path): shutil.rmtree(dir_path)
             else: break
         # Case only one part #
         if len(self.parts) == 1:
-            os.symlink(self.path, self.parts[0].path)
+            self.parts[0].directory.create(safe=True)
+            self.link_to(self.parts[0])
             return
         # Compute number of sequences #
         self.seqs_per_part = int(math.floor(self.count / self.num_parts))
