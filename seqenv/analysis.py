@@ -293,12 +293,23 @@ class Analysis(object):
     def source_db(self):
         """The sqlite3 database containing every GI number in all NCBI that has an
         isolation source associated to it. In addition, the pubmed-ID is listed too
-        if there is one. Thus, the database containing three columns:
-        - The GI number of a sequence. (id INTEGER)
-        - The isolation source text of that sequence. (source TEXT)
-        - The pubmed id if it has one. 44%% of entries have one. (pubmed INTEGER)
-        If we don't have it locally already, we will go download it.
-        If you attempt to access a GI that has no isolation source then XXXXXX."""
+        if there is one. If we don't have it locally already, we will go download it.
+        Thus, the database containing two tables:
+
+        CREATE TABLE "isolation"
+            (
+              "id"     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+              "source" TEXT NOT NULL,
+              "envos"  BLOB NOT NULL
+            );
+        CREATE TABLE "data"
+            (
+              "id"      INTEGER PRIMARY KEY NOT NULL,
+              "isokey"  INTEGER NOT NULL REFERENCES "isolation"("id"),
+              "pubmed"  INTEGER
+            );
+        CREATE INDEX "isolation_index" on "isolation" (source);
+        CREATE INDEX 'main_index' on 'data' (id);"""
         path     = module_dir + 'data_sources/gi_db.sqlite3'
         drop_box = "ts5at7sISLFe9HxAyVjyemywNL78dMecTrNdoYmuD7DqSLUFxfpixCaPtvMZAOLB"
         retrieve = "https://dl.dropboxusercontent.com/content_link/%s/file?dl=1" % drop_box

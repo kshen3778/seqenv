@@ -144,7 +144,7 @@ def run(database, timer):
     timer.print_elapsed()
 
     # STEP 6 #
-    print 'STEP 6: Making and filling the new table. (~xmin)'
+    print 'STEP 6: Making and filling the new table. (~1hour)'
     query = """
     CREATE TABLE "new"
     (
@@ -162,10 +162,13 @@ def run(database, timer):
 
     # STEP 5 #
     print 'STEP 5: Delete the old table and rename the new table.'
+    command = 'DROP INDEX "main_index";'
+    database.execute(command)
     command = 'DROP TABLE "data";'
     database.execute(command)
     command = 'ALTER TABLE "new" RENAME TO "data";'
     database.execute(command)
+    database.index(command)
     timer.print_elapsed()
 
     # STEP 6 #
@@ -224,3 +227,5 @@ if __name__ == '__main__':
         ids = pre_test(db)
         run(db, timer)
         post_test(db, ids)
+    # Size #
+    print "Final size is %s" % db_path.size

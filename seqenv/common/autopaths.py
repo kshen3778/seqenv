@@ -188,6 +188,11 @@ class FilePath(str):
         """Raise an exception if the path doesn't exist."""
         if not self.exists: raise Exception("The file path '%s' does not exist." % self.path)
 
+    @property
+    def size(self):
+        """Human readable file size"""
+        return Filesize(self.count_bytes)
+
     def link_from(self, path, safe=False):
         """Make a link here pointing to another file somewhere else.
         The destination is hence self.path and the source is *path*."""
@@ -245,3 +250,46 @@ class FilePermissions(object):
     def only_readable(self):
         """Remove all writing privileges"""
         return os.chmod(self.path, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+
+################################################################################
+class Filesize(object):
+    """
+    Container for a size in bytes with a human readable representation
+    Use it like this:
+
+        >>> size = Filesize(123123123)
+        >>> print size
+        '117.4 MiB'
+    """
+
+    chunk      = 1000 # Could be 1024 if you like old-style sizes
+    units      = ['bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB']
+    precisions = [0, 0, 1, 2, 2, 2]
+
+    def __init__(self, size):
+        self.size = size
+
+    def __int__(self):
+        return self.size
+
+    def __eq__(self, other):
+        return self.size == other
+
+    def __str__(self):
+        if self.size == 0: return '0 bytes'
+        from math import log
+        unit = self.units[min(int(log(self.size, self.chunk)), len(self.units) - 1)]
+        return self.format(unit)
+
+    def format(self, unit):
+        # Input checking #
+        if unit not in self.units: raise Exception("Not a valid file size unit: %s" % unit)
+        # Special no plural case #
+        if self.size == 1 and unit == 'bytes': return '1 byte'
+        # Compute #
+        exponent      = self.units.index(unit)
+        quotient      = float(self.size) / self.chunk**exponent
+        precision     = self.precisions[exponent]
+        format_string = '{:.%sf} {}' % (precision)
+        # Return a string #
+        return format_string.format(quotient, unit)
