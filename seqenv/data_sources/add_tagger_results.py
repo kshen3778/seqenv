@@ -88,7 +88,7 @@ def pre_test(database, n=20):
         msg = msg % (gi, text[:15], envos)
         ids.append(gi)
         print msg
-    print '-'*50
+    print '-'*63
     return ids
 
 ###############################################################################
@@ -219,7 +219,6 @@ def post_test_2(database, ids):
         msg = 'ID: %s, GI: %s, SOURCE: "%s…", ENVOS: %s'
         msg = msg % (rowid, gi, source[:15], envos)
         print msg
-    print '-'*70
 
 ###############################################################################
 def post_test_3(database, ids):
@@ -243,7 +242,7 @@ def post_test_3(database, ids):
         msg = 'GI: %s, SOURCE: "%s…", ENVOS: %s'
         msg = msg % (gi, source[:15], envos)
         print msg
-    print '-'*70
+    print '-'*63
 
 ###############################################################################
 if __name__ == '__main__':

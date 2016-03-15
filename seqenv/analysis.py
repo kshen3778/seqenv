@@ -256,10 +256,7 @@ class Analysis(object):
     # seq_to_gis
     # unique_gis
     # source_database
-    # gis_with_text
-    # unique_texts
-    # text_to_matches
-    # text_to_counts
+    # gis_with_envos
     # seq_to_counts
 
     @property_cached
@@ -296,24 +293,26 @@ class Analysis(object):
         if there is one. If we don't have it locally already, we will go download it.
         Thus, the database containing two tables:
 
-        CREATE TABLE "isolation"
-            (
-              "id"     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-              "source" TEXT NOT NULL,
-              "envos"  BLOB NOT NULL
-            );
-        CREATE TABLE "data"
+        CREATE TABLE "gi"
             (
               "id"      INTEGER PRIMARY KEY NOT NULL,
               "isokey"  INTEGER NOT NULL REFERENCES "isolation"("id"),
               "pubmed"  INTEGER
             );
+        CREATE TABLE "isolation"
+            (
+              "id"     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+              "source" TEXT NOT NULL,
+              "envos"  BLOB NOT NULL <- marshaled tuple of ints
+            );
+        CREATE VIEW "data" AS SELECT gi.id, (->source), gi.pubmed, (->envos) from "gi";
+        CREATE INDEX "gi_index" on "gi" (id);
         CREATE INDEX "isolation_index" on "isolation" (source);
-        CREATE INDEX 'data_index' on 'data' (id);"""
+        """
         path     = module_dir + 'data_sources/gi_db.sqlite3'
         drop_box = "hash_goes_here"
         retrieve = "https://dl.dropboxusercontent.com/content_link/%s/file?dl=1" % drop_box
-        md5      = "ec938cfb49ac2aac065f1beb32e7bb72"
+        md5      = "3b7370f8e9f1993e9c1a0a8386b207a4"
         database = Database(path, retrieve=retrieve, md5=md5, text_fact=bytes)
         self.timer.print_elapsed()
         return database
@@ -321,7 +320,6 @@ class Analysis(object):
     @property_cached
     def gis_with_envo(self):
         """A set containing every GI that was found and that had some envo numbers associated."""
-        return 0
         return set(gi for gi in self.unique_gis if gi in self.source_db)
 
     @property_cached
@@ -335,7 +333,7 @@ class Analysis(object):
         We can also avoid counting two GIs that are coming from the same study, if a pubmed
         number is available."""
         result = {}
-        # Flat or Unique source are quite similar #
+        # "Flat" or "Unique source" are quite similar #
         if self.normalization == 'flat': set_or_list = list
         if self.normalization == 'ui':   set_or_list = set
         # It's just about using a list or a set in the right place #
