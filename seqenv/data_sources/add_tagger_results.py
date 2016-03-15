@@ -171,7 +171,7 @@ def run(database, timer):
     database.index(table='gi', column='id')
     command   = 'CREATE VIEW "data" AS'
     command  += ' SELECT data.id, %s from "gi";'
-    subselect = '(SELECT source from isolation where data.isokey=isolation.id)'
+    subselect = '(SELECT source from isolation where gi.isokey=isolation.id)'
     database.execute(command % subselect)
     timer.print_elapsed()
 
