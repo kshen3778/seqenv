@@ -58,17 +58,27 @@ class Tagger(object):
         return self.api.GetMatches(text, "", [-27])
 
 ###############################################################################
+def make_test_database(database):
+    command = """
+    DELETE FROM "data"
+        WHERE id NOT IN (SELECT id
+                         FROM "data"
+                         LIMIT 10000);"""
+    database.execute(command)
+
+###############################################################################
 def restore_database(timer):
-    print '-> Restoring database.'
+    print '-> Restoring database (~5sec).'
     db_path.remove()
     restore_path.unzip_to(db_path)
     timer.print_elapsed()
 
 ###############################################################################
 def pre_test(database, n=20):
-    print '-'*50
+    print '-'*25 + "PRE TEST" + '-'*25
     database.execute('SELECT * from data')
     tagger = Tagger()
+    ids = []
     for i in range(n):
         gi, text, pubmed = database.cursor.next()
         matches = tagger.match(text)
@@ -76,8 +86,10 @@ def pre_test(database, n=20):
         envos = tuple(int(n[1][5:]) for m in matches for n in m[2])
         msg = 'GI: %s, SOURCE: "%s…", ENVOS: %s'
         msg = msg % (gi, text[:15], envos)
+        ids.append(gi)
         print msg
     print '-'*50
+    return ids
 
 ###############################################################################
 def run(database, timer):
@@ -104,7 +116,7 @@ def run(database, timer):
     timer.print_elapsed()
     print "Total sources: %i" % len(all_sources)
 
-    # STEP 3A #
+    # STEP 3 #
     print 'STEP 3: Adding all isolation sources and tags in the new table (~2min).'
     tagger = Tagger()
     def gen_rows(sources):
@@ -122,11 +134,17 @@ def run(database, timer):
 
     # STEP 4 #
     print 'STEP 4: Indexing on source text in the isolation table.'
-    database.index('isolation', 'source')
+    database.index(table='isolation', column='source')
     timer.print_elapsed()
 
     # STEP 5 #
-    print 'STEP 5: Making the data table again.'
+    print 'STEP 5: Uniquifying Gids in the old table.'
+    query = 'DELETE from "data" WHERE rowid not in (select min(rowid) from data group by id);'
+    database.execute(query)
+    timer.print_elapsed()
+
+    # STEP 6 #
+    print 'STEP 6: Making and filling the new table.'
     query = """
     CREATE TABLE "new"
     (
@@ -135,21 +153,17 @@ def run(database, timer):
       "pubmed"  INTEGER
     );"""
     database.execute(query)
-    timer.print_elapsed()
-
-    # STEP 6 #
-    print 'STEP 6: Filling the new table.'
     command = """
     INSERT INTO "new"("id","isokey","pubmed")
     SELECT id, isolation.id, pubmed
     FROM
     (SELECT * FROM "data" WHERE data.source = isolation.source);"""
     # OK I'm not good enough at SQL yet, let's do it in python
-    def gen_rows():
+    def gen_rows(database):
         for gi, text, pubmed in database:
             isolation = database.get_entry(text, 'source', 'isolation')
-            if isolation: yield gi, isolation[1], pubmed
-    database.add(gen_rows(), 'isolation')
+            if isolation: yield gi, isolation[0], pubmed
+    database.add(gen_rows(database), 'new', ignore=False)
     timer.print_elapsed()
 
     # STEP 5 #
@@ -171,25 +185,37 @@ def run(database, timer):
     timer.print_total_elapsed()
 
 ###############################################################################
-def post_test(database, n=20):
-    print '-'*50
-    database.execute('SELECT * from "isolation"')
+def post_test(database, ids, n=20):
+    print '-'*25 + "POST TEST 1" + '-'*25
+    database.execute('SELECT rowid, * from "isolation"')
     for i in range(n/2):
-        key, source, envos = database.cursor.next()
+        rowid, key, source, envos = database.cursor.next()
         envos = marshal.loads(envos)
-        msg = 'KEY: %s, SOURCE: "%s…", ENVOS: %s'
-        msg = msg % (key, source[:15], envos)
+        msg = 'ID: %s, KEY: %s, SOURCE: "%s…", ENVOS: %s'
+        msg = msg % (rowid, key, source[:15], envos)
         print msg
-    print '-'*50
-    database.execute('SELECT * from "data"')
-    for i in range(n):
-        gi, isokey, pubmed = database.cursor.next()
+    print '-'*25 + "POST TEST 2" + '-'*25
+    command = """
+    SELECT rowid, * from "data"
+    WHERE rowid in (%s)
+    ORDER BY CASE rowid
+    %s
+    END
+    """
+    ordered = ','.join(map(str,ids))
+    rowids  = '\n'.join("WHEN '%s' THEN %s" % (row,i) for i,row in enumerate(ids))
+    command = command % (ordered, rowids)
+    # This could have worked but sqlite3 was too old on the server
+    # ORDER BY instr(',%s,', ',' || id || ',')
+    database.execute(command)
+    for i in range(len(ids)):
+        rowid, gi, isokey, pubmed = database.cursor.next()
         key, source, envos = database.get_entry(isokey, 'id', 'isolation')
         envos = marshal.loads(envos)
-        msg = 'GI: %s, SOURCE: "%s…", ENVOS: %s'
-        msg = msg % (gi, text[:15], envos)
+        msg = 'ID: %s, GI: %s, SOURCE: "%s…", ENVOS: %s'
+        msg = msg % (rowid, gi, source[:15], envos)
         print msg
-    print '-'*50
+    print '-'*70
 
 ###############################################################################
 if __name__ == '__main__':
@@ -201,6 +227,6 @@ if __name__ == '__main__':
     restore_database(timer)
     # Do it #
     with Database(db_path, text_fact=bytes) as db:
-        pre_test(db)
+        ids = pre_test(db)
         run(db, timer)
-        post_test(db)
+        post_test(db, ids)

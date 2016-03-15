@@ -1,6 +1,5 @@
 # Built-in modules #
-import os, sqlite3
-from itertools import islice
+import os, sqlite3, types
 
 # Internal modules #
 from seqenv.common           import download_from_url, md5sum
@@ -195,16 +194,7 @@ class Database(FilePath):
         self.cursor.fetchall()
         return columns
 
-    def index(self, column='id', table=None):
-        if table is None: table = self.main_table
-        try:
-            command = 'CREATE INDEX if not exists "main_index" on "%s" (%s);'
-            self.own_cursor.execute(command % (table, column))
-        except KeyboardInterrupt as err:
-            print "You interrupted the creation of the index. Not committing."
-            raise err
-
-    def add(self, entries, table=None, columns=None):
+    def add(self, entries, table=None, columns=None, ignore=False):
         """Add entries to a table.
         The *entries* variable should be an iterable."""
         # Default table and columns #
@@ -212,28 +202,49 @@ class Database(FilePath):
         if columns is None: columns = self.get_columns_of_table(table)
         # Default columns #
         question_marks = ','.join('?' for c in columns)
-        columns        = ','.join('"' + c + '"' for c in columns)
-        sql_command    = 'INSERT into "%s"(%s) VALUES (%s);' % (table, columns, question_marks)
+        cols           = ','.join('"' + c + '"' for c in columns)
+        ignore         = " OR IGNORE" if ignore else ""
+        sql_command    = 'INSERT%s into "%s"(%s) VALUES (%s);'
+        sql_command    = sql_command % (ignore, table, cols, question_marks)
+        # Possible errors we want to catch #
+        errors  = (sqlite3.OperationalError, sqlite3.ProgrammingError)
+        errors += (sqlite3.IntegrityError, sqlite3.InterfaceError, ValueError)
+        # Do it #
         try:
-            self.own_cursor.executemany(sql_command, entries)
-        except (ValueError, sqlite3.OperationalError, sqlite3.ProgrammingError, sqlite3.InterfaceError) as err:
-            first_elem = islice(entries, 0, 1)
-            message1 = "The command <%s%s%s> on the database '%s' failed with error:\n %s%s%s"
-            params   =  (Color.cyn, sql_command, Color.end, self, Color.u_red, err, Color.end)
-            message1 = message1 % params
-            message2 = "\n * %sThe bindings (%i) %s: %s \n * %sYou gave%s: %s"
-            params   =  (Color.b_ylw, len(self.columns), Color.end)
-            params  +=  (self.columns, Color.b_ylw, Color.end, entries)
-            message2 = message2 % params
-            message3 = "\n * %sFirst element (%i)%s: %s \n"
-            params   =  (Color.b_ylw, len(first_elem) if first_elem else 0, Color.end, first_elem)
-            message3 = message3 % params
-            message4 = "\n The original error was: '%s'" % err
-            raise Exception(message1 + message2 + message3 + message4)
+            new_cursor = self.own_connection.cursor()
+            new_cursor.executemany(sql_command, entries)
+        except errors as err:
+            raise Exception(self.detailed_error(sql_command, columns, entries, err))
         except KeyboardInterrupt as err:
-            print "You interrupted the data insertion. Committing everything done up to this point."
+            print "You interrupted the data insertion."
+            print "Committing everything done up to this point."
             self.own_connection.commit()
             raise err
+
+    def detailed_error(self, sql_command, columns, entries, err):
+        # The command #
+        message1 = "\n\n The command \n <%s%s%s> \n on the database '%s' failed."
+        params   = (Color.cyn, sql_command, Color.end, self)
+        message1 = message1 % params
+        # The bindings #
+        message2 = "\n * %sThe bindings (%i) %s: %s \n * %sYou gave%s: %s"
+        params   = (Color.b_ylw, len(columns), Color.end)
+        params  += (columns, Color.b_ylw, Color.end, entries)
+        message2 = message2 % params
+        # The first element #
+        message3 = "\n * %sExample element (%i)%s: %s \n"
+        elem     = None
+        if isinstance(entries, types.GeneratorType):
+            try: elem = entries.next()
+            except StopIteration: pass
+        if isinstance(entries, (list, tuple)) and entries:
+            elem = entries[0]
+        params   =  (Color.b_ylw, len(elem) if elem else 0, Color.end, elem)
+        message3 = message3 % params
+        # The original error #
+        message4 = "The original error was:\n %s%s%s \n" % (Color.u_red, err, Color.end)
+        # Return #
+        return message1 + message2 + message3 + message4
 
     def add_by_steps(self, entries_by_step, table=None, columns=None):
         """Add entries to the main table.
@@ -245,6 +256,17 @@ class Database(FilePath):
         if table is None: table = self.main_table
         self.own_cursor.execute('SELECT COUNT(1) FROM "%s";' % table)
         return int(self.own_cursor.fetchone()[0])
+
+    def index(self, column='id', table=None):
+        if table is None: table = self.main_table
+        index_name = table + '_index'
+        try:
+            command = 'CREATE INDEX if not exists "%s" on "%s" (%s);'
+            command = command % (index_name, table, column)
+            self.own_cursor.execute(command)
+        except KeyboardInterrupt as err:
+            print "You interrupted the creation of the index. Not committing."
+            raise err
 
     def get_first(self, table=None):
         """Just the first entry."""
@@ -268,7 +290,7 @@ class Database(FilePath):
         """Get a specific entry."""
         if table is None:  table  = self.main_table
         if column is None: column = "id"
-        key   = key.replace("'","''")
+        if isinstance(key, basestring): key = key.replace("'","''")
         query = 'SELECT * from "%s" where "%s"=="%s" LIMIT 1;'
         query = query % (table, column, key)
         self.own_cursor.execute(query)
