@@ -109,8 +109,8 @@ def run(database, timer, start_again=False):
     timer.print_elapsed()
     print "Total sources: %i" % len(all_sources)
 
-    # STEP 3 #
-    print 'STEP 3: Adding all isolation sources and tags in the new table (~2min).'
+    # STEP 3A #
+    print 'STEP 3A: Adding all isolation sources and tags in the new table (~2min).'
     tagger = Tagger()
     def gen_rows(sources):
         for i in trange(len(sources)):
@@ -125,18 +125,35 @@ def run(database, timer, start_again=False):
     total = database.count_entries('isolation')
     print "Total sources that had at least one match: %i" % total
 
-    # STEP 4 #
-    print 'STEP 4: Removing the source text column and removing matchless entries.'
-    pass
+    # STEP 3B #
+    print 'STEP 3B: Indexing.'
+    database.index('isolation', 'source')
     timer.print_elapsed()
 
     # STEP 4 #
-    print 'STEP 4: Removing the source text column and removing matchless entries.'
-    pass
+    print 'STEP 4: Adding the key column for isolation source texts.'
+    for gi, text, pubmed in database:
+        result = database.get_entry(text, 'source', 'isolation')
+        if not result: database.
+        num, source, envos = result
+        envos = marshal.loads(envos)
+        print num, source, envos
+        break
     timer.print_elapsed()
 
     # STEP 5 #
-    print 'STEP 5: Vacuuming.'
+    print 'STEP 5: Removing the source text column and removing matchless entries.'
+    for gi, text, pubmed in database:
+        result = database.get_entry(text, 'source', 'isolation')
+        if not result: database.
+        num, source, envos = result
+        envos = marshal.loads(envos)
+        print num, source, envos
+        break
+    timer.print_elapsed()
+
+    # STEP 6 #
+    print 'STEP 6: Vacuuming.'
     database.vacuum()
     timer.print_elapsed()
 

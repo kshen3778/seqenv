@@ -70,12 +70,7 @@ class Database(FilePath):
 
     def __getitem__(self, key):
         """Called when evaluating ``database[0] or database['P81239A']``."""
-        if isinstance(key, int):
-            self.own_cursor.execute('SELECT * from "%s" LIMIT 1 OFFSET %i;' % (self.main_table, key))
-        else:
-            key = key.replace("'","''")
-            self.own_cursor.execute('SELECT * from "%s" where id=="%s" LIMIT 1;' % (self.main_table, key))
-        return self.own_cursor.fetchone()
+        return self.get_entry(key)
 
     # ------------------------------ Properties ----------------------------- #
     @property_cached
@@ -121,7 +116,7 @@ class Database(FilePath):
     @property
     def first(self):
         """Just the first entry."""
-        return self[0]
+        return self.get_first()
 
     @property
     def last(self):
@@ -204,7 +199,7 @@ class Database(FilePath):
         if table is None: table = self.main_table
         try:
             command = 'CREATE INDEX if not exists "main_index" on "%s" (%s);'
-            self.own_cursor.execute(command % (self.main_table, column))
+            self.own_cursor.execute(command % (table, column))
         except KeyboardInterrupt as err:
             print "You interrupted the creation of the index. Not committing."
             raise err
@@ -251,11 +246,33 @@ class Database(FilePath):
         self.own_cursor.execute('SELECT COUNT(1) FROM "%s";' % table)
         return int(self.own_cursor.fetchone()[0])
 
+    def get_first(self, table=None):
+        """Just the first entry."""
+        if table is None: table = self.main_table
+        query = 'SELECT * FROM "%s" LIMIT 1;' % table
+        return self.own_cursor.execute(query).fetchone()
+
     def get_last(self, table=None):
         """Just the last entry."""
         if table is None: table = self.main_table
         query = 'SELECT * FROM "%s" ORDER BY ROWID DESC LIMIT 1;' % table
         return self.own_cursor.execute(query).fetchone()
+
+    def get_number(self, num, table=None):
+        """Get a specific entry by it's number."""
+        if table is None: table = self.main_table
+        self.own_cursor.execute('SELECT * from "%s" LIMIT 1 OFFSET %i;' % (self.main_table, num))
+        return self.own_cursor.fetchone()
+
+    def get_entry(self, key, column=None, table=None):
+        """Get a specific entry."""
+        if table is None:  table  = self.main_table
+        if column is None: column = "id"
+        key   = key.replace("'","''")
+        query = 'SELECT * from "%s" where "%s"=="%s" LIMIT 1;'
+        query = query % (table, column, key)
+        self.own_cursor.execute(query)
+        return self.own_cursor.fetchone()
 
     def vacuum(self):
         """Compact the database, remove old transactions."""
