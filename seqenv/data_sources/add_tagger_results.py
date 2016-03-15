@@ -170,7 +170,7 @@ def run(database, timer):
     database.execute(command)
     database.index(table='gi', column='id')
     command  = 'CREATE VIEW "data" AS'
-    command += ' SELECT gi.id, %s, gi.pubmed, %s from "gi";'
+    command += ' SELECT gi.id, gi.isokey, %s, gi.pubmed, %s from "gi";'
     sub_one  = '(SELECT source from isolation where gi.isokey=isolation.id)'
     sub_two  = '(SELECT envos  from isolation where gi.isokey=isolation.id)'
     command  = command % (sub_one, sub_two)

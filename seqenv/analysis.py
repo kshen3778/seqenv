@@ -2,7 +2,7 @@
 from __future__ import division
 
 # Built-in modules #
-import os, multiprocessing, warnings, unicodedata
+import os, multiprocessing, warnings, marshal
 from collections import defaultdict
 import cPickle as pickle
 
@@ -39,7 +39,7 @@ class Analysis(object):
 
     * `search_db`: The path to the database to search against. Defaults to `nt`.
 
-    * `--normalization`: Can be either of `flat`, `ui` or `upui`.
+    * `normalization`: Can be either of `flat`, `ui` or `upui`.
       This option defaults to `ui`.
          * If you choose `flat`, we will count every isolation source independently,
            even if the same text appears several times for the same input sequence.
@@ -48,6 +48,10 @@ class Analysis(object):
          * If you choose `upui`, standing for unique isolation and unique pubmed-ID,
            we will uniquify the counts based on the text entry of the isolation
            sources as well as on the pubmed identifiers from which the GI obtained.
+
+    * `relative`: Should we divide the counts of every input sequence by the
+                      number of envo terms that were associated to it.
+                      Defaults to `True`.
 
     * `proportional`: Should we divide the counts of every input sequence by the
                       number of envo terms that were associated to it.
@@ -284,7 +288,7 @@ class Analysis(object):
         return set(gi for gis in self.seq_to_gis.values() for gi in gis)
 
     @property_cached
-    def source_db(self):
+    def db(self):
         """The sqlite3 database containing every GI number in all NCBI that has an
         isolation source associated to it. In addition, the pubmed-ID is listed too
         if there is one. If we don't have it locally already, we will go download it.
@@ -317,7 +321,7 @@ class Analysis(object):
     @property_cached
     def gis_with_envo(self):
         """A set containing every GI that was found and that had some envo numbers associated."""
-        return set(gi for gi in self.unique_gis if gi in self.source_db)
+        return set(gi for gi in self.unique_gis if gi in self.db)
 
     @property_cached
     def seq_to_counts(self):
@@ -330,37 +334,41 @@ class Analysis(object):
         We can also avoid counting two GIs that are coming from the same study, if a pubmed
         number is available."""
         result = {}
+        # Useful later #
+        gi_to_key    = lambda gi: self.db.get("gi","id",gi)[1]
+        gi_to_pub    = lambda gi: self.db.get("gi","id",gi)[2]
+        key_to_envos = lambda key: marshal.loads(self.db.get("isolation","id",key)[2])
+        first_key    = lambda d,k: [(gi, knp) for gi, knp in d.items()  if knp[0]==k][0]
+        first_pub    = lambda d,p: [(gi, knp) for gi, knp in d.values() if knp[1]==p][0]
         # "Flat" or "Unique source" are quite similar #
         if self.normalization == 'flat': set_or_list = list
         if self.normalization == 'ui':   set_or_list = set
         # It's just about using a list or a set in the right place #
         if self.normalization == 'flat' or self.normalization == 'ui':
             for seq, gis in self.seq_to_gis.items():
-                texts = set_or_list(self.source_db[gi][1] for gi in gis if gi in self.source_db)
+                isokeys   = (gi_to_key(gi) for gi in gis if gi in self.db)
+                isokeys   = set_or_list(isokeys)
+                all_envos = (e for key in isokeys for e in key_to_envos(key))
+                if self.proportional: score = 1/len(all_envos)
+                else:                 score = 1.0
                 counts = defaultdict(float)
-                for text in texts:
-                    if text not in self.text_to_counts: continue
-                    for c,i in self.text_to_counts[text].items(): counts[c] += i
+                for e in all_envos: counts[e] += score
+                result[seq] = counts
         # Unique source and unique pubmed #
         if self.normalization == 'uiup':
             for seq, gis in self.seq_to_gis.items():
-                gis_w_text = [gi for gi in gis if gi in self.source_db]
-                gi_to_tnp  = {gi: (self.source_db[gi][1], self.source_db[gi][2]) for gi in gis_w_text}
-                texts      = set(text for text, pubmed in gi_to_tnp.values())
-                find_first = lambda d,t: [(gi, tnp) for gi, tnp in d.values() if tnp[0]==t][0]
-                gi_tnp_ut  = dict(find_first(gi_to_tnp, text) for text in texts)
-                pubmeds    = set(pubmed for text, pubmed in gi_tnp_ut.values())
-                find_first = lambda d,p: [(gi, tnp) for gi, tnp in d.values() if tnp[1]==p][0]
-                gi_tnp_up  = dict(find_first(gi_to_tnp, pubmed) for pubmed in pubmeds)
+                gis_w_envo = [gi for gi in gis if gi in self.db]
+                gi_to_knp  = {gi: (gi_to_key(gi), gi_to_pub(gi)) for gi in gis_w_envo}
+                uniq_keys  = set(key for key, pub in gi_to_knp.values())
+                gi2knp_uk  = dict(first_key(gi_to_knp, key) for key in uniq_keys)
+                pubmeds    = set(pub for key, pub in gi2knp_uk.values())
+                gi2knp_up  = dict(first_pub(gi_to_knp, pubmed) for pubmed in pubmeds)
+                all_envos = (e for key,pub in gi2knp_up.values() for e in key_to_envos(key))
+                if self.proportional: score = 1/len(all_envos)
+                else:                 score = 1.0
                 counts = defaultdict(float)
-                for text, pubmed in gi_tnp_up:
-                    if text not in self.text_to_counts: continue
-                    for c,i in self.text_to_counts[text].items(): counts[c] += i
-        # Proportional option #
-        if self.proportional:
-            tot_matches = sum([len(self.text_to_matches[text]) for text in texts])
-            for k in counts: counts[k] /= tot_matches
-        result[seq] = counts
+                for e in all_envos: counts[e] += score
+                result[seq] = counts
         # Return #
         return result
 
