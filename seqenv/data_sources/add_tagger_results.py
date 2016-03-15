@@ -80,17 +80,12 @@ def pre_test(database, n=20):
     print '-'*50
 
 ###############################################################################
-def run(database, timer, start_again=False):
+def run(database, timer):
     """Main part."""
-    # STEP 0 #
-    if start_again:
-        print 'STEP 0: Starting over. Droping table.'
-        database.execute('DROP TABLE IF EXISTS "isolation"')
-
     # STEP 1 #
-    print 'STEP 1: Adding new table if not exists.'
+    print 'STEP 1: Adding the isolation table.'
     query = """
-    CREATE TABLE IF NOT EXISTS "isolation"
+    CREATE TABLE "isolation"
     (
       "id"     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
       "source" TEXT NOT NULL,
@@ -110,7 +105,7 @@ def run(database, timer, start_again=False):
     print "Total sources: %i" % len(all_sources)
 
     # STEP 3A #
-    print 'STEP 3A: Adding all isolation sources and tags in the new table (~2min).'
+    print 'STEP 3: Adding all isolation sources and tags in the new table (~2min).'
     tagger = Tagger()
     def gen_rows(sources):
         for i in trange(len(sources)):
@@ -125,35 +120,48 @@ def run(database, timer, start_again=False):
     total = database.count_entries('isolation')
     print "Total sources that had at least one match: %i" % total
 
-    # STEP 3B #
-    print 'STEP 3B: Indexing.'
+    # STEP 4 #
+    print 'STEP 4: Indexing on source text in the isolation table.'
     database.index('isolation', 'source')
     timer.print_elapsed()
 
-    # STEP 4 #
-    print 'STEP 4: Adding the key column for isolation source texts.'
-    for gi, text, pubmed in database:
-        result = database.get_entry(text, 'source', 'isolation')
-        if not result: database.
-        num, source, envos = result
-        envos = marshal.loads(envos)
-        print num, source, envos
-        break
-    timer.print_elapsed()
-
     # STEP 5 #
-    print 'STEP 5: Removing the source text column and removing matchless entries.'
-    for gi, text, pubmed in database:
-        result = database.get_entry(text, 'source', 'isolation')
-        if not result: database.
-        num, source, envos = result
-        envos = marshal.loads(envos)
-        print num, source, envos
-        break
+    print 'STEP 5: Making the data table again.'
+    query = """
+    CREATE TABLE "new"
+    (
+      "id"      INTEGER PRIMARY KEY NOT NULL,
+      "isokey"  INTEGER NOT NULL REFERENCES "isolation"("id"),
+      "pubmed"  INTEGER
+    );"""
+    database.execute(query)
     timer.print_elapsed()
 
     # STEP 6 #
-    print 'STEP 6: Vacuuming.'
+    print 'STEP 6: Filling the new table.'
+    command = """
+    INSERT INTO "new"("id","isokey","pubmed")
+    SELECT id, isolation.id, pubmed
+    FROM
+    (SELECT * FROM "data" WHERE data.source = isolation.source);"""
+    # OK I'm not good enough at SQL yet, let's do it in python
+    def gen_rows():
+        for gi, text, pubmed in database:
+            isolation = database.get_entry(text, 'source', 'isolation')
+            if isolation: yield gi, isolation[1], pubmed
+    database.add(gen_rows(), 'isolation')
+    timer.print_elapsed()
+
+    # STEP 5 #
+    print 'STEP 5: Delete the old table and rename the new table.'
+    command = 'DROP TABLE "data";'
+    database.execute(command)
+    command = 'ALTER TABLE "new" RENAME TO "data";'
+    database.execute(command)
+    timer.print_elapsed()
+
+    # STEP 6 #
+    print 'STEP 6: Rebuild the entire database (vacuuming).'
     database.vacuum()
     timer.print_elapsed()
 
@@ -167,13 +175,20 @@ def post_test(database, n=20):
     print '-'*50
     database.execute('SELECT * from "isolation"')
     for i in range(n/2):
-        num, source, envos = database.cursor.next()
+        key, source, envos = database.cursor.next()
         envos = marshal.loads(envos)
-        msg = 'NUM: %s, SOURCE: "%s…", ENVOS: %s'
-        msg = msg % (num, source[:15], envos)
+        msg = 'KEY: %s, SOURCE: "%s…", ENVOS: %s'
+        msg = msg % (key, source[:15], envos)
         print msg
     print '-'*50
-    pass
+    database.execute('SELECT * from "data"')
+    for i in range(n):
+        gi, isokey, pubmed = database.cursor.next()
+        key, source, envos = database.get_entry(isokey, 'id', 'isolation')
+        envos = marshal.loads(envos)
+        msg = 'GI: %s, SOURCE: "%s…", ENVOS: %s'
+        msg = msg % (gi, text[:15], envos)
+        print msg
     print '-'*50
 
 ###############################################################################

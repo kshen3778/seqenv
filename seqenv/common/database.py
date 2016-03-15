@@ -173,7 +173,7 @@ class Database(FilePath):
         if type_map is None and isinstance(columns, dict): types = columns
         if type_map is None:                               types = {}
         # Safe or unsafe #
-        if if_not_exists: query = 'CREATE IF NOT EXISTS table "%s" (%s);'
+        if if_not_exists: query = 'CREATE TABLE IF NOT EXISTS "%s" (%s);'
         else:             query = 'CREATE table "%s" (%s);'
         # Do it #
         cols = ','.join(['"' + c + '"' + ' ' + types.get(c, 'text') for c in columns])
@@ -209,11 +209,11 @@ class Database(FilePath):
         The *entries* variable should be an iterable."""
         # Default table and columns #
         if table is None:   table   = self.main_table
-        if columns is None: columns = self.columns
+        if columns is None: columns = self.get_columns_of_table(table)
         # Default columns #
-        fields         = ','.join('"' + c + '"' for c in columns)
         question_marks = ','.join('?' for c in columns)
-        sql_command    = 'INSERT into "%s"(%s) VALUES (%s);' % (table, fields, question_marks)
+        columns        = ','.join('"' + c + '"' for c in columns)
+        sql_command    = 'INSERT into "%s"(%s) VALUES (%s);' % (table, columns, question_marks)
         try:
             self.own_cursor.executemany(sql_command, entries)
         except (ValueError, sqlite3.OperationalError, sqlite3.ProgrammingError, sqlite3.InterfaceError) as err:
