@@ -309,98 +309,29 @@ class Analysis(object):
               "pubmed"  INTEGER
             );
         CREATE INDEX "isolation_index" on "isolation" (source);
-        CREATE INDEX 'main_index' on 'data' (id);"""
+        CREATE INDEX 'data_index' on 'data' (id);"""
         path     = module_dir + 'data_sources/gi_db.sqlite3'
-        drop_box = "ts5at7sISLFe9HxAyVjyemywNL78dMecTrNdoYmuD7DqSLUFxfpixCaPtvMZAOLB"
+        drop_box = "hash_goes_here"
         retrieve = "https://dl.dropboxusercontent.com/content_link/%s/file?dl=1" % drop_box
-        md5      = "e02d307bb099caced9f50843172fca26"
+        md5      = "ec938cfb49ac2aac065f1beb32e7bb72"
         database = Database(path, retrieve=retrieve, md5=md5, text_fact=bytes)
         self.timer.print_elapsed()
         return database
 
     @property_cached
-    def gis_with_text(self):
-        """A set containing every GI that was found and that had a source text associated."""
+    def gis_with_envo(self):
+        """A set containing every GI that was found and that had some envo numbers associated."""
+        return 0
         return set(gi for gi in self.unique_gis if gi in self.source_db)
-
-    @property_cached
-    def unique_texts(self):
-        """A set containing every unique isolation source text as unicode strings."""
-        return set(self.source_db[gi][1] for gi in self.gis_with_text)
-
-    @property_cached
-    def text_to_matches(self):
-        """A dictionary linking every isolation source found in this analysis
-        to zero, one or several matches. You will not get a KeyError if you attempt to
-        get the matches for an isolation source that had none."""
-        text_to_matches = FilePath(self.out_dir + 'text_to_matches.pickle')
-        # Check that it was run #
-        if not text_to_matches.exists:
-            print "--> STEP 5: Loading database with all NCBI isolation sources"
-            print "Got %i unique GIs from search results" % len(self.unique_gis)
-            print "Got %i unique GIs with an isolation source" % len(self.gis_with_text)
-            print "Got %i unique isolation source texts" % len(self.unique_texts)
-            self.timer.print_elapsed()
-            print "--> STEP 6: Run the text mining tagger on all blobs."
-            # Create the tagger #
-            t = tagger.Tagger()
-            # Load the dictionary #
-            t.LoadNames(module_dir + 'data_envo/envo_entities.tsv',
-                        module_dir + 'data_envo/envo_names.tsv')
-            # Load a global blacklist #
-            t.LoadGlobal(module_dir + 'data_envo/envo_global.tsv')
-            # Tag all the texts, but the tagger only supports ascii #
-            result = {}
-            for text in self.unique_texts:
-                ascii = unicodedata.normalize('NFKD', text).encode('ascii','ignore')
-                result[text] = t.GetMatches(ascii, "", [-27])
-            with open(text_to_matches, 'w') as handle: pickle.dump(result, handle)
-            self.timer.print_elapsed()
-            return result
-        # Parse the results #
-        with open(text_to_matches) as handle: return pickle.load(handle)
-
-    @property_cached
-    def text_to_counts(self):
-        """A dictionary linking every isolation source to the concept counts.
-        (dictionaries of concept:int). This is done by finding regions of interest in the text
-        (i.e. a match). We can assign meaning to the matches in terms of concepts.
-        A 'concept' or 'entity' here would be an envo term such as 'ENVO:01000047'
-        You will get a KeyError if you attempt to get the counts for an isolation source
-        that had none."""
-        text_to_counts = FilePath(self.out_dir + 'text_to_counts.pickle')
-        # Check that it was run #
-        if not text_to_counts.exists:
-            print "Got %i environmental term matches" % sum(map(len,self.text_to_matches.values()))
-            print "--> STEP 7: Parsing the tagger results and counting terms."
-            result = {}
-            for text, matches in self.text_to_matches.items():
-                if not matches: continue
-                counts = defaultdict(float)
-                for start_pos, end_pos, concepts in matches:
-                    # This is the first place where the normalization technique used
-                    # has to be thought about. For instance, at some point we had decided that
-                    # every gi should adds up to 1.0 unless we have turned on backtracking.
-                    # But this is not the case anymore in the current version!
-                    ids = [concept_id for concept_type, concept_id in concepts]
-                    score = 1 / len(ids) # Most of the time score is thus equal to 1
-                    if self.backtracking: ids.extend([p for c in ids for p in self.child_to_parents[c]])
-                    for concept_id in ids: counts[concept_id] += score
-                result[text] = dict(counts)
-            with open(text_to_counts, 'w') as handle: pickle.dump(result, handle)
-            self.timer.print_elapsed()
-            return result
-        # Parse the results #
-        with open(text_to_counts) as handle: return pickle.load(handle)
 
     @property_cached
     def seq_to_counts(self):
         """A dictionary linking every input sequence to its summed normalized concept
         counts dict, provided the input sequence had some hits, and at least one hit had
-        a match. Otherwise it is empty.
+        some envo number associated. Otherwise it is empty.
         NB: What we want to account for is the fact that two GIs originating from the
         same sequence could be pointing to the same isolation source.
-        In such case, we shall count the concepts from that isolation source only once.
+        In such case, we shall count the envo numbers from that isolation source only once.
         We can also avoid counting two GIs that are coming from the same study, if a pubmed
         number is available."""
         result = {}
@@ -446,13 +377,15 @@ class Analysis(object):
     @property_cached
     def serial_to_concept(self):
         """A dictionary linking every concept serial to its concept id.
-        Every line in the file contains three columns: serial, concept_type, concept_id."""
+        Every line in the file contains three columns: serial, concept_type, concept_id.
+        An example line: 1007000022 -27 ENVO:00000021"""
         return dict(line.split()[0::2] for line in open(module_dir + 'data_envo/envo_entities.tsv'))
 
     @property_cached
     def child_to_parents(self):
         """A dictionary linking every concept id to a list of parent concept ids.
-        Every line in the file contains two columns: child_serial, parent_serial"""
+        Every line in the file contains two columns: child_serial, parent_serial
+        An example line: 1007000003 1007001640"""
         result = defaultdict(list)
         with open(module_dir + 'data_envo/envo_groups.tsv') as handle:
             for line in handle:
@@ -465,5 +398,7 @@ class Analysis(object):
     @property_cached
     def concept_to_name(self):
         """A dictionary linking the concept id to relevant names. In this case ENVO terms.
-        Hence, ENVO:00000095 would be linked to 'lava field'"""
-        return dict(line.strip('\n').split('\t') for line in open(module_dir + 'data_envo/envo_preferred.tsv'))
+        Hence, ENVO:00000095 would be linked to 'lava field'
+        An example line: ENVO:00000015  ocean"""
+        handle = open(module_dir + 'data_envo/envo_preferred.tsv')
+        return dict(line.strip('\n').split('\t') for line in handle)

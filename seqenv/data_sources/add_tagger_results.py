@@ -144,31 +144,35 @@ def run(database, timer):
     timer.print_elapsed()
 
     # STEP 6 #
-    print 'STEP 6: Making and filling the new table. (~1hour)'
     query = """
-    CREATE TABLE "new"
+    CREATE TABLE "gi"
     (
       "id"      INTEGER PRIMARY KEY NOT NULL,
       "isokey"  INTEGER NOT NULL REFERENCES "isolation"("id"),
       "pubmed"  INTEGER
     );"""
     database.execute(query)
+    print 'STEP 6A: Putting the new table in RAM. (~3min)'
     def gen_rows(database):
         for gi, text, pubmed in tqdm(database):
             isolation = database.get_entry(text, 'source', 'isolation')
             if isolation: yield gi, isolation[0], pubmed
-    database.add(gen_rows(database), 'new', ignore=False)
+    rows = tuple(gen_rows(database))
+    print 'STEP 6B: Filling the new table into the database. (~30min)'
+    database.add(tqdm(rows), 'gi')
     timer.print_elapsed()
 
     # STEP 5 #
-    print 'STEP 5: Delete the old table and rename the new table.'
+    print 'STEP 5: Delete the old table, index and make a view.'
     command = 'DROP INDEX "main_index";'
     database.execute(command)
     command = 'DROP TABLE "data";'
     database.execute(command)
-    command = 'ALTER TABLE "new" RENAME TO "data";'
-    database.execute(command)
-    database.index(command)
+    database.index(table='gi', column='id')
+    command   = 'CREATE VIEW "data" AS'
+    command  += ' SELECT data.id, %s from "gi";'
+    subselect = '(SELECT source from isolation where data.isokey=isolation.id)'
+    database.execute(command % subselect)
     timer.print_elapsed()
 
     # STEP 6 #
