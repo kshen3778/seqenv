@@ -21,7 +21,7 @@ from seqenv.common.database import Database
 import tagger as tagger_api
 
 # Third party modules #
-from tqdm import trange
+from tqdm import trange, tqdm
 
 # Get the directory of this script #
 filename = inspect.getframeinfo(inspect.currentframe()).filename
@@ -117,7 +117,7 @@ def run(database, timer):
     print "Total sources: %i" % len(all_sources)
 
     # STEP 3 #
-    print 'STEP 3: Adding all isolation sources and tags in the new table (~2min).'
+    print 'STEP 3: Adding all isolation sources and tags in the new table (~1min).'
     tagger = Tagger()
     def gen_rows(sources):
         for i in trange(len(sources)):
@@ -138,13 +138,13 @@ def run(database, timer):
     timer.print_elapsed()
 
     # STEP 5 #
-    print 'STEP 5: Uniquifying Gids in the old table.'
+    print 'STEP 5: Uniquifying Gids in the old table. (~1min)'
     query = 'DELETE from "data" WHERE rowid not in (select min(rowid) from data group by id);'
     database.execute(query)
     timer.print_elapsed()
 
     # STEP 6 #
-    print 'STEP 6: Making and filling the new table.'
+    print 'STEP 6: Making and filling the new table. (~xmin)'
     query = """
     CREATE TABLE "new"
     (
@@ -153,14 +153,8 @@ def run(database, timer):
       "pubmed"  INTEGER
     );"""
     database.execute(query)
-    command = """
-    INSERT INTO "new"("id","isokey","pubmed")
-    SELECT id, isolation.id, pubmed
-    FROM
-    (SELECT * FROM "data" WHERE data.source = isolation.source);"""
-    # OK I'm not good enough at SQL yet, let's do it in python
     def gen_rows(database):
-        for gi, text, pubmed in database:
+        for gi, text, pubmed in tqdm(database):
             isolation = database.get_entry(text, 'source', 'isolation')
             if isolation: yield gi, isolation[0], pubmed
     database.add(gen_rows(database), 'new', ignore=False)
@@ -175,7 +169,7 @@ def run(database, timer):
     timer.print_elapsed()
 
     # STEP 6 #
-    print 'STEP 6: Rebuild the entire database (vacuuming).'
+    print 'STEP 6: Rebuild the entire database (vacuuming). (~xmin)'
     database.vacuum()
     timer.print_elapsed()
 
