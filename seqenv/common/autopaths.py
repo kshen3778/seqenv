@@ -2,6 +2,7 @@
 import os, sh, glob, shutil, stat
 
 # Internal modules #
+from seqenv.common import unzip
 from seqenv.common.cache import property_cached
 
 ################################################################################
@@ -221,6 +222,10 @@ class FilePath(str):
             except OSError: pass
             try: os.symlink(source, destination)
             except OSError: pass
+
+    def unzip_to(self, destination=None, inplace=False):
+       """Make an unzipped version of the file at a given path"""
+       return unzip(self.path, destination=destination, inplace=inplace)
 
 ################################################################################
 class FilePermissions(object):

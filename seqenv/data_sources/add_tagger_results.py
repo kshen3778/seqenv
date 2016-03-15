@@ -12,9 +12,10 @@ $ ./add_tagger_results.py
 """
 
 # Built-in modules #
-import os, inspect, marshal, unicodedata
+import os, inspect, marshal
 
 # Internal modules #
+from seqenv.common.autopaths import FilePath
 from seqenv.common.timer import Timer
 from seqenv.common.database import Database
 import tagger as tagger_api
@@ -28,7 +29,8 @@ current_dir = os.path.dirname(os.path.abspath(filename))  + '/'
 default_data_dir = current_dir + '../data_envo/'
 
 # The default location of the database #
-db_path = "gi_db.sqlite3"
+restore_path = FilePath("restore_gi_db.zip")
+db_path      = FilePath("gi_db.sqlite3")
 
 ###############################################################################
 class Tagger(object):
@@ -56,8 +58,11 @@ class Tagger(object):
         return self.api.GetMatches(text, "", [-27])
 
 ###############################################################################
-def restore_database():
-    pass
+def restore_database(timer):
+    print '-> Restoring database.'
+    db_path.remove()
+    restore_path.unzip_to(db_path)
+    timer.print_elapsed()
 
 ###############################################################################
 def pre_test(database, n=20):
@@ -75,12 +80,8 @@ def pre_test(database, n=20):
     print '-'*50
 
 ###############################################################################
-def run(database, start_again=True):
-    """Run this script."""
-    # Start timer #
-    timer = Timer()
-    timer.print_start()
-
+def run(database, timer, start_again=False):
+    """Main part."""
     # STEP 0 #
     if start_again:
         print 'STEP 0: Starting over. Droping table.'
@@ -161,8 +162,13 @@ def post_test(database, n=20):
 ###############################################################################
 if __name__ == '__main__':
     print "*** Adding tagger results to database (pid %i) ***" % os.getpid()
-    restore_database()
+    # Time it #
+    timer = Timer()
+    timer.print_start()
+    # Unzip again #
+    restore_database(timer)
+    # Do it #
     with Database(db_path, text_fact=bytes) as db:
         pre_test(db)
-        run(db)
+        run(db, timer)
         post_test(db)
