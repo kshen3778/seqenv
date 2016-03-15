@@ -39,21 +39,18 @@ class Analysis(object):
 
     * `search_db`: The path to the database to search against. Defaults to `nt`.
 
-    * `normalization`: Can be either of `flat`, `ui` or `upui`.
-                        - If you choose `flat`, we will count every isolation source once,
-                          even if the same text entry appears several time for the same inputs
-                          sequence.
-                        - If you choose `ui`, standing for unique isolation, we will uniquify
-                          every frequency count depending on the text entry of its isolation
-                          source.
-                        - If you choose `upui`, standing for unique isolation and unique pubmed-ID,
-                          we will uniquify the frequency counts based on the text entry of its
-                          isolation source and the pubmed-ID from which the isolation text was
-                          obtained.
-                       This option defaults to `ui`.
+    * `--normalization`: Can be either of `flat`, `ui` or `upui`.
+      This option defaults to `ui`.
+         * If you choose `flat`, we will count every isolation source independently,
+           even if the same text appears several times for the same input sequence.
+         * If you choose `ui`, standing for unique isolation, we will count every
+           identical isolation source only once within the same input sequence.
+         * If you choose `upui`, standing for unique isolation and unique pubmed-ID,
+           we will uniquify the counts based on the text entry of the isolation
+           sources as well as on the pubmed identifiers from which the GI obtained.
 
     * `proportional`: Should we divide the counts of every input sequence by the
-                      number of text entries that were associated to it.
+                      number of envo terms that were associated to it.
                       Defaults to `True`.
 
     * `backtracking`: For every term identified by the tagger, we will propagate

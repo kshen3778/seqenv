@@ -31,7 +31,7 @@ parameters = {
     "search_algo"   : "Either 'blast' or 'usearch'. Defaults to `blast`.",
     "search_db"     : "The path to the database to search against. Defaults to `nt`.",
     "normalization" : "What normalization strategy should we use for the frequency counts. Refer to the README.",
-    "proportional"  : "Should we divide the counts of every input sequence by the number of text entries that were associated to it. Defaults to `True`.",
+    "proportional"  : "Should we divide the counts of every input sequence by the number of envo terms that were associated to it. Defaults to `True`.",
     "backtracking"  : "For every term identified by the tagger, we will propagate frequency counts up the acyclic directed graph described by the ontology. Defaults to `False`.",
     "num_threads"   : "Number of threads to use. Default to the number of cores on the current machine.",
     "out_dir"       : "Place all the outputs in the specified directory. Defaults to the input file's directory.",
