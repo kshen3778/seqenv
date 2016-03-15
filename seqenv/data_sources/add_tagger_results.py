@@ -139,7 +139,7 @@ def run(database, timer):
 
     # STEP 5 #
     print 'STEP 5: Uniquifying Gids in the old table. (~1min)'
-    query = 'DELETE from "data" WHERE rowid not in (select min(rowid) from data group by id);'
+    query = 'DELETE from "data" WHERE rowid not in (select min(rowid) from "data" group by id);'
     database.execute(query)
     timer.print_elapsed()
 
@@ -170,7 +170,7 @@ def run(database, timer):
     database.execute(command)
     database.index(table='gi', column='id')
     command   = 'CREATE VIEW "data" AS'
-    command  += ' SELECT gi.id, %s from "gi";'
+    command  += ' SELECT gi.id, %s, gi.pubmed from "gi";'
     subselect = '(SELECT source from isolation where gi.isokey=isolation.id)'
     database.execute(command % subselect)
     timer.print_elapsed()
@@ -186,19 +186,45 @@ def run(database, timer):
     timer.print_total_elapsed()
 
 ###############################################################################
-def post_test(database, ids, n=20):
+def post_test_1(database, n=10):
     print '-'*25 + "POST TEST 1" + '-'*25
     database.execute('SELECT rowid, * from "isolation"')
-    for i in range(n/2):
+    for i in range(n):
         rowid, key, source, envos = database.cursor.next()
         envos = marshal.loads(envos)
         msg = 'ID: %s, KEY: %s, SOURCE: "%s…", ENVOS: %s'
         msg = msg % (rowid, key, source[:15], envos)
         print msg
+
+###############################################################################
+def post_test_2(database, ids):
     print '-'*25 + "POST TEST 2" + '-'*25
     command = """
-    SELECT rowid, * from "data"
+    SELECT rowid, * from "gi"
     WHERE rowid in (%s)
+    ORDER BY CASE rowid
+    %s
+    END
+    """
+    ordered = ','.join(map(str,ids))
+    rowids  = '\n'.join("WHEN '%s' THEN %s" % (row,i) for i,row in enumerate(ids))
+    command = command % (ordered, rowids)
+    database.execute(command)
+    for i in range(len(ids)):
+        rowid, gi, isokey, pubmed = database.cursor.next()
+        key, source, envos = database.get_entry(isokey, 'id', 'isolation')
+        envos = marshal.loads(envos)
+        msg = 'ID: %s, GI: %s, SOURCE: "%s…", ENVOS: %s'
+        msg = msg % (rowid, gi, source[:15], envos)
+        print msg
+    print '-'*70
+
+###############################################################################
+def post_test_3(database, ids):
+    print '-'*25 + "POST TEST 3" + '-'*25
+    command = """
+    SELECT * from "data"
+    WHERE id in (%s)
     ORDER BY CASE rowid
     %s
     END
@@ -210,11 +236,11 @@ def post_test(database, ids, n=20):
     # ORDER BY instr(',%s,', ',' || id || ',')
     database.execute(command)
     for i in range(len(ids)):
-        rowid, gi, isokey, pubmed = database.cursor.next()
+        gi, isokey, pubmed = database.cursor.next()
         key, source, envos = database.get_entry(isokey, 'id', 'isolation')
         envos = marshal.loads(envos)
-        msg = 'ID: %s, GI: %s, SOURCE: "%s…", ENVOS: %s'
-        msg = msg % (rowid, gi, source[:15], envos)
+        msg = 'GI: %s, SOURCE: "%s…", ENVOS: %s'
+        msg = msg % (gi, source[:15], envos)
         print msg
     print '-'*70
 
@@ -230,6 +256,8 @@ if __name__ == '__main__':
     with Database(db_path, text_fact=bytes) as db:
         ids = pre_test(db)
         run(db, timer)
-        post_test(db, ids)
+        post_test_1(db)
+        post_test_2(db, ids)
+        post_test_3(db, ids)
     # Size #
     print "Final size is %s" % db_path.size

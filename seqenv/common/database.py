@@ -306,7 +306,31 @@ class Database(FilePath):
         self.own_cursor.close()
         self.own_connection.close()
 
-    # ------------------------------- Extended ------------------------------- #
+    # ----------------------------- Unfinished ------------------------------ #
     def add_column(self, name, kind=None, table=None):
         """Add add a new column to a table."""
         pass
+
+    def open(self):
+        """Reopen a database that was closed, useful for debugging."""
+        pass
+
+    def uniquify(self, name, kind=None, table=None):
+        """Remove entries that have duplicate values on a specific column."""
+        query = 'DELETE from "data" WHERE rowid not in (select min(rowid) from data group by id);'
+        pass
+
+    def get_and_order(self, ids, column=None, table=None):
+        """Get specific entries and order them in the same way."""
+        command = """
+        SELECT rowid, * from "data"
+        WHERE rowid in (%s)
+        ORDER BY CASE rowid
+        %s
+        END
+        """
+        ordered = ','.join(map(str,ids))
+        rowids  = '\n'.join("WHEN '%s' THEN %s" % (row,i) for i,row in enumerate(ids))
+        command = command % (ordered, rowids)
+        # This could have worked but sqlite3 was too old on the server
+        # ORDER BY instr(',%s,', ',' || id || ',')
