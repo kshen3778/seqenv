@@ -327,7 +327,7 @@ class Database(FilePath):
         WHERE rowid in (%s)
         ORDER BY CASE rowid
         %s
-        END
+        END;
         """
         ordered = ','.join(map(str,ids))
         rowids  = '\n'.join("WHEN '%s' THEN %s" % (row,i) for i,row in enumerate(ids))

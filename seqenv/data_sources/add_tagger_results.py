@@ -169,10 +169,12 @@ def run(database, timer):
     command = 'DROP TABLE "data";'
     database.execute(command)
     database.index(table='gi', column='id')
-    command   = 'CREATE VIEW "data" AS'
-    command  += ' SELECT gi.id, %s, gi.pubmed from "gi";'
-    subselect = '(SELECT source from isolation where gi.isokey=isolation.id)'
-    database.execute(command % subselect)
+    command  = 'CREATE VIEW "data" AS'
+    command += ' SELECT gi.id, %s, gi.pubmed, %s from "gi";'
+    sub_one  = '(SELECT source from isolation where gi.isokey=isolation.id)'
+    sub_two  = '(SELECT envos  from isolation where gi.isokey=isolation.id)'
+    command  = command % (sub_one, sub_two)
+    database.execute(command)
     timer.print_elapsed()
 
     # STEP 6 #
@@ -204,7 +206,7 @@ def post_test_2(database, ids):
     WHERE rowid in (%s)
     ORDER BY CASE rowid
     %s
-    END
+    END;
     """
     ordered = ','.join(map(str,ids))
     rowids  = '\n'.join("WHEN '%s' THEN %s" % (row,i) for i,row in enumerate(ids))
@@ -225,9 +227,9 @@ def post_test_3(database, ids):
     command = """
     SELECT * from "data"
     WHERE id in (%s)
-    ORDER BY CASE rowid
+    ORDER BY CASE id
     %s
-    END
+    END;
     """
     ordered = ','.join(map(str,ids))
     rowids  = '\n'.join("WHEN '%s' THEN %s" % (row,i) for i,row in enumerate(ids))
@@ -236,8 +238,7 @@ def post_test_3(database, ids):
     # ORDER BY instr(',%s,', ',' || id || ',')
     database.execute(command)
     for i in range(len(ids)):
-        gi, isokey, pubmed = database.cursor.next()
-        key, source, envos = database.get_entry(isokey, 'id', 'isolation')
+        gi, source, pubmed, envos = database.cursor.next()
         envos = marshal.loads(envos)
         msg = 'GI: %s, SOURCE: "%s…", ENVOS: %s'
         msg = msg % (gi, source[:15], envos)
