@@ -15,7 +15,10 @@ from seqenv.common.git import GitRepo
 module     = sys.modules[__name__]
 module_dir = os.path.dirname(module.__file__) + '/'
 repos_dir  = os.path.abspath(module_dir + '../') + '/'
-git_repo   = GitRepo(repos_dir)
+
+# If we are in dev mode it's a git repo #
+if os.path.exists(repos_dir + '.git/'): git_repo = GitRepo(repos_dir)
+else:                                   git_repo = None
 
 # Expose the main object #
 from seqenv.analysis import Analysis

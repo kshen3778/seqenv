@@ -134,7 +134,7 @@ class Analysis(object):
         style, we just need to make a call to `outputs.make_all` and everything will be
         generated automatically, in a reverse fashion."""
         print version_string + " (pid %i)" % os.getpid()
-        print "The exact version of the code is: " + git_repo.short_hash
+        if git_repo: print "The exact version of the code is: " + git_repo.short_hash
         self.timer.print_start()
         self.outputs.make_all()
         print "------------\nSuccess. Outputs are in '%s'" % self.out_dir
