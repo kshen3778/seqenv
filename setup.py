@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
         name             = 'seqenv',
-        version          = '1.0.5',
+        version          = '1.0.6',
         description      = 'Assign environment ontology (EnvO) terms to short DNA sequences',
         long_description = open('README.md').read(),
         license          = 'MIT',

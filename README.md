@@ -1,4 +1,4 @@
-# `seqenv` version 1.0.5
+# `seqenv` version 1.0.6
 * Assign environment ontology (EnvO) terms to short DNA sequences.
 * More information at: http://environments.hcmr.gr/seqenv.html
 * Code written by [Lucas Sinclair](http://envonautics.com/#lucas).
