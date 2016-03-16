@@ -313,7 +313,7 @@ class Analysis(object):
         path     = module_dir + 'data_sources/gi_db.sqlite3'
         drop_box = "hash_goes_here"
         retrieve = "https://dl.dropboxusercontent.com/content_link/%s/file?dl=1" % drop_box
-        md5      = "3b7370f8e9f1993e9c1a0a8386b207a4"
+        md5      = "bda6297a8cc6219836ed1cb118e03510"
         database = Database(path, retrieve=retrieve, md5=md5, text_fact=bytes)
         self.timer.print_elapsed()
         return database
@@ -327,13 +327,18 @@ class Analysis(object):
     def seq_to_counts(self):
         """A dictionary linking every input sequence to its summed normalized concept
         counts dict, provided the input sequence had some hits, and at least one hit had
-        some envo number associated. Otherwise it is empty.
+        some envo number associated. Otherwise it is absent.
         NB: What we want to account for is the fact that two GIs originating from the
         same sequence could be pointing to the same isolation source.
         In such case, we shall count the envo numbers from that isolation source only once.
         We can also avoid counting two GIs that are coming from the same study, if a pubmed
         number is available."""
-        result = {}
+        # Message #
+        msg = "Got %i GI hits and %i of them had one for more EnvO terms associated."
+        print msg % (len(self.unique_gis), len(self.gis_with_envo))
+        # Step 5 #
+        print "--> STEP 5: Computing EnvO term frequencies."
+        results = {}
         # Useful later #
         gi_to_key    = lambda gi: self.db.get("gi","id",gi)[1]
         gi_to_pub    = lambda gi: self.db.get("gi","id",gi)[2]
@@ -348,29 +353,34 @@ class Analysis(object):
             for seq, gis in self.seq_to_gis.items():
                 isokeys   = (gi_to_key(gi) for gi in gis if gi in self.db)
                 isokeys   = set_or_list(isokeys)
-                all_envos = (e for key in isokeys for e in key_to_envos(key))
+                if not isokeys: continue
+                all_envos = [e for key in isokeys for e in key_to_envos(key)]
                 if self.proportional: score = 1/len(all_envos)
                 else:                 score = 1.0
                 counts = defaultdict(float)
                 for e in all_envos: counts[e] += score
-                result[seq] = counts
+                results[seq] = counts
         # Unique source and unique pubmed #
         if self.normalization == 'uiup':
             for seq, gis in self.seq_to_gis.items():
                 gis_w_envo = [gi for gi in gis if gi in self.db]
+                if not gis_w_envo: continue
                 gi_to_knp  = {gi: (gi_to_key(gi), gi_to_pub(gi)) for gi in gis_w_envo}
                 uniq_keys  = set(key for key, pub in gi_to_knp.values())
                 gi2knp_uk  = dict(first_key(gi_to_knp, key) for key in uniq_keys)
                 pubmeds    = set(pub for key, pub in gi2knp_uk.values())
                 gi2knp_up  = dict(first_pub(gi_to_knp, pubmed) for pubmed in pubmeds)
-                all_envos = (e for key,pub in gi2knp_up.values() for e in key_to_envos(key))
+                all_envos  = [e for key,pub in gi2knp_up.values() for e in key_to_envos(key)]
                 if self.proportional: score = 1/len(all_envos)
                 else:                 score = 1.0
                 counts = defaultdict(float)
                 for e in all_envos: counts[e] += score
-                result[seq] = counts
+                results[seq] = counts
+        # Check #
+        if not results: raise Exception("We found no isolation sources with your input. Sorry.")
         # Return #
-        return result
+        self.timer.print_elapsed()
+        return results
 
     # --------------------------- In this section --------------------------- #
     # serial_to_concept
@@ -404,4 +414,9 @@ class Analysis(object):
         Hence, ENVO:00000095 would be linked to 'lava field'
         An example line: ENVO:00000015  ocean"""
         handle = open(module_dir + 'data_envo/envo_preferred.tsv')
-        return dict(line.strip('\n').split('\t') for line in handle)
+        result = {}
+        for line in handle:
+            envo, name = line.strip('\n').split('\t')
+            if envo == "ENVO:root": continue
+            result[int(envo[5:])] = name
+        return result

@@ -103,8 +103,6 @@ class Database(FilePath):
 
     @property_cached
     def main_table(self):
-        if self.tables and not 'data' in self.tables:
-            raise Exception("The file '" + self.path + "' does not contain any 'data' table.")
         return 'data'
 
     @property
@@ -286,6 +284,7 @@ class Database(FilePath):
         self.own_cursor.execute('SELECT * from "%s" LIMIT 1 OFFSET %i;' % (self.main_table, num))
         return self.own_cursor.fetchone()
 
+    def get(self, table, column, key): return self.get_entry(key, column, table)
     def get_entry(self, key, column=None, table=None):
         """Get a specific entry."""
         if table is None:  table  = self.main_table

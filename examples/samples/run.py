@@ -8,7 +8,8 @@ Run the samples example
 from seqenv import Analysis
 
 ################################################################################
-analysis = Analysis("community.fasta", out_dir='output/', abundances="abundances.tsv", N=10)
+analysis = Analysis("community.fasta", out_dir='output/',
+                    abundances="abundances.tsv", N=10, num_threads=5)
 
 # Run #
 analysis.timer.print_start()

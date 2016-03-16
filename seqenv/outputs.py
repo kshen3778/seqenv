@@ -1,5 +1,5 @@
 # Built-in modules #
-import warnings
+import warnings, marshal
 
 # Internal modules #
 import seqenv
@@ -16,8 +16,8 @@ with warnings.catch_warnings():
 
 ################################################################################
 class OutputGenerator(object):
-    """Once the Analysis is run and all the data is in memory in the
-    form of python objects, this class will take care of generating
+    """Once the Analysis is done running and all the data is in memory in the
+    form of python objects, this object will take care of generating
     all the output files the user could possibly want. You pass it the Analysis
     object obviously."""
 
@@ -49,23 +49,23 @@ class OutputGenerator(object):
         # Return
         return df
 
-    def tsv_seq_to_concepts(self):
+    def tsv_seq_to_concepts(self, name="seq_to_concepts.tsv"):
         """A TSV matrix file containing the df_seqs_concepts matrix"""
-        with open(self.a.out_dir + 'seq_to_concepts.tsv', 'w') as handle:
+        with open(self.a.out_dir + name, 'w') as handle:
             content = self.df_seqs_concepts.to_csv(None, sep=self.sep, float_format=self.float_format)
             handle.writelines(content)
 
-    def tsv_seq_to_names(self, sep='\t'):
+    def tsv_seq_to_names(self, name='seq_to_names.tsv'):
         """A TSV matrix file where we translate the concept to human readable names"""
-        with open(self.a.out_dir + 'seq_to_names.tsv', 'w') as handle:
+        with open(self.a.out_dir + name, 'w') as handle:
             df = self.df_seqs_concepts.rename(index=self.a.concept_to_name)
             content = df.to_csv(None, sep=self.sep, float_format=self.float_format)
             handle.writelines(content)
 
     @property_cached
     def df_sample_names(self):
-        """A dataframe where we operate a matrix multiplication with the abundances file
-        provided to link samples to concept human readable names"""
+        """A dataframe where we operate a matrix multiplication with the abundances
+        file provided, to link samples to concept human readable names."""
         # Get results #
         df1 = self.df_seqs_concepts.rename(index=self.a.concept_to_name)
         # Remove those that were discarded #
@@ -81,30 +81,35 @@ class OutputGenerator(object):
         # Return
         return df
 
-    def tsv_samples_to_names(self, sep='\t'):
-        """A TSV matrix file where operate a matrix multiplication with the abundances file
-        provided to link samples to concept human readable names"""
-        with open(self.a.out_dir + 'samples_to_names.tsv', 'w') as handle:
+    def tsv_samples_to_names(self, name='samples_to_names.tsv'):
+        """A TSV matrix file with matrix above."""
+        with open(self.a.out_dir + name, 'w') as handle:
             content = self.df_sample_names.to_csv(sep=self.sep, float_format=self.float_format)
             handle.writelines(content)
 
-    def list_sequence_concept(self):
+    def list_sequence_concept(self, name='list_concepts_found.tsv'):
         """A flat TSV file listing every concept found for every sequence.
         It has one concept per line and looks something like this:
         - OTU1, ENVO:00001, ocean, 4, GIs : [56, 123, 345]
         - OTU1, ENVO:00002, soil, 7, GIs : [22, 44]
         """
-        with open(self.a.out_dir + 'list_concepts_found.tsv', 'w') as handle:
+        # Useful later #
+        gi_to_key    = lambda gi: self.a.db.get("gi","id",gi)[1]
+        key_to_envos = lambda key: marshal.loads(self.a.db.get("isolation","id",key)[2])
+        gi_to_envos  = lambda gi: key_to_envos(gi_to_key(gi))
+        # Loop #
+        with open(self.a.out_dir + name, 'w') as handle:
             for seq, gis in self.a.seq_to_gis.items():
-                gis = [gi for gi in gis if gi in self.a.db and self.a.db[gi][1] in self.a.text_to_counts]
-                texts = set(self.a.db[gi][1] for gi in gis)
-                concepts = set(flatter(self.a.text_to_counts[t].keys() for t in texts))
-                for concept in concepts:
+                gis     = [gi for gi in gis if gi in self.a.db]
+                isokeys = set(gi_to_key(gi) for gi in gis)
+                envos   = [e for key in isokeys for e in key_to_envos(key)]
+                for envo in envos:
                     seq_name     = self.a.renamed_to_orig[seq]
-                    concept_name = self.a.concept_to_name.get(concept, concept)
-                    concept_gis  = [gi for gi in gis if concept in self.a.text_to_counts[self.a.db[gi][1]]]
+                    envo_id      = "ENVO:%08d" % envo
+                    concept_name = self.a.concept_to_name.get(envo, envo_id)
+                    concept_gis  = [gi for gi in gis if envo in gi_to_envos(gi)]
                     count_gis    = len(concept_gis)
-                    line         = (seq_name, concept, concept_name, str(count_gis), str(concept_gis))
+                    line         = (seq_name, envo_id, concept_name, str(count_gis), str(concept_gis))
                     handle.write('\t'.join(line) + '\n')
 
     def biom_output(self):

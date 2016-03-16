@@ -8,7 +8,7 @@ Run the sequences example
 from seqenv import Analysis
 
 ################################################################################
-analysis = Analysis("community.fasta", out_dir='output/')
+analysis = Analysis("community.fasta", out_dir='output/', num_threads=20)
 
 # Run #
 analysis.timer.print_start()

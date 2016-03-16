@@ -49,6 +49,7 @@ class FASTA(FilePath):
     def create(self):
         self.buffer = []
         self.buf_count = 0
+        if not self.directory.exists: self.directory.create()
         self.open('w')
         return self
 
