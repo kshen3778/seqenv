@@ -3,7 +3,7 @@
 * More information at: http://environments.hcmr.gr/seqenv.html
 * Code written by [Lucas Sinclair](http://envonautics.com/#lucas).
 
-### Installing (doesn't work yet, go to development install)
+### Installing
 To install `seqenv` onto your machine, use the python package manager:
 
     $ pip install seqenv

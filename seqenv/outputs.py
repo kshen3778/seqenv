@@ -3,7 +3,6 @@ import warnings, marshal
 
 # Internal modules #
 import seqenv
-from seqenv.common import flatter
 from seqenv.common.cache import property_cached
 
 # Third party modules #
