@@ -5,3 +5,4 @@ include seqenv/data_envo/envo_groups.tsv
 include seqenv/data_envo/envo_names.tsv
 include seqenv/data_envo/envo_preferred.tsv
 include seqenv/data_envo/envo.obo
+include seqenv/data_sources/generate.py
