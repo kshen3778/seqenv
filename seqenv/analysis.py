@@ -302,7 +302,7 @@ class Analysis(object):
         CREATE INDEX "gi_index" on "gi" (id);
         CREATE INDEX "isolation_index" on "isolation" (source);
         """
-        print "--> STEP 5: Setting up the database connection."
+        print "--> STEP 5: Setting up the SQLite3 database connection."
         path     = module_dir + 'data_sources/gi_db.sqlite3'
         drop_box = "hash_goes_here"
         retrieve = "https://dl.dropboxusercontent.com/content_link/%s/file?dl=1" % drop_box

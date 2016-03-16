@@ -137,6 +137,7 @@ This work would not have been possible without the advice and support of many pe
 
 - Simon Berger (simon.berger@h-its.org)
 - Alica Chronakova (alicach@upb.cas.cz)
+- Lars Juhl Jensen (lars.juhl.jensen@cpr.ku.dk)
 - Anastasis Oulas (oulas@hcmr.gr)
 - [Evangelos Pafilis](http://epafilis.info/) (pafilis@hcmr.gr) [2]
 - Christina Pavloudi (cpavloud@hcmr.gr)

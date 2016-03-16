@@ -18,7 +18,6 @@ import os, inspect, marshal
 from seqenv.common.autopaths import FilePath
 from seqenv.common.timer import Timer
 from seqenv.common.database import Database
-import tagger as tagger_api
 
 # Third party modules #
 from tqdm import trange, tqdm
@@ -44,6 +43,7 @@ class Tagger(object):
         if names is None:    names    = data_dir + 'envo_names.tsv'
         if globs is None:    globs    = data_dir + 'envo_global.tsv'
         # Make an instance of the API #
+        import tagger as tagger_api
         self.api = tagger_api.Tagger()
         self.api.LoadNames(entities, names)
         self.api.LoadGlobal(globs)
