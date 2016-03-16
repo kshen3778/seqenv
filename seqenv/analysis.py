@@ -19,14 +19,6 @@ from seqenv.common.database    import Database
 # Third party modules #
 import pandas
 
-# Compiled modules #
-try:
-    import tagger
-except ImportError:
-    tagger = None
-    msg = "Failed to import the tagger submodule, maybe it wasn't compiled correctly ?"
-    warnings.warn(msg + " Seqenv won't work until that is fixed.", UserWarning)
-
 ################################################################################
 class Analysis(object):
     """The main object. The only mandatory argument is the input fasta file path.
@@ -347,6 +339,7 @@ class Analysis(object):
         first_key    = lambda d,k: [(gi, knp) for gi, knp in d.items()  if knp[0]==k][0]
         first_pub    = lambda d,p: [(gi, knp) for gi, knp in d.values() if knp[1]==p][0]
         # "Flat" or "Unique source" are quite similar #
+        set_or_list = None
         if self.normalization == 'flat': set_or_list = list
         if self.normalization == 'ui':   set_or_list = set
         # It's just about using a list or a set in the right place #
