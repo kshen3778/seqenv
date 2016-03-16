@@ -91,7 +91,7 @@ $ seqenv centers.fasta --abundances abundance.tsv --seq_type nucl --out_dir outp
 The output you will receive should look something like this:
 
 ~~~
-seqenv version 1.0.4 (pid 52169)
+seqenv version 1.0.5 (pid 52169)
 Start at: 2016-03-02 00:22:09.727377
 --> STEP 1: Parse the input FASTA file.
 Elapsed time: 0:00:00.005811
@@ -102,17 +102,9 @@ Elapsed time: 0:02:11.215829
 Elapsed time: 0:00:00.002071
 --> STEP 4: Parsing the search results
 Elapsed time: 0:00:00.002099
-Elapsed time: 0:00:00.000156
---> STEP 5: Loading database with all NCBI isolation sources
-Got 60 unique GIs from search results
-Got 56 unique GIs with an isolation source
-Got 24 unique isolation source texts
-Elapsed time: 0:00:01.496406
---> STEP 6: Run the text mining tagger on all blobs.
-Elapsed time: 0:00:00.025384
-Got 28 environmental term matches
---> STEP 7: Parsing the tagger results and counting terms.
-Elapsed time: 0:00:00.001027
+Got 52 GI hits and 40 of them had one for more EnvO terms associated.
+--> STEP 5: Computing EnvO term frequencies.
+Elapsed time: 0:00:00.320825
 ------------
 Success. Outputs are in 'output/'
 End at: 2016-03-02 00:24:22.504485
@@ -123,10 +115,9 @@ Once the pipeline has finished processing, you will have the following contents 
 
 ~~~
 $ ls output/
-list_concepts_found.tsv  seq_to_concepts.tsv    text_to_matches.pickle
-renamed.fasta            seq_to_gis.pickle      top_seqs.blastout
-samples.biom             seq_to_names.tsv       top_seqs.fasta
-samples_to_names.tsv     text_to_counts.pickle  top_seqs.fasta.parts
+list_concepts_found.tsv  samples_to_names.tsv  seq_to_names.tsv   top_seqs.fasta.parts
+renamed.fasta            seq_to_concepts.tsv   top_seqs.blastout
+samples.biom             seq_to_gis.pickle     top_seqs.fasta
 ~~~
 
 The most interesting files are probably:

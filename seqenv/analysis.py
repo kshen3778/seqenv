@@ -310,6 +310,7 @@ class Analysis(object):
         CREATE INDEX "gi_index" on "gi" (id);
         CREATE INDEX "isolation_index" on "isolation" (source);
         """
+        print "--> STEP 5: Setting up the database connection."
         path     = module_dir + 'data_sources/gi_db.sqlite3'
         drop_box = "hash_goes_here"
         retrieve = "https://dl.dropboxusercontent.com/content_link/%s/file?dl=1" % drop_box
@@ -337,7 +338,7 @@ class Analysis(object):
         msg = "Got %i GI hits and %i of them had one for more EnvO terms associated."
         print msg % (len(self.unique_gis), len(self.gis_with_envo))
         # Step 5 #
-        print "--> STEP 5: Computing EnvO term frequencies."
+        print "--> STEP 6: Computing EnvO term frequencies."
         results = {}
         # Useful later #
         gi_to_key    = lambda gi: self.db.get("gi","id",gi)[1]
