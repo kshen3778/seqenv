@@ -19,3 +19,7 @@ seqenv/data_sources/restore_gi_db.zip
 # Distribution on PyPI #
 dist/
 MANIFEST
+
+# Automatic documentation #
+documentation/automatic
+documentation/html
