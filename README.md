@@ -213,4 +213,4 @@ Now, you can check that it all works like this:
     $ python -c "import seqenv"
 
 ### Further documentation
-The code is written in a clean, object-oriented, and pythonic way. It is also carries a fair deal of documentation. You can see this within the code itself or by going here: http://seqenv.github.io
+The code is written in a clean, object-oriented, and pythonic way. It is also carries a fair deal of documentation. You can see this within the code itself or by going here: http://xapple.github.io/seqenv
