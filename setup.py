@@ -14,5 +14,4 @@ setup(
       scripts          = ['seqenv/seqenv'],
       install_requires = ['biopython', 'sh', 'pandas', 'tqdm', 'biom-format', 'requests'],
       long_description = open('README.md').read(),
-      long_description_markdown_filename='README.md'
     )

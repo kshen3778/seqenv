@@ -1,6 +1,7 @@
 # `seqenv` version 1.0.8
 * Assign environment ontology (EnvO) terms to short DNA sequences.
-* Code written by [Lucas Sinclair](http://envonautics.com/#lucas).
+* All code written by [Lucas Sinclair](http://envonautics.com/#lucas).
+* Publication at: http://example.com/ (The link will appear here once it is available)
 
 ### Installing
 To install `seqenv` onto your machine, use the python package manager:
@@ -74,6 +75,8 @@ The pipeline has already been applied to a range of datasets (e.g Greek lagoon, 
  Given a set of DNA sequences, `seqenv` first retrieves highly similar sequences from public repositories (e.g. NCBI GenBank) using BLAST or similar algorithm. Subsequently, from each of these homologous records, text fields carrying environmental context information such as the reference title and the **isolation source** field found in the metadata are extracted. Once the relevant pieces of text from each matching sequence have been gathered, they are processed by a text mining module capable of identifying any EnvO terms they contain (e.g. the word "glacier", or "pelagic", "forest", etc.). The identified EnvO terms along with their frequencies of occurrence are then subjected to multivariate statistics, producing matrices relating your samples to their putative sources as well as other useful outputs.
 
 ### Pipeline overview
+The publication contains more information of course, but here is a schematic overview of what happens inside `seqenv`:
+
 [![seqenv](documentation/frequencies.png)](documentation/frequencies.png)
 
 ### Tutorial
@@ -126,11 +129,11 @@ The most interesting files are probably:
 * `samples_to_names.tsv` if an abundance file was provided, this is a a matrix linking every one of your samples to its "composition" in terms of ENVO identifiers translated to readable names.
 
 ### Acknowledgments
-`seqenv` was conceived and developed in the following hackathons supported by European Union's Earth System Science and Environmental Management ES1103 COST Action ("[Microbial ecology & the earth system: collaborating for insight and success with the new generation of sequencing tools](http://www.cost.eu/domains_actions/essem/Actions/ES1103)"):
+`seqenv` was originally conceived in the following hackathons supported by European Union's Earth System Science and Environmental Management ES1103 COST Action ("[Microbial ecology & the earth system: collaborating for insight and success with the new generation of sequencing tools](http://www.cost.eu/domains_actions/essem/Actions/ES1103)"):
 
-- **From Signals to Environmentally Tagged Sequences** (Ref: ECOST-MEETING-ES1103-050912-018418), September 27th-29th 2012, Hellenic Centre for Marine Research, Crete, Greece.
-- **From Signals to Environmentally Tagged Sequences II** (Ref: ECOST-MEETING-ES1103-100613-031037), June 10th-13th 2013, Hellenic Centre for Marine Research, Crete, Greece.
-- **From Signals to Environmentally Tagged Sequences III** (Ref: ECOST-MEETING-ES1103-220914-047036), September 22nd-25th 2014, Hellenic Centre for Marine Research, Crete, Greece.
+- **From Signals to Environmentally Tagged Sequences** (Ref: ECOST-MEETING-ES1103-050912-018418), September 27th-29th 2012, Hellenic Center for Marine Research, Crete, Greece.
+- **From Signals to Environmentally Tagged Sequences II** (Ref: ECOST-MEETING-ES1103-100613-031037), June 10th-13th 2013, Hellenic Center for Marine Research, Crete, Greece.
+- **From Signals to Environmentally Tagged Sequences III** (Ref: ECOST-MEETING-ES1103-220914-047036), September 22nd-25th 2014, Hellenic Center for Marine Research, Crete, Greece.
 
 This work would not have been possible without the advice and support of many people who attended the hackathons, in alphabetical order:
 
@@ -159,7 +162,7 @@ This work would not have been possible without the advice and support of many pe
 * Can marine bacteria be recruited from freshwater sources and the air? `doi:10.1038/ismej.2014.89`
 
 ### Development installation
-This chapter shows you how to get a development install that makes it easier to contribute to and change `seqenv` to suit your needs. If you cannot get a functional installation set up, contact the authors.
+This chapter shows you how to get a development install that makes it easier to contribute to and change `seqenv` to suit your needs. If you cannot get a functional installation set up, feel free to contact the authors.
 
 ##### Step 1: Cloning the repository
 Here you will download a copy of the code and place it somewhere in your home directory.
@@ -179,7 +182,7 @@ Here you will edit your ``~/.bashrc`` or ``~/.bash_profile`` to add a reference 
 And finally source your profile file if you haven't already.
 
 ##### Step 3 (optional): Install your own version of python
-Your system probably comes with a version of python installed. But the variations from system to system are too great to rely on any available python. We strongly suggest to just install our own version in your home directory. Otherwise make sure that you are using version 2.7.x of python.
+Your system probably comes with a version of python installed. But the variations from system to system are too great to rely on any available python. We suggest to just install our own version in your home directory. Otherwise, make sure that you are using version 2.7.x of python.
 
 ##### Step 4: Check you have all the required executables
 `seqenv` will search for several different binaries as it processes your data. Please check all of these are available in your `$PATH`:
@@ -208,3 +211,6 @@ If you are using a python manager such as pyenv, don't forget to rehash the bina
 Now, you can check that it all works like this:
 
     $ python -c "import seqenv"
+
+### Further documentation
+The code is written in a clean, object-oriented, and pythonic way. It is also carries a fair deal of documentation. You can see this within the code itself or by going here: http://seqenv.github.io

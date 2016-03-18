@@ -15,3 +15,7 @@ seqenv/data_sources/restore_gi_db.zip
 
 # IDE #
 .idea
+
+# Distribution on PyPI #
+dist/
+MANIFEST
