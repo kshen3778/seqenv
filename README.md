@@ -1,3 +1,5 @@
+[![changelog](http://allmychanges.com/p/python/seqenv/badge/)](http://allmychanges.com/p/python/seqenv/?utm_source=badge)
+
 # `seqenv` version 1.0.8
 * Assign environment ontology (EnvO) terms to short DNA sequences.
 * All code written by [Lucas Sinclair](http://envonautics.com/#lucas).
