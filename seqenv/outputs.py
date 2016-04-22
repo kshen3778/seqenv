@@ -45,6 +45,9 @@ class OutputGenerator(object):
         df = df.fillna(0)
         # Rename to original names #
         df = df.rename(columns=self.a.renamed_to_orig)
+        # Rename envo integers to envo strings #
+        envo_int_to_id = lambda e: "ENVO:%08d" % e
+        df = df.rename(index=envo_int_to_id)
         # Return
         return df
 

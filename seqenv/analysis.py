@@ -11,7 +11,7 @@ from seqenv                    import module_dir, version_string, git_repo
 from seqenv.fasta              import FASTA
 from seqenv.outputs            import OutputGenerator
 from seqenv.seqsearch.parallel import ParallelSeqSearch
-from seqenv.common.cache       import property_cached
+from seqenv.common.cache       import property_cached, cached, class_property
 from seqenv.common.timer       import Timer
 from seqenv.common.autopaths   import FilePath
 from seqenv.common.database    import Database
@@ -349,6 +349,8 @@ class Analysis(object):
                 isokeys   = set_or_list(isokeys)
                 if not isokeys: continue
                 all_envos = [e for key in isokeys for e in key_to_envos(key)]
+                if self.backtracking:
+                    all_envos.extend([p for e in all_envos for p in self.child_to_parents[e]])
                 if self.proportional: score = 1/len(all_envos)
                 else:                 score = 1.0
                 counts = defaultdict(float)
@@ -365,6 +367,8 @@ class Analysis(object):
                 pubmeds    = set(pub for key, pub in gi2knp_uk.values())
                 gi2knp_up  = dict(first_pub(gi_to_knp, pubmed) for pubmed in pubmeds)
                 all_envos  = [e for key,pub in gi2knp_up.values() for e in key_to_envos(key)]
+                if self.backtracking:
+                    all_envos.extend([p for e in all_envos for p in self.child_to_parents[e]])
                 if self.proportional: score = 1/len(all_envos)
                 else:                 score = 1.0
                 counts = defaultdict(float)
@@ -381,29 +385,35 @@ class Analysis(object):
     # child_to_parents
     # concept_to_name
 
-    @property_cached
-    def serial_to_concept(self):
+    @class_property
+    @classmethod
+    @cached
+    def serial_to_concept(cls):
         """A dictionary linking every concept serial to its concept id.
         Every line in the file contains three columns: serial, concept_type, concept_id.
         An example line: 1007000022 -27 ENVO:00000021"""
         return dict(line.split()[0::2] for line in open(module_dir + 'data_envo/envo_entities.tsv'))
 
-    @property_cached
-    def child_to_parents(self):
-        """A dictionary linking every concept id to a list of parent concept ids.
+    @class_property
+    @classmethod
+    @cached
+    def child_to_parents(cls):
+        """A dictionary linking concept id to a list of parent concept ids.
         Every line in the file contains two columns: child_serial, parent_serial
         An example line: 1007000003 1007001640"""
         result = defaultdict(list)
         with open(module_dir + 'data_envo/envo_groups.tsv') as handle:
             for line in handle:
                 child_serial, parent_serial = line.split()
-                child_concept = self.serial_to_concept[child_serial]
-                parent_concept = self.serial_to_concept[parent_serial]
+                child_concept = cls.serial_to_concept[child_serial]
+                parent_concept = cls.serial_to_concept[parent_serial]
                 result[child_concept].append(parent_concept)
         return result
 
-    @property_cached
-    def concept_to_name(self):
+    @class_property
+    @classmethod
+    @cached
+    def concept_to_name(cls):
         """A dictionary linking the concept id to relevant names. In this case ENVO terms.
         Hence, ENVO:00000095 would be linked to 'lava field'
         An example line: ENVO:00000015  ocean"""
