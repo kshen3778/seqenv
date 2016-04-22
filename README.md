@@ -159,12 +159,12 @@ This work would not have been possible without the advice and support of many pe
 ### News
 * **August 2013**: Chris Quince presented a talk on `seqenv` at [STAMPS2013](https://stamps.mbl.edu/index.php/Main_Page). You can download the PDF of the presentation: [C Quince et. al., SeqEnv: Annotating sequences with environments (STAMPS 2013)](https://stamps.mbl.edu/images/4/44/Quince_SeqEnvSTAMPS2013.pdf)
 
-### Publications that have used seqenv
+### Publications that have used `seqenv`
 * Bacterial diversity along a 2600 km river continuum. `doi:10.1111/1462-2920.12886`
 * Can marine bacteria be recruited from freshwater sources and the air? `doi:10.1038/ismej.2014.89`
 
 ### Development installation
-This chapter shows you how to get a development install that makes it easier to contribute to and change `seqenv` to suit your needs. If you cannot get a functional installation set up, feel free to contact the authors.
+This chapter shows you how to get a development install that makes it easier to contribute to and to change `seqenv` to suit your needs. If you cannot get a functional installation set up, feel free to contact the authors.
 
 ##### Step 1: Cloning the repository
 Here you will download a copy of the code and place it somewhere in your home directory.
