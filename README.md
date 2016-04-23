@@ -106,9 +106,11 @@ Elapsed time: 0:02:11.215829
 Elapsed time: 0:00:00.002071
 --> STEP 4: Parsing the search results
 Elapsed time: 0:00:00.002099
-Got 52 GI hits and 40 of them had one for more EnvO terms associated.
---> STEP 5: Computing EnvO term frequencies.
-Elapsed time: 0:00:00.320825
+--> STEP 5: Setting up the SQLite3 database connection.
+Elapsed time: 0:00:00.054077
+Got 81 GI hits and 65 of them had one for more EnvO terms associated.
+--> STEP 6: Computing EnvO term frequencies.
+Elapsed time: 0:00:00.721455
 ------------
 Success. Outputs are in 'output/'
 End at: 2016-03-02 00:24:22.504485
@@ -129,6 +131,9 @@ The most interesting files are probably:
 * `list_concepts_found.tsv` links every OTU to all its relevant BLAST hits and linked ENVO terms.
 * `seq_to_names.tsv` a matrix linking every OTU to its "composition" in terms of ENVO identifiers translated to readable names.
 * `samples_to_names.tsv` if an abundance file was provided, this is a a matrix linking every one of your samples to its "composition" in terms of ENVO identifiers translated to readable names.
+* `graphviz/` directory containing ontology graphs for everyone of the inputed sequences, such as in the following example:
+
+[![seqenv](documentation/ontology_graph.png)](documentation/ontology_graph.png)
 
 ### Acknowledgments
 `seqenv` was originally conceived in the following hackathons supported by European Union's Earth System Science and Environmental Management ES1103 COST Action ("[Microbial ecology & the earth system: collaborating for insight and success with the new generation of sequencing tools](http://www.cost.eu/domains_actions/essem/Actions/ES1103)"):

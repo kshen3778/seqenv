@@ -1,5 +1,3 @@
-Add the dot files back, use package for reading ovo files.
-
 Test that seqenv can easily be installed on a different university cluster easily through one pip command
 
 Possibly: Add the ability to extract information only for a subset of envo terms (such as biome feature) (i.e. the masking feature)
