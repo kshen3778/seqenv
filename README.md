@@ -1,6 +1,6 @@
 [![changelog](http://allmychanges.com/p/python/seqenv/badge/)](http://allmychanges.com/p/python/seqenv/?utm_source=badge) [![PyPI version](https://badge.fury.io/py/seqenv.svg)](https://badge.fury.io/py/seqenv)
 
-# `seqenv` version 1.1.1
+# `seqenv` version 1.1.2
 * Assign environment ontology (EnvO) terms to short DNA sequences.
 * All code written by [Lucas Sinclair](http://envonautics.com/#lucas).
 * Publication at: http://example.com/ (The link will appear here once it is available)
@@ -95,7 +95,7 @@ $ seqenv centers.fasta --abundances abundance.tsv --seq_type nucl --out_dir outp
 The output you will receive should look something like this:
 
 ~~~
-seqenv version 1.0.5 (pid 52169)
+seqenv version 1.1.2 (pid 52169)
 Start at: 2016-03-02 00:22:09.727377
 --> STEP 1: Parse the input FASTA file.
 Elapsed time: 0:00:00.005811
