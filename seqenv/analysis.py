@@ -327,7 +327,7 @@ class Analysis(object):
         We can also avoid counting two GIs that are coming from the same study, if a pubmed
         number is available."""
         # Message #
-        msg = "Got %i GI hits and %i of them had one for more EnvO terms associated."
+        msg = "Got %i GI hits and %i of them had one or more EnvO terms associated."
         print msg % (len(self.unique_gis), len(self.gis_with_envo))
         # Step 5 #
         print "--> STEP 6: Computing EnvO term frequencies."

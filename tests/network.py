@@ -92,9 +92,9 @@ ontology = Ontology()
 g = ontology.get_subgraph()
 g = ontology.add_weights(g)
 g = ontology.add_style(g)
-g = ontology.add_legend(g)
 ontology.write_to_dot(g, home+'Desktop/viz/final.dot')
-ontology.draw_to_pdf(g,  home+'Desktop/viz/final.pdf')
+ontology.add_legend(home+'Desktop/viz/final.dot')
+ontology.draw_to_pdf(home+'Desktop/viz/final.dot', home+'Desktop/viz/final.pdf')
 
 ################################################################################
 # Old method #

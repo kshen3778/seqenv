@@ -5,7 +5,8 @@ from seqenv import module_dir
 from seqenv.common.cache import property_cached
 
 # Third party modules #
-import networkx, pygraphviz
+import sh, networkx
+import matplotlib.colors
 
 # A list of envos to help test this module #
 test_envos = [
@@ -108,7 +109,7 @@ class Ontology(object):
         if envos is None: envos = test_envos
         # All nodes #
         nodes = set(n for e in envos for n in networkx.descendants(self.networkx, e))
-        nodes.update(test_envos)
+        nodes.update(envos)
         nodes = list(nodes)
         # Return #
         return self.networkx.subgraph(nodes)
@@ -116,57 +117,70 @@ class Ontology(object):
     def add_weights(self, g, weights=None):
         """Input a networkx DiGraph object.
         Outputs a pygraphviz AGraph object."""
-        return networkx.nx_agraph.to_agraph(g)
+        g = networkx.nx_agraph.to_agraph(g)
+        if weights is None: return g
+        for envo in weights:
+            node   = g.get_node(envo)
+            weight = weights[envo]
+            color  = matplotlib.colors.rgb2hex((1.0, 1.0 - weight, 0.0))
+            node.attr['fillcolor'] = color
+        return g
 
     def add_style(self, g):
         """Input a pygraphviz AGraph object.
         Outputs a pygraphviz AGraph object."""
         for node in g.nodes():
-            node.attr['label'] = node.attr['name']
-            node.attr['shape'] = 'box'
-            node.attr['style'] = 'rounded'
+            text = node.attr['name']
+            #envo = node.attr['label']
+            #node.attr['label'] = "{<f0> %s|<f1> %s}" % (envo, text)
+            node.attr['label'] = text.replace(' ','\\n')
+            node.attr['name']  = ''
+            node.attr['shape'] = 'Mrecord'
+            node.attr['style'] = 'filled'
         for edge in g.edges():
             if edge.attr['label'] == 'located_in': edge.attr['color'] = 'turquoise4'
             edge.attr['label'] = ''
         return g
 
-    def add_legend(self, g):
-        """Input a pygraphviz AGraph object.
-        Outputs a pygraphviz AGraph object."""
-        legend_txt = """
-        subgraph legend {
-        label = "Legend";
-        key [label=<<table border="0" cellpadding="2" cellspacing="0" cellborder="0">
-          <tr><td align="right" port="i1">Is a</td></tr>
-          <tr><td align="right" port="i2">Part of</td></tr>
-          <tr><td align="right" port="i3">Located in</td></tr>
-          </table>>];
-        key2 [label=<<table border="0" cellpadding="2" cellspacing="0" cellborder="0">
-          <tr><td port="i1">&nbsp;</td></tr>
-          <tr><td port="i2">&nbsp;</td></tr>
-          <tr><td port="i3">&nbsp;</td></tr>
-          </table>>];
-        key:i1:e -> key2:i1:w [color=red];
-        key:i2:e -> key2:i2:w [color=blue];
-        key:i3:e -> key2:i3:w [color=turquoise4];
-        }"""
-        orig_txt = g.to_string().rstrip()[:-1]
-        new_text = orig_txt[:-1] + '\n' + legend_txt + '\n' + '}'
-        print new_text
-        return pygraphviz.AGraph(new_text)
-
     def write_to_dot(self, g, path):
         """Input a pygraphviz AGraph object."""
-        with open(path, 'w') as handle:
-            handle.write(g.to_string())
+        with open(path, 'w') as handle: handle.write(g.to_string())
 
-    def draw_to_pdf(self, g, path):
-        """Input a pygraphviz AGraph object."""
-        g.draw(path, format='pdf', prog='dot')
+    def add_legend(self, path):
+        """Input the path to a dot file."""
+        legend_txt = """
+        digraph {
+          rankdir=LR
+          node [shape=plaintext,fontname="helvetica"]
+          subgraph cluster_01 {
+          label = "NB: darker nodes weigh more";
+            key [label=<<table border="0" cellpadding="2" cellspacing="0" cellborder="0">
+              <tr><td align="right" port="i1">Is</td></tr>
+              <tr><td align="right" port="i2">Part</td></tr>
+              <tr><td align="right" port="i3">Located</td></tr>
+              </table>>];
+            key2 [label=<<table border="0" cellpadding="2" cellspacing="0" cellborder="0">
+              <tr><td port="i1">a</td></tr>
+              <tr><td port="i2">of</td></tr>
+              <tr><td port="i3">in</td></tr>
+              </table>>];
+            key:i1:e -> key2:i1:w [color=red];
+            key:i2:e -> key2:i2:w [color=blue];
+            key:i3:e -> key2:i3:w [color=turquoise4];
+        }"""
+        orig_txt = [line.rstrip('\n') for line in open(path, 'r') if line]
+        new_text = [line.lstrip() for line in legend_txt.split('\n') if line]
+        new_text = '\n'.join(new_text + orig_txt[2:])
+        with open(path, 'w') as handle: handle.write(new_text)
+
+    def draw_to_pdf(self, in_path, out_path):
+        """Input a path to a dot file."""
+        sh.dot(in_path, '-Tpdf', '-o', out_path)
 
     # --------------------------- In this section --------------------------- #
     # print_test
     # draw_with_networkx
+    # draw_with_pygraphviz
 
     def print_test(self, e=None):
         """Just a method to see a bit how the different libraries work."""
@@ -196,3 +210,9 @@ class Ontology(object):
         networkx.draw(g)
         pyplot.savefig(path)
         pyplot.close()
+
+    def draw_with_pygraphviz(self, g, path):
+        """Input a pygraphviz AGraph object."""
+        with open(path, 'w') as handle:
+            handle.write(g.to_string())
+

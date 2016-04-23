@@ -162,11 +162,23 @@ class OutputGenerator(object):
         """Generations of files that can be viewed in `graphviz`.
         There is one dotfile per input sequence."""
         # The output directory #
-        directory = DirectoryPath(self.a.out_dir + 'dot_files/')
+        directory = DirectoryPath(self.a.out_dir + 'graphviz/')
         directory.create_if_not_exists()
         # Main loop #
-        for seq in self.a.seqs:
-            self.ontology
+        for seq in self.a.seq_to_counts:
+            dot_path = directory + seq + '.dot'
+            pdf_path = directory + seq + '.pdf'
+            counts = self.a.seq_to_counts[seq]
+            counts = {"ENVO:%08d"%k:v for k,v in counts.items()}
+            total  = sum(counts.values())
+            counts = {k:v/total for k,v in counts.items()}
+            envos  = counts.keys()
+            graph  = self.ontology.get_subgraph(envos)
+            graph  = self.ontology.add_weights(graph, counts)
+            graph  = self.ontology.add_style(graph)
+            self.ontology.write_to_dot(graph, dot_path)
+            self.ontology.add_legend(dot_path)
+            self.ontology.draw_to_pdf(dot_path, pdf_path)
 
     # --------------------------- In this section --------------------------- #
     # output_3
