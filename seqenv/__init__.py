@@ -20,5 +20,9 @@ repos_dir  = os.path.abspath(module_dir + '../') + '/'
 if os.path.exists(repos_dir + '.git/'): git_repo = GitRepo(repos_dir)
 else:                                   git_repo = None
 
+# Disable the X display #
+import matplotlib
+matplotlib.use('Agg', warn=False)
+
 # Expose the main object #
 from seqenv.analysis import Analysis

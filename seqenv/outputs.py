@@ -3,7 +3,9 @@ import warnings, marshal
 
 # Internal modules #
 import seqenv
-from seqenv.common.cache import property_cached
+from seqenv.common.cache     import property_cached
+from seqenv.common.autopaths import DirectoryPath
+from seqenv.ontology         import Ontology
 
 # Third party modules #
 import pandas
@@ -27,6 +29,12 @@ class OutputGenerator(object):
         self.analysis = analysis
         self.a        = analysis
 
+    # --------------------------- In this section --------------------------- #
+    # make_all
+    # df_seqs_concepts
+    # df_sample_names
+    # ontology
+
     def make_all(self):
         """Let's generate all the files"""
         # General matrices #
@@ -36,6 +44,8 @@ class OutputGenerator(object):
         # Only in the with 'samples' case #
         if self.a.abundances: self.tsv_samples_to_names()
         if self.a.abundances: self.biom_output()
+        # Graphical outputs #
+        self.dot_files()
 
     @property_cached
     def df_seqs_concepts(self):
@@ -50,19 +60,6 @@ class OutputGenerator(object):
         df = df.rename(index=envo_int_to_id)
         # Return
         return df
-
-    def tsv_seq_to_concepts(self, name="seq_to_concepts.tsv"):
-        """A TSV matrix file containing the df_seqs_concepts matrix"""
-        with open(self.a.out_dir + name, 'w') as handle:
-            content = self.df_seqs_concepts.to_csv(None, sep=self.sep, float_format=self.float_format)
-            handle.writelines(content)
-
-    def tsv_seq_to_names(self, name='seq_to_names.tsv'):
-        """A TSV matrix file where we translate the concept to human readable names"""
-        with open(self.a.out_dir + name, 'w') as handle:
-            df = self.df_seqs_concepts.rename(index=self.a.concept_to_name)
-            content = df.to_csv(None, sep=self.sep, float_format=self.float_format)
-            handle.writelines(content)
 
     @property_cached
     def df_sample_names(self):
@@ -82,6 +79,32 @@ class OutputGenerator(object):
         df = df1.dot(df2)
         # Return
         return df
+
+    @property_cached
+    def ontology(self):
+        """The ontology instance (singleton)."""
+        return Ontology()
+
+    # --------------------------- In this section --------------------------- #
+    # tsv_seq_to_concepts
+    # tsv_seq_to_names
+    # tsv_samples_to_names
+    # list_sequence_concept
+    # biom_output
+    # dot_files
+
+    def tsv_seq_to_concepts(self, name="seq_to_concepts.tsv"):
+        """A TSV matrix file containing the df_seqs_concepts matrix"""
+        with open(self.a.out_dir + name, 'w') as handle:
+            content = self.df_seqs_concepts.to_csv(None, sep=self.sep, float_format=self.float_format)
+            handle.writelines(content)
+
+    def tsv_seq_to_names(self, name='seq_to_names.tsv'):
+        """A TSV matrix file where we translate the concept to human readable names"""
+        with open(self.a.out_dir + name, 'w') as handle:
+            df = self.df_seqs_concepts.rename(index=self.a.concept_to_name)
+            content = df.to_csv(None, sep=self.sep, float_format=self.float_format)
+            handle.writelines(content)
 
     def tsv_samples_to_names(self, name='samples_to_names.tsv'):
         """A TSV matrix file with matrix above."""
@@ -114,12 +137,12 @@ class OutputGenerator(object):
                     line         = (seq_name, envo_id, concept_name, str(count_gis), str(concept_gis))
                     handle.write('\t'.join(line) + '\n')
 
-    def biom_output(self):
+    def biom_output(self, name='samples.biom'):
         """The same matrix as the user gave in the abundance file, but with source
         information attached for every sequence.
         See http://biom-format.org"""
         data = self.a.df_abundances
-        with open(self.a.out_dir + 'samples.biom', 'w') as handle:
+        with open(self.a.out_dir + name, 'w') as handle:
             # Basic #
             sample_ids = data.columns
             sample_md = None
@@ -134,6 +157,19 @@ class OutputGenerator(object):
             # Output #
             t = biom.table.Table(data.transpose().as_matrix(), sample_ids, observation_ids, sample_md, observation_md)
             handle.write(t.to_json('seqenv version %s') % seqenv.__version__)
+
+    def dot_files(self):
+        """Generations of files that can be viewed in `graphviz`.
+        There is one dotfile per input sequence."""
+        # The output directory #
+        directory = DirectoryPath(self.a.out_dir + 'dot_files/')
+        directory.create_if_not_exists()
+        # Main loop #
+        for seq in self.a.seqs:
+            self.ontology
+
+    # --------------------------- In this section --------------------------- #
+    # output_3
 
     def output_3(self):
         """Possible output #3: the number of terms per OTU

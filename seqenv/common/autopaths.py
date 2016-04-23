@@ -83,6 +83,9 @@ class DirectoryPath(str):
                 if inherit: os.chmod(self.path, self.directory.permissions.number)
             except OSError: pass
 
+    def create_if_not_exists(self):
+        if not self.exists: self.create()
+
 ################################################################################
 class FilePath(str):
     """I can never remember all those darn `os.path` commands, so I made a class

@@ -12,6 +12,7 @@ setup(
     classifiers      = ['Topic :: Scientific/Engineering :: Bio-Informatics'],
     packages         = ['seqenv', 'seqenv.common', 'seqenv.fasta', 'seqenv.seqsearch'],
     scripts          = ['seqenv/seqenv'],
-    install_requires = ['biopython', 'sh', 'pandas', 'tqdm', 'biom-format', 'requests'],
+    install_requires = ['biopython', 'sh', 'pandas', 'tqdm', 'biom-format', 'requests',
+                        'pygraphviz', 'networkx', 'Orange-Bioinformatics'],
     long_description = open('README.md').read(),
 )
