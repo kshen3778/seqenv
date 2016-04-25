@@ -131,12 +131,13 @@ class Ontology(object):
         Outputs a pygraphviz AGraph object."""
         for node in g.nodes():
             text = node.attr['name']
-            #envo = node.attr['label']
-            #node.attr['label'] = "{<f0> %s|<f1> %s}" % (envo, text)
             node.attr['label'] = text.replace(' ','\\n')
             node.attr['name']  = ''
             node.attr['shape'] = 'Mrecord'
             node.attr['style'] = 'filled'
+            # To add the envo id to each node, uncomment:
+            #envo = node.attr['label']
+            #node.attr['label'] = "{<f0> %s|<f1> %s}" % (envo, text)
         for edge in g.edges():
             if edge.attr['label'] == 'located_in': edge.attr['color'] = 'turquoise4'
             edge.attr['label'] = ''
@@ -176,6 +177,14 @@ class Ontology(object):
     def draw_to_pdf(self, in_path, out_path):
         """Input a path to a dot file."""
         sh.dot(in_path, '-Tpdf', '-o', out_path)
+
+    # --------------------------- In this section --------------------------- #
+    # descends
+
+    def descends(self, e, root):
+        """Does the envo term `e` descend from the node `root`?
+        Returns True or False."""
+        return e in networkx.ancestors(self.networkx, root)
 
     # --------------------------- In this section --------------------------- #
     # print_test

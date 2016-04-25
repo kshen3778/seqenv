@@ -37,6 +37,7 @@ parameters = {
     "backtracking"  : "For every term identified by the tagger, we will propagate the"
                       + " frequency counts up the acyclic directed graph described by"
                       + " the ontology. Defaults to `False`.",
+    "restrict"      : "Restrict the output to the descendants of just one ENVO term.",
     "num_threads"   : "Number of threads to use. Default to the number of cores on"
                       + " the current machine.",
     "out_dir"       : "Place all the outputs in the specified directory."

@@ -9,6 +9,7 @@ import cPickle as pickle
 # Internal modules #
 from seqenv                    import module_dir, version_string, git_repo
 from seqenv.fasta              import FASTA
+from seqenv.ontology           import Ontology
 from seqenv.outputs            import OutputGenerator
 from seqenv.seqsearch.parallel import ParallelSeqSearch
 from seqenv.common.cache       import property_cached, cached, class_property
@@ -53,6 +54,10 @@ class Analysis(object):
                       frequency counts up the acyclic directed graph described by
                       the ontology. Defaults to `False`.
 
+    * `restrict`: Restrict the output to the descendants of just one ENVO term.
+                  This removes all other terms that are not reachable through the node.
+                  For instance you could specify: `ENVO:00010483`. Disabled by default.
+
     * `num_threads`: The number of threads. Default to the number of cores on the
                      current machine.
 
@@ -83,6 +88,7 @@ class Analysis(object):
                  normalization = 'ui',
                  proportional  = True,
                  backtracking  = False,
+                 restrict      = None,
                  num_threads   = None,
                  out_dir       = None,
                  min_identity  = 0.97,
@@ -107,6 +113,12 @@ class Analysis(object):
         message = 'Normalization has to be one of %s' % (','.join(options))
         if normalization not in options: raise Exception(message)
         self.normalization = normalization
+        # Restrict parameter #
+        message = "The '--restrict' parameter must be an ENVO term, not '%s'."
+        if restrict and not restrict[:5] == 'ENVO:': raise Exception(message % restrict)
+        message = "The '--restrict' parameter must be a known ENVO term."
+        if restrict and not restrict in self.serial_to_concept.values(): raise Exception(message)
+        self.restrict = restrict
         # Search parameters #
         self.search_algo = search_algo
         self.search_db = search_db
@@ -351,6 +363,8 @@ class Analysis(object):
                 all_envos = [e for key in isokeys for e in key_to_envos(key)]
                 if self.backtracking:
                     all_envos.extend([p for e in all_envos for p in self.child_to_parents[e]])
+                if self.restrict:
+                    all_envos = [e for e in all_envos if self.ontology.descends(e, self.restrict)]
                 if self.proportional: score = 1/len(all_envos)
                 else:                 score = 1.0
                 counts = defaultdict(float)
@@ -369,6 +383,8 @@ class Analysis(object):
                 all_envos  = [e for key,pub in gi2knp_up.values() for e in key_to_envos(key)]
                 if self.backtracking:
                     all_envos.extend([p for e in all_envos for p in self.child_to_parents[e]])
+                if self.restrict:
+                    all_envos = [e for e in all_envos if self.ontology.descends(e, self.restrict)]
                 if self.proportional: score = 1/len(all_envos)
                 else:                 score = 1.0
                 counts = defaultdict(float)
@@ -384,6 +400,7 @@ class Analysis(object):
     # serial_to_concept
     # child_to_parents
     # concept_to_name
+    # ontology
 
     @class_property
     @classmethod
@@ -424,3 +441,11 @@ class Analysis(object):
             if envo == "ENVO:root": continue
             result[int(envo[5:])] = name
         return result
+
+    @class_property
+    @classmethod
+    @cached
+    def ontology(self):
+        """The ontology instance (singleton).
+        Give access to all the ENVO terms graph."""
+        return Ontology()

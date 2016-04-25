@@ -53,6 +53,7 @@ Several other options are possible. Here is a list describing them all:
        sources as well as on the pubmed identifiers from which the GI obtained.
    * `--proportional`: Should we divide the counts of every input sequence by the number of envo terms that were associated to it. Defaults to `True`.
    * `--backtracking`: For every term identified by the tagger, we will propagate frequency counts up the acyclic directed graph described by the ontology. Defaults to `False`.
+   * `--restrict`: Restrict the output to the descendants of just one ENVO term. This removes all other terms that are not reachable through the given node. For instance you could specify: `ENVO:00010483` (Disabled by default)
    * `--num_threads`: Number of cores to use (Defaults to the total number of cores). Use `1` for non-parallel processing.
    * `--out_dir`: The output directory in which to store the result and intermediary files. Defaults to the same directory as the input file.
    * `--min_identity`: Minimum identity in similarity search (Default: `0.97`). Note: not available when using `blastp`.

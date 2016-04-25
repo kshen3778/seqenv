@@ -5,7 +5,6 @@ import warnings, marshal
 import seqenv
 from seqenv.common.cache     import property_cached
 from seqenv.common.autopaths import DirectoryPath
-from seqenv.ontology         import Ontology
 
 # Third party modules #
 import pandas
@@ -79,11 +78,6 @@ class OutputGenerator(object):
         df = df1.dot(df2)
         # Return
         return df
-
-    @property_cached
-    def ontology(self):
-        """The ontology instance (singleton)."""
-        return Ontology()
 
     # --------------------------- In this section --------------------------- #
     # tsv_seq_to_concepts
@@ -173,12 +167,12 @@ class OutputGenerator(object):
             total  = sum(counts.values())
             counts = {k:v/total for k,v in counts.items()}
             envos  = counts.keys()
-            graph  = self.ontology.get_subgraph(envos)
-            graph  = self.ontology.add_weights(graph, counts)
-            graph  = self.ontology.add_style(graph)
-            self.ontology.write_to_dot(graph, dot_path)
-            self.ontology.add_legend(dot_path)
-            self.ontology.draw_to_pdf(dot_path, pdf_path)
+            graph  = self.a.ontology.get_subgraph(envos)
+            graph  = self.a.ontology.add_weights(graph, counts)
+            graph  = self.a.ontology.add_style(graph)
+            self.a.ontology.write_to_dot(graph, dot_path)
+            self.a.ontology.add_legend(dot_path)
+            self.a.ontology.draw_to_pdf(dot_path, pdf_path)
 
     # --------------------------- In this section --------------------------- #
     # output_3
