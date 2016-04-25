@@ -184,6 +184,8 @@ class Ontology(object):
     def descends(self, e, root):
         """Does the envo term `e` descend from the node `root`?
         Returns True or False."""
+        if not    e.startswith('ENVO:'):    e = "ENVO:%08d" % e
+        if not root.startswith('ENVO:'): root = "ENVO:%08d" % root
         return e in networkx.ancestors(self.networkx, root)
 
     # --------------------------- In this section --------------------------- #
