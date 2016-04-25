@@ -365,6 +365,7 @@ class Analysis(object):
                     all_envos.extend([p for e in all_envos for p in self.child_to_parents[e]])
                 if self.restrict:
                     all_envos = [e for e in all_envos if self.ontology.descends(e, self.restrict)]
+                if not all_envos: continue
                 if self.proportional: score = 1/len(all_envos)
                 else:                 score = 1.0
                 counts = defaultdict(float)
@@ -385,6 +386,7 @@ class Analysis(object):
                     all_envos.extend([p for e in all_envos for p in self.child_to_parents[e]])
                 if self.restrict:
                     all_envos = [e for e in all_envos if self.ontology.descends(e, self.restrict)]
+                if not all_envos: continue
                 if self.proportional: score = 1/len(all_envos)
                 else:                 score = 1.0
                 counts = defaultdict(float)
