@@ -209,6 +209,9 @@ You can choose the database you want to BLAST against. By default we will search
     $ pip install tqdm
     $ pip install biom-format
     $ pip install requests
+    $ pip install pygraphviz
+    $ pip install networkx
+    $ pip install Orange-Bioinformatics
 
 If you are on a machine that does not authorize you to install packages like that you can try to install them by adding the `--user` option.
 
