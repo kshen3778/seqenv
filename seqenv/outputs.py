@@ -31,8 +31,9 @@ class OutputGenerator(object):
     # --------------------------- In this section --------------------------- #
     # make_all
     # df_seqs_concepts
+    # abundance_mat_mult
+    # df_sample_concepts
     # df_sample_names
-    # ontology
 
     def make_all(self):
         """Let's generate all the files"""
@@ -60,12 +61,14 @@ class OutputGenerator(object):
         # Return
         return df
 
-    @property_cached
-    def df_sample_names(self):
-        """A dataframe where we operate a matrix multiplication with the abundances
-        file provided, to link samples to concept human readable names."""
+    def abundance_mat_mult(self, human_names=False):
+        """We operate a matrix multiplication with the abundances
+        file provided, to link samples to either concept human readable names
+        or the envo term IDs."""
         # Get results #
-        df1 = self.df_seqs_concepts.rename(index=self.a.concept_to_name)
+        df1 = self.df_seqs_concepts
+        # Rename #
+        if human_names: df1 = df1.rename(index=self.a.concept_to_name)
         # Remove those that were discarded #
         df2 = self.a.df_abundances
         df2 = df2.loc[df1.columns]
@@ -78,6 +81,18 @@ class OutputGenerator(object):
         df = df1.dot(df2)
         # Return
         return df
+
+    @property_cached
+    def df_sample_concepts(self):
+        """A dataframe where we operate a matrix multiplication with the abundances
+        file provided, to link samples to concept envo terms."""
+        return self.abundance_mat_mult()
+
+    @property_cached
+    def df_sample_names(self):
+        """A dataframe where we operate a matrix multiplication with the abundances
+        file provided, to link samples to concept human readable names."""
+        return self.abundance_mat_mult(True)
 
     # --------------------------- In this section --------------------------- #
     # tsv_seq_to_concepts
@@ -101,7 +116,7 @@ class OutputGenerator(object):
             handle.writelines(content)
 
     def tsv_samples_to_names(self, name='samples_to_names.tsv'):
-        """A TSV matrix file with matrix above."""
+        """A TSV matrix file with matrix `df_sample_names`."""
         with open(self.a.out_dir + name, 'w') as handle:
             content = self.df_sample_names.to_csv(sep=self.sep, float_format=self.float_format)
             handle.writelines(content)
@@ -125,7 +140,7 @@ class OutputGenerator(object):
                 for envo in envos:
                     seq_name     = self.a.renamed_to_orig[seq]
                     envo_id      = "ENVO:%08d" % envo
-                    concept_name = self.a.concept_to_name.get(envo, envo_id)
+                    concept_name = self.a.integer_to_name.get(envo, envo_id)
                     concept_gis  = [gi for gi in gis if envo in gi_to_envos(gi)]
                     count_gis    = len(concept_gis)
                     line         = (seq_name, envo_id, concept_name, str(count_gis), str(concept_gis))

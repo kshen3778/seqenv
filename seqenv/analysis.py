@@ -174,7 +174,7 @@ class Analysis(object):
         """The opposite of the above dictionary"""
         return dict((v,k) for k,v in self.orig_names_to_renamed.items())
 
-    @property
+    @property_cached
     def renamed_fasta(self):
         """Make a new fasta file where every name in the input FASTA file is replaced
         with "C1", "C2", "C3" etc. Returns this new FASTA file."""
@@ -192,7 +192,7 @@ class Analysis(object):
         assert self.abundances
         return pandas.io.parsers.read_csv(self.abundances, sep='\t', index_col=0, encoding='utf-8')
 
-    @property
+    @property_cached
     def only_top_sequences(self):
         """Make a new fasta file where only the top N sequences are included
         (in terms of their abundance). Skipped if no abundance info is given."""
@@ -438,6 +438,20 @@ class Analysis(object):
         """A dictionary linking the concept id to relevant names. In this case ENVO terms.
         Hence, ENVO:00000095 would be linked to 'lava field'
         An example line: ENVO:00000015  ocean"""
+        handle = open(module_dir + 'data_envo/envo_preferred.tsv')
+        result = {}
+        for line in handle:
+            envo, name = line.strip('\n').split('\t')
+            if envo == "ENVO:root": continue
+            result[envo] = name
+        return result
+
+    @class_property
+    @classmethod
+    @cached
+    def integer_to_name(cls):
+        """A dictionary linking the concept id integer to relevant names.
+        The same thing as above, but with integers as keys."""
         handle = open(module_dir + 'data_envo/envo_preferred.tsv')
         result = {}
         for line in handle:
