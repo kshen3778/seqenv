@@ -347,9 +347,9 @@ class Analysis(object):
         # Useful later #
         gi_to_key    = lambda gi: self.db.get("gi","id",gi)[1]
         gi_to_pub    = lambda gi: self.db.get("gi","id",gi)[2]
-        key_to_envos = lambda key: marshal.loads(self.db.get("isolation","id",key)[2])
+        key_to_envos = lambda k: marshal.loads(self.db.get("isolation","id",k)[2])
         first_key    = lambda d,k: [(gi, knp) for gi, knp in d.items()  if knp[0]==k][0]
-        first_pub    = lambda d,p: [(gi, knp) for gi, knp in d.values() if knp[1]==p][0]
+        first_pub    = lambda d,p: [(gi, knp) for gi, knp in d.items() if knp[1]==p][0]
         # "Flat" or "Unique source" are quite similar #
         set_or_list = None
         if self.normalization == 'flat': set_or_list = list
@@ -357,9 +357,9 @@ class Analysis(object):
         # It's just about using a list or a set in the right place #
         if self.normalization == 'flat' or self.normalization == 'ui':
             for seq, gis in self.seq_to_gis.items():
-                isokeys   = (gi_to_key(gi) for gi in gis if gi in self.db)
-                isokeys   = set_or_list(isokeys)
-                if not isokeys: continue
+                gis_w_envo = [gi for gi in gis if gi in self.db]
+                if not gis_w_envo: continue
+                isokeys   = set_or_list(gi_to_key(gi) for gi in gis_w_envo)
                 all_envos = [e for key in isokeys for e in key_to_envos(key)]
                 if self.backtracking:
                     all_envos.extend([p for e in all_envos for p in self.child_to_parents[e]])
@@ -372,15 +372,17 @@ class Analysis(object):
                 for e in all_envos: counts[e] += score
                 results[seq] = counts
         # Unique source and unique pubmed #
-        if self.normalization == 'uiup':
+        if self.normalization == 'upui':
             for seq, gis in self.seq_to_gis.items():
                 gis_w_envo = [gi for gi in gis if gi in self.db]
                 if not gis_w_envo: continue
                 gi_to_knp  = {gi: (gi_to_key(gi), gi_to_pub(gi)) for gi in gis_w_envo}
                 uniq_keys  = set(key for key, pub in gi_to_knp.values())
                 gi2knp_uk  = dict(first_key(gi_to_knp, key) for key in uniq_keys)
-                pubmeds    = set(pub for key, pub in gi2knp_uk.values())
-                gi2knp_up  = dict(first_pub(gi_to_knp, pubmed) for pubmed in pubmeds)
+                pubmeds    = set(pub for key, pub in gi2knp_uk.values() if pub != None)
+                gi2knp_up  = dict(first_pub(gi2knp_uk, pubmed) for pubmed in pubmeds)
+                # But if the pubmed field is None, keep them all #
+                gi2knp_up.update({(gi, knp) for gi, knp in gi2knp_uk.items() if knp[1]==None})
                 all_envos  = [e for key,pub in gi2knp_up.values() for e in key_to_envos(key)]
                 if self.backtracking:
                     all_envos.extend([p for e in all_envos for p in self.child_to_parents[e]])
