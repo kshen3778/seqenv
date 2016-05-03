@@ -1,5 +1,5 @@
 # Built-in modules #
-import warnings, marshal
+import warnings, marshal, re
 
 # Internal modules #
 import seqenv
@@ -45,7 +45,8 @@ class OutputGenerator(object):
         if self.a.abundances: self.tsv_samples_to_names()
         if self.a.abundances: self.biom_output()
         # Graphical outputs #
-        self.dot_files()
+        self.per_seq_dot_files()
+        if self.a.abundances: self.per_sample_dot_files()
 
     @property_cached
     def df_seqs_concepts(self):
@@ -100,7 +101,6 @@ class OutputGenerator(object):
     # tsv_samples_to_names
     # list_sequence_concept
     # biom_output
-    # dot_files
 
     def tsv_seq_to_concepts(self, name="seq_to_concepts.tsv"):
         """A TSV matrix file containing the df_seqs_concepts matrix"""
@@ -167,11 +167,16 @@ class OutputGenerator(object):
             t = biom.table.Table(data.transpose().as_matrix(), sample_ids, observation_ids, sample_md, observation_md)
             handle.write(t.to_json('seqenv version %s') % seqenv.__version__)
 
-    def dot_files(self):
+    # --------------------------- In this section --------------------------- #
+    # per_seq_dot_files
+    # per_sample_dot_files
+
+    def per_seq_dot_files(self):
         """Generations of files that can be viewed in `graphviz`.
-        There is one dotfile per input sequence."""
+        There is one dotfile per every input sequence.
+        We also automiatcally make a corresponding PDF file."""
         # The output directory #
-        directory = DirectoryPath(self.a.out_dir + 'graphviz/')
+        directory = DirectoryPath(self.a.out_dir+'per_seq_ontology/')
         directory.create_if_not_exists()
         # Main loop #
         for seq in self.a.seq_to_counts:
@@ -181,6 +186,28 @@ class OutputGenerator(object):
             counts = {"ENVO:%08d"%k:v for k,v in counts.items()}
             total  = sum(counts.values())
             counts = {k:v/total for k,v in counts.items()}
+            envos  = counts.keys()
+            graph  = self.a.ontology.get_subgraph(envos)
+            graph  = self.a.ontology.add_weights(graph, counts)
+            graph  = self.a.ontology.add_style(graph)
+            self.a.ontology.write_to_dot(graph, dot_path)
+            self.a.ontology.add_legend(dot_path)
+            self.a.ontology.draw_to_pdf(dot_path, pdf_path)
+
+    def per_sample_dot_files(self):
+        """Generations of files that can be viewed in `graphviz`.
+        There is one dotfile per every sample inputted.
+        We also automiatcally make a corresponding PDF file."""
+        # The output directory #
+        directory = DirectoryPath(self.a.out_dir+'per_sample_ontology/')
+        directory.create_if_not_exists()
+        # Main loop #
+        for i, sample in self.df_sample_concepts.iteritems():
+            sanitized_name = "".join([c for c in sample.name if re.match(r'\w', c)])
+            dot_path = directory + sanitized_name +'.dot'
+            pdf_path = directory + sanitized_name +'.pdf'
+            counts = sample / sample.sum()
+            counts = dict(counts)
             envos  = counts.keys()
             graph  = self.a.ontology.get_subgraph(envos)
             graph  = self.a.ontology.add_weights(graph, counts)
