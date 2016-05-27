@@ -33,7 +33,7 @@ class Analysis(object):
     * `search_db`: The path to the database to search against. Defaults to `nt`.
 
     * `normalization`: Can be either of `flat`, `ui` or `upui`.
-      This option defaults to `ui`.
+      This option defaults to `flat`.
          * If you choose `flat`, we will count every isolation source independently,
            even if the same text appears several times for the same input sequence.
          * If you choose `ui`, standing for unique isolation, we will count every
@@ -59,7 +59,7 @@ class Analysis(object):
                   For instance you could specify: `ENVO:00010483`. Disabled by default.
 
     * `num_threads`: The number of threads. Default to the number of cores on the
-                     current machine.
+                     current machine or a maximum of 32.
 
     * `out_dir`: Place all the outputs in the specified directory.
                  Defaults to the input file's directory.
@@ -85,7 +85,7 @@ class Analysis(object):
                  seq_type      = 'nucl',
                  search_algo   = 'blast',
                  search_db     = 'nt',
-                 normalization = 'ui',
+                 normalization = 'flat',
                  proportional  = True,
                  backtracking  = False,
                  restrict      = None,
@@ -146,7 +146,7 @@ class Analysis(object):
         style, we just need to make a call to `outputs.make_all` and everything will be
         generated automatically, in a reverse fashion."""
         print version_string + " (pid %i)" % os.getpid()
-        if git_repo: print "The exact version of the code is: " + git_repo.short_hash
+        if git_repo: print "The exact version of the codebase is: " + git_repo.short_hash
         self.timer.print_start()
         self.outputs.make_all()
         print "------------\nSuccess. Outputs are in '%s'" % self.out_dir
