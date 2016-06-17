@@ -48,15 +48,21 @@ def download_from_url(source, destination, progress=False, uncompress=True):
     destination.directory.create_if_not_exists()
     # Over HTTP #
     response = requests.get(source, stream=True)
+    total_size = int(response.headers.get('content-length'))
+    block_size = total_size/1024
+    # Do it #
     with open(destination, "wb") as handle:
         if progress:
-            for data in tqdm(response.iter_content()): handle.write(data)
+            for data in tqdm(response.iter_content(chunk_size=block_size), total=1024): handle.write(data)
         else:
-            for data in response.iter_content(): handle.write(data)
+            for data in response.iter_content(chunk_size=block_size): handle.write(data)
+    # Uncompress #
     if uncompress:
         with open(destination) as f: header = f.read(4)
         if header == "PK\x03\x04": unzip(destination, inplace=True)
         # Add other compression formats here
+    # Return #
+    return destination
 
 ################################################################################
 def unzip(source, destination=None, inplace=False, single=True):
