@@ -1,0 +1,12 @@
+Starting from a clean Ubuntu 14.04.4 LTS
+
+lucas@chris-1  $ sudo apt-get install libgraphviz-dev libfreetype6-dev ncbi-blast+
+...
+lucas@chris-1 ~ $ pip install --user numpy matplotlib seqenv
+...
+lucas@chris-1 ~ $ mkdir test_seqenv
+lucas@chris-1 ~ $ cd test_seqenv/
+lucas@chris-1 test_seqenv $ wget -O - ftp://ftp.ncbi.nlm.nih.gov/blast/db/FASTA/nt.gz | gunzip -c | head -n 10000 > fake_nt.fasta
+lucas@chris-1 test_seqenv $ makeblastdb -in fake_nt.fasta -dbtype nucl
+lucas@chris-1 test_seqenv $ printf ">test\nAAATAAGGACTTGTATGAATGGCCACACGAGGGTTTTACTGTCTCTTACTTTTAATCAGTGAAATTGACCTCCCCGTGAAGAGGCGGGGATAATAAAATAAGACGAGAAGACCCTATGGAGCTTTAATTAATCAACTCAAAAATCAGAAAACAATACCACTAAGGGATAACAGA" > seq.fasta
+lucas@chris-1 test_seqenv $ seqenv seq.fasta --out_dir output --search_db fake_nt.fasta

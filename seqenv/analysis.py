@@ -316,8 +316,8 @@ class Analysis(object):
         """
         print "--> STEP 5: Setting up the SQLite3 database connection."
         path     = module_dir + 'data_sources/gi_db.sqlite3'
-        drop_box = "qPBOyJXMAqoXysGANj73auUItrECVHo0peqW1U51Kk1xnZp1zMf00cfBbn7Zqlql"
-        retrieve = "https://dl.dropboxusercontent.com/content_link/%s/file?dl=1" % drop_box
+        drop_box = "1yxoc1530am6tn0/gi_db.sqlite3.zip"
+        retrieve = "https://www.dropbox.com/s/%s?dl=1" % drop_box
         md5      = "bda6297a8cc6219836ed1cb118e03510"
         database = Database(path, retrieve=retrieve, md5=md5, text_fact=bytes)
         self.timer.print_elapsed()

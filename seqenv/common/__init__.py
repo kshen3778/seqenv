@@ -39,8 +39,14 @@ def download_from_url(source, destination, progress=False, uncompress=True):
     """Download a file from an URL and place it somewhere. Like wget.
     Uses requests and tqdm to display progress if you want.
     By default it will uncompress files."""
+    # Modules #
     from tqdm import tqdm
     import requests
+    from autopaths import FilePath
+    # Check destination exists #
+    destination = FilePath(destination)
+    destination.directory.create_if_not_exists()
+    # Over HTTP #
     response = requests.get(source, stream=True)
     with open(destination, "wb") as handle:
         if progress:

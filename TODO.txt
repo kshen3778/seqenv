@@ -1,11 +1,7 @@
+Add a function that checks that NT is installed
+
 Test that seqenv can easily be installed on a different university cluster easily through one pip command
 
-Possibly: Add the ability to extract information only for a subset of envo terms (such as biome feature) (i.e. the masking feature)
-
-Possibly: Integrate VSEARCH in the sequence similarity search as an alternative to BLAST
-
 Possibly: Have the outputted named with OTU names sorted in the same order as the user provided them
-
-Possibly: Integrating SUMMARIZEplot and heatmap from T & T with seqenv
 
 Possibly: Add the word cloud and heatmap generation back.
