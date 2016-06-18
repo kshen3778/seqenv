@@ -118,7 +118,7 @@ class OutputGenerator(object):
     def tsv_samples_to_names(self, name='samples_to_names.tsv'):
         """A TSV matrix file with matrix `df_sample_names`."""
         with open(self.a.out_dir + name, 'w') as handle:
-            content = self.df_sample_names.to_csv(sep=self.sep, float_format=self.float_format)
+            content = self.df_sample_names.to_csv(None, sep=self.sep, float_format=self.float_format)
             handle.writelines(content)
 
     def list_sequence_concept(self, name='list_concepts_found.tsv'):
