@@ -51,7 +51,7 @@ parameters = {
     "abundances"    : "If you have sample information, give is as a TSV file with"
                       + " OTUs as rows and sample names as columns.",
     "N"             : "Use only the top `N` sequences in terms of their abundance."
-                      + " Defaults to 1000.",
+                      + " Disabled by default.",
 }
 
 # Parse it #

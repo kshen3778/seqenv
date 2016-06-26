@@ -197,16 +197,16 @@ class Analysis(object):
         """Make a new fasta file where only the top N sequences are included
         (in terms of their abundance). Skipped if no abundance info is given."""
         if not self.abundances: return self.renamed_fasta
+        if self.N is None:      return self.renamed_fasta
+        # Parse it #
+        N = int(self.N)
+        # Create file #
         only_top_fasta = FASTA(self.out_dir + 'top_seqs.fasta')
-        if only_top_fasta.exists: return only_top_fasta
-        # Use the default in case it was not provided #
-        if self.N is None: N = 1000
-        else:              N = int(self.N)
         # Print status #
         print "Using: " + self.renamed_fasta
         print "--> STEP 1B: Get the top %i sequences (in terms of their abundances)." % N
         # Check the user inputted value #
-        if self.N is not None and N > self.input_file.count:
+        if N > self.input_file.count:
             msg = "You asked for the top %i sequences"
             msg += ", but your input file only contains %i sequences!"
             msg = msg % (self.N, self.input_file.count)
