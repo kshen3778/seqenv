@@ -203,15 +203,21 @@ class OutputGenerator(object):
         directory.create_if_not_exists()
         # Main loop #
         for i, sample in self.df_sample_concepts.iteritems():
+            # File path #
             sanitized_name = "".join([c for c in sample.name if re.match(r'\w', c)])
             dot_path = directory + sanitized_name +'.dot'
             pdf_path = directory + sanitized_name +'.pdf'
+            # Counts #
             counts = sample / sample.sum()
             counts = dict(counts)
             envos  = counts.keys()
+            # Skip sample if it has no counts #
+            if sample.sum() == 0: continue
+            # Make graph #
             graph  = self.a.ontology.get_subgraph(envos)
             graph  = self.a.ontology.add_weights(graph, counts)
             graph  = self.a.ontology.add_style(graph)
+            # Write output #
             self.a.ontology.write_to_dot(graph, dot_path)
             self.a.ontology.add_legend(dot_path)
             self.a.ontology.draw_to_pdf(dot_path, pdf_path)
