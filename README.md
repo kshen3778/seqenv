@@ -3,7 +3,7 @@
 # `seqenv` version 1.2.6
 * Assign environment ontology (EnvO) terms to short DNA sequences.
 * All code written by [Lucas Sinclair](http://envonautics.com/#lucas).
-* Publication at: http://example.com/ (The link will appear here once it is available)
+* Publication at: https://peerj.com/preprints/2317/
 
 ### Installing
 To install `seqenv` onto your machine, use the python package manager:
