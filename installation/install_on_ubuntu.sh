@@ -12,8 +12,7 @@ source virtualenvwrapper_lazy.sh
 export PYTHONPATH=""
 
 mkvirtualenv kiwi
-pip install --user numpy matplotlib seqenv
-
+pip install numpy matplotlib
 pip install seqenv
 python -c "import seqenv; print seqenv.__version__; print seqenv"
 
