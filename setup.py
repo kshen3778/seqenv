@@ -2,11 +2,11 @@ from distutils.core import setup
 
 setup(
     name             = 'seqenv',
-    version          = '1.2.7',
+    version          = '1.2.8',
     description      = 'Assign environment ontology (EnvO) terms to short DNA sequences',
     license          = 'MIT',
     url              = 'https://github.com/xapple/seqenv',
-    download_url     = 'https://github.com/xapple/seqenv/tarball/1.2.7',
+    download_url     = 'https://github.com/xapple/seqenv/tarball/1.2.8',
     author           = 'Lucas Sinclair',
     author_email     = 'lucas.sinclair@me.com',
     classifiers      = ['Topic :: Scientific/Engineering :: Bio-Informatics'],
