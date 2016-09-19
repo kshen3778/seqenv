@@ -5,6 +5,11 @@
 * All code written by [Lucas Sinclair](http://envonautics.com/#lucas).
 * Publication at: https://peerj.com/preprints/2317/
 
+### Dependencies
+* You need to have a copy of the NCBI nucleotide data base (called `nt`) installed locally as well as the `blastn` executable in your `$PATH`. So that BLAST finds the NT database, you can edit your `~/.ncbirc` file. The `blastn` executable should be in your `$PATH`.
+* You need to have `graphviz` installed and the C libraries should be accessible. This is usually resolved by typing `apt-get install libgraphviz-dev`. The `dot` executable should be in your `$PATH`.
+* The project also depends on some other python modules such as `biopython` and `pandas`. Happily, these will be installed automatically when calling the `pip` command below.
+
 ### Installing
 To install `seqenv` onto your machine, use the python package manager:
 
@@ -15,11 +20,6 @@ You might be installing this onto a computer server which you don't own and thus
     $ pip install --user seqenv
 
 If this still doesn't work, you might be missing the `pip` program on your system or the correct version of Python (any version `2.7.x`). You can get both of these things by using using this little project: https://github.com/yyuu/pyenv
-
-### Dependencies
-* You need to have a copy of the NCBI nucleotide data base (called `nt`) installed locally as well as the `blastn` executable in your `$PATH`. So that BLAST finds the NT database, you can edit your `~/.ncbirc` file. The `blastn` executable should be in your `$PATH`.
-* You need to have `graphviz` installed and the c libraries should be accessible. This is usually resolved by a `apt-get install libgraphviz-dev`. The `dot` executable should be in your `$PATH`.
-* The project also depends on some other python modules such as `biopython` and `pandas`. Happily, these will be installed automatically when calling the `pip` command above.
 
 ### Usage
 Once that is done, you can start processing FASTA files from the command line. For using the default parameters you can just type:
