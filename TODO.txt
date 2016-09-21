@@ -1,6 +1,8 @@
+Check writable status of database download directory, else use home directory
+
 Add a function that checks that NT is installed
 
-Test that seqenv can easily be installed on a different university cluster easily through one pip command
+Add function to take FASTQ files
 
 Possibly: Have the outputted named with OTU names sorted in the same order as the user provided them
 
