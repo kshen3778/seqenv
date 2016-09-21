@@ -99,7 +99,7 @@
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc
 
-\f0\fs24 \cf0 Note: The "--proportional" option is active}</string>
+\f0\fs24 \cf0 Note: The "--proportional" option is active.}</string>
 				<key>VerticalPad</key>
 				<integer>0</integer>
 			</dict>
@@ -2249,7 +2249,7 @@ ENVO:00000020}</string>
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{1747.096509625344, 82.669410819650693}, {91, 14}}</string>
+			<string>{{1746.596509625344, 82.669410819650693}, {92, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -5316,7 +5316,7 @@ also called C1}</string>
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2016-06-26 14:00:40 +0000</string>
+	<string>2016-09-20 11:25:41 +0000</string>
 	<key>Modifier</key>
 	<string>Lucas Sinclair</string>
 	<key>NotesVisible</key>
@@ -5388,13 +5388,13 @@ also called C1}</string>
 	<key>WindowInfo</key>
 	<dict>
 		<key>BottomSlabHeight</key>
-		<real>899</real>
+		<real>530</real>
 		<key>CurrentSheet</key>
 		<integer>0</integer>
 		<key>Expanded_Canvases</key>
 		<array/>
 		<key>Frame</key>
-		<string>{{584, 146}, {1954, 1246}}</string>
+		<string>{{0, 0}, {1436, 877}}</string>
 		<key>ShowInfo</key>
 		<true/>
 		<key>ShowRuler</key>
@@ -5404,7 +5404,7 @@ also called C1}</string>
 		<key>SidebarWidth</key>
 		<integer>0</integer>
 		<key>VisibleRegion</key>
-		<string>{{0, -135}, {1904.6511311090082, 1280.2325368443333}}</string>
+		<string>{{604.65115273301842, 52.465115273301848}, {1302.3255597326552, 851.16277653955672}}</string>
 		<key>Zoom</key>
 		<real>0.86000001430511475</real>
 		<key>ZoomValues</key>
