@@ -34,7 +34,7 @@ db_path      = FilePath("gi_db.sqlite3")
 ###############################################################################
 class Tagger(object):
     """Interface to the C-coded tagger. Randomly segfaults last
-    time I recomplied it and then tried it on a new machine."""
+    time I recompiled it and then tried it on a new machine."""
 
     def __init__(self, entities=None, names=None, globs=None, data_dir=None):
         # Defaults #

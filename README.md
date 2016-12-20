@@ -3,7 +3,7 @@
 # `seqenv` version 1.2.9
 * Assign environment ontology (EnvO) terms to short DNA sequences.
 * All code written by [Lucas Sinclair](http://envonautics.com/#lucas).
-* Publication at: https://peerj.com/preprints/2317/
+* Publication at: https://peerj.com/articles/2690/
 
 ### Dependencies
 * You need to have a copy of the NCBI nucleotide data base (called `nt`) installed locally as well as the `blastn` executable in your `$PATH`. So that BLAST finds the NT database, you can edit your `~/.ncbirc` file. The `blastn` executable should be in your `$PATH`.
@@ -28,7 +28,7 @@ Once that is done, you can start processing FASTA files from the command line. F
 
 We will then assume that you have inputed 16S sequences. To modify the database or input a different type of sequences:
 
-    $ seqenv sequences.fasta --seqtype prot --db nr
+    $ seqenv sequences.fasta --seqtype prot --search_db nr
 
 To modify the minimum identity in the similarity search, use the following:
 
