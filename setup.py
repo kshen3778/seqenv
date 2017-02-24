@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name             = 'seqenv',
-    version          = '1.2.9',
+    version          = '1.3.0',
     description      = 'Assign environment ontology (EnvO) terms to DNA sequences',
     license          = 'MIT',
     url              = 'https://github.com/xapple/seqenv',

@@ -4,7 +4,7 @@ b'This module needs Python 2.7.x'
 from __future__ import division
 
 # Special variables #
-__version__ = '1.2.9'
+__version__ = '1.3.0'
 version_string = "seqenv version %s" % __version__
 
 # Modules #
