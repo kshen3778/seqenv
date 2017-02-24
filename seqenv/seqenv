@@ -13,13 +13,7 @@ current_dir = os.path.dirname(os.path.abspath(current_script)) + '/'
 readme_path = current_dir + '../README.md'
 
 # Get the different paragraphs #
-if os.path.exists(readme_path):
-    readme_contents = open(readme_path).read()
-    doc_params = re.findall('^### All parameters(.+?)###', readme_contents, flags=re.M|re.DOTALL)[0]
-    doc_usage = re.findall('^### Usage(.+?)###', readme_contents, flags=re.M|re.DOTALL)[0]
-    desc = seqenv.version_string + "\n\n" + doc_usage + "\n\n" + doc_params
-else:
-    desc = seqenv.version_string
+desc = seqenv.version_string
 
 # Make a shell arguments parser #
 parser = argparse.ArgumentParser(description=desc, formatter_class=RawTextHelpFormatter)
