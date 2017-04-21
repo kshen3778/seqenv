@@ -50,9 +50,9 @@ parameters = {
 
 # Parse it #
 for param, hlp in parameters.items(): parser.add_argument("--" + param, help=hlp)
-args = parser.parse_args()
+args       = parser.parse_args()
 input_path = args.input_file
-kwargs = {k:getattr(args, k) for k in parameters if getattr(args, k) is not None}
+kwargs     = {k:getattr(args, k) for k in parameters if getattr(args, k) is not None}
 
 # Check modules are installed #
 #TODO
