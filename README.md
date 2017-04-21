@@ -6,7 +6,7 @@
 * Publication at: https://peerj.com/articles/2690/
 
 ### Dependencies
-* You need to have a copy of the NCBI nucleotide data base (called `nt`) installed locally as well as the `blastn` executable in your `$PATH`. So that BLAST finds the NT database, you can edit your `~/.ncbirc` file. The `blastn` executable should be in your `$PATH`.
+* You need to have a copy of the NCBI nucleotide data base (called `nt`) installed locally as well as the `blastn` executable in your `$PATH`. So that BLAST finds the NT database, you can edit your `~/.ncbirc` file.
 * You need to have `graphviz` installed and the C libraries should be accessible. This is usually resolved by typing `apt-get install libgraphviz-dev`. The `dot` executable should be in your `$PATH`.
 * The project also depends on some other python modules such as `biopython` and `pandas`. Happily, these will be installed automatically when calling the `pip` command below.
 
