@@ -74,7 +74,12 @@ class BLASTquery(object):
         return map(str, cmd)
 
     def run(self):
-        sh.Command(self.command[0])(self.command[1:])
+        # Use sh #
+        result = sh.Command(self.command[0])(self.command[1:])
+        # Check for errors #
+        if "BLAST Database error" in result.stderr:
+            raise Exception("Sequence search error: '%s'" % result.stderr)
+        # Remove logs #
         if os.path.exists("error.log") and os.path.getsize("error.log") == 0: os.remove("error.log")
 
     def non_block_run(self):

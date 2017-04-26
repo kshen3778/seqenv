@@ -7,6 +7,7 @@ from collections import defaultdict
 import cPickle as pickle
 
 # Internal modules #
+import seqenv
 from seqenv                    import module_dir, version_string, git_repo
 from seqenv.fasta              import FASTA
 from seqenv.ontology           import Ontology
@@ -146,6 +147,7 @@ class Analysis(object):
         style, we just need to make a call to `outputs.make_all` and everything will be
         generated automatically, in a reverse fashion."""
         print version_string + " (pid %i)" % os.getpid()
+        print "Codebase at: %s" % seqenv
         if git_repo: print "The exact version of the codebase is: " + git_repo.short_hash
         self.timer.print_start()
         self.outputs.make_all()

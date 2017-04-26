@@ -53,9 +53,15 @@ class ParallelSeqSearch(SeqSearch):
 
     def run(self):
         """Run the search"""
+        # Chop up the FASTA #
         self.splitable.split()
-        for query in self.queries: query.non_block_run()
-        for query in self.queries: query.wait()
+        # Case only one query #
+        if len(self.queries) == 1: self.queries[0].run()
+        # Case many queries #
+        else:
+            for query in self.queries: query.non_block_run()
+            for query in self.queries: query.wait()
+        # Join the results #
         self.join_outputs()
 
     def join_outputs(self):
