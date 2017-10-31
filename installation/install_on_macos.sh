@@ -19,7 +19,7 @@ pip install --global-option=build_ext --global-option="-I/usr/local/Cellar/graph
 pip install seqenv
 python -c "import seqenv; print seqenv.__version__; print seqenv"
 
-wget -O - ftp://ftp.ncbi.nlm.nih.gov/blast/db/FASTA/nt.gz | gunzip -c | head -n 10000 > fake_nt.fasta
+wget -O - ftp://ftp.ncbi.nlm.nih.gov/blast/db/FASTA/nt.gz | gunzip -c | head -n 100000 > fake_nt.fasta
 makeblastdb -in fake_nt.fasta -dbtype nucl
 printf ">test\nAAATAAGGACTTGTATGAATGGCCACACGAGGGTTTTACTGTCTCTTACTTTTAATCAGTGAAATTGACCTCCCCGTGAAGAGGCGGGGATAATAAAATAAGACGAGAAGACCCTATGGAGCTTTAATTAATCAACTCAAAAATCAGAAAACAATACCACTAAGGGATAACAGA" > seq.fasta
 seqenv seq.fasta --out_dir output --search_db fake_nt.fasta
