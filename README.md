@@ -165,6 +165,7 @@ This work would not have been possible without the advice and support of many pe
 
 ### News
 * **August 2013**: Chris Quince presented a talk on `seqenv` at [STAMPS2013](https://stamps.mbl.edu/index.php/Main_Page). You can download the PDF of the presentation: [C Quince et. al., SeqEnv: Annotating sequences with environments (STAMPS 2013)](https://stamps.mbl.edu/images/4/44/Quince_SeqEnvSTAMPS2013.pdf)
+* **October 2017**: A follow up paper is published by Ali Ijaz et al. [PeerJ Article 3827](https://peerj.com/articles/3827/).
 
 ### Publications that have used `seqenv`
 * Bacterial diversity along a 2600 km river continuum. `doi:10.1111/1462-2920.12886`

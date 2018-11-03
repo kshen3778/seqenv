@@ -44,8 +44,8 @@ class Analysis(object):
            sources as well as on the pubmed identifiers from which the GI obtained.
 
     * `relative`: Should we divide the counts of every input sequence by the
-                      number of envo terms that were associated to it.
-                      Defaults to `True`.
+                  number of envo terms that were associated to it.
+                  Defaults to `True`.
 
     * `proportional`: Should we divide the counts of every input sequence by the
                       number of envo terms that were associated to it.
