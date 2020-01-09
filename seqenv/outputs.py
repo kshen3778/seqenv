@@ -87,7 +87,7 @@ class OutputGenerator(object):
     def df_sample_concepts(self):
         """A dataframe where we operate a matrix multiplication with the abundances
         file provided, to link samples to concept envo terms."""
-        return self.abundance_mat_mult()
+        return self.abundance_mat_mult(False)
 
     @property_cached
     def df_sample_names(self):
@@ -197,7 +197,7 @@ class OutputGenerator(object):
     def per_sample_dot_files(self):
         """Generations of files that can be viewed in `graphviz`.
         There is one dotfile per every sample inputted.
-        We also automiatcally make a corresponding PDF file."""
+        We also automatically make a corresponding PDF file."""
         # The output directory #
         directory = DirectoryPath(self.a.out_dir+'per_sample_ontology/')
         directory.create_if_not_exists()
