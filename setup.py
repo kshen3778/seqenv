@@ -10,6 +10,7 @@ setup(
     author           = 'Lucas Sinclair',
     author_email     = 'lucas.sinclair@me.com',
     long_description = open('README.md').read(),
+    long_description_content_type = 'text/markdown',
     classifiers      = ['Topic :: Scientific/Engineering :: Bio-Informatics'],
     packages         = find_packages(),
 
