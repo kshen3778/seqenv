@@ -23,7 +23,8 @@ import pandas
 
 ################################################################################
 class Analysis(object):
-    """The main object. The only mandatory argument is the input fasta file path.
+    """
+    The main object. The only mandatory argument is the input fasta file path.
     The text below is somewhat redundant with what is in the README file and also
     the text in the command line script.
 
