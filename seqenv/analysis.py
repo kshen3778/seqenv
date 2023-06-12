@@ -147,7 +147,7 @@ class Analysis(object):
         """A method to run the whole pipeline. As everything is coded in a functional
         style, we just need to make a call to `outputs.make_all` and everything will be
         generated automatically, in a reverse fashion."""
-        print version_string + " (pid %i)" % os.getpid()
+        print(version_string + " (pid %i)" % os.getpid())
         print "Codebase at: %s" % seqenv
         if git_repo: print "The exact version of the codebase is: " + git_repo.short_hash
         self.timer.print_start()

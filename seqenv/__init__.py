@@ -1,4 +1,3 @@
-b'This module needs Python 2.7.x'
 
 # Futures #
 from __future__ import division
@@ -22,7 +21,7 @@ else:                                   git_repo = None
 
 # Disable the X display #
 import matplotlib
-matplotlib.use('Agg', warn=False)
+matplotlib.use('Agg')
 
 # Expose the main object #
 from seqenv.analysis import Analysis

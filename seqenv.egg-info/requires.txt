@@ -1,0 +1,11 @@
+Orange-Bioinformatics
+biom-format
+biopython
+matplotlib
+networkx
+numpy
+pandas
+pygraphviz
+requests
+sh
+tqdm
