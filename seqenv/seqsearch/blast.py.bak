@@ -2,7 +2,6 @@
 from __future__ import division
 
 # Built-in modules #
-from __future__ import absolute_import
 import os, multiprocessing, threading, shutil
 
 # Internal modules #
@@ -12,7 +11,6 @@ from seqenv.common.autopaths import FilePath
 
 # Third party modules #
 import sh
-from six.moves import map
 
 ###############################################################################
 class BLASTquery(object):
@@ -73,7 +71,7 @@ class BLASTquery(object):
         # Options #
         for k,v in self.params.items(): cmd += [k, v]
         # Return #
-        return list(map(str, cmd))
+        return map(str, cmd)
 
     def run(self):
         # Use sh #

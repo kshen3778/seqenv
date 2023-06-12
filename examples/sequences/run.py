@@ -5,6 +5,7 @@ Run the sequences example
 """
 
 # Modules #
+from __future__ import absolute_import
 from seqenv import Analysis
 
 # Change directory #

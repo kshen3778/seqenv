@@ -1,8 +1,6 @@
 # Built-in modules #
 
 # Internal modules #
-from __future__ import absolute_import
-from __future__ import print_function
 from seqenv import module_dir
 from seqenv.common.cache import property_cached
 
@@ -202,22 +200,22 @@ class Ontology(object):
         # Test node #
         if e is None: e = test_envos[0]
         # Goa #
-        print("Goa: ")
-        print(self.goatools[e])
+        print "Goa: "
+        print self.goatools[e]
         # Pygraphviz #
-        print("pygraphviz: ")
-        print(self.pygraphviz[e])
-        print(self.pygraphviz.successors(e))
-        print(self.pygraphviz.predecessors(e))
-        print(self.pygraphviz.get_node(e))
+        print "pygraphviz: "
+        print self.pygraphviz[e]
+        print self.pygraphviz.successors(e)
+        print self.pygraphviz.predecessors(e)
+        print self.pygraphviz.get_node(e)
         # Networkx #
         import networkx
-        print("networkx: ")
-        print(self.networkx[e])
-        print(self.networkx.successors(e))
-        print(self.networkx.predecessors(e))
-        print(networkx.ancestors(self.networkx, e))   # same as predecessors
-        print(networkx.descendants(self.networkx, e)) # almost as child_to_parents
+        print "networkx: "
+        print self.networkx[e]
+        print self.networkx.successors(e)
+        print self.networkx.predecessors(e)
+        print networkx.ancestors(self.networkx, e)   # same as predecessors
+        print networkx.descendants(self.networkx, e) # almost as child_to_parents
 
     def draw_with_networkx(self, g, path):
         """Input a networkx DiGraph object."""

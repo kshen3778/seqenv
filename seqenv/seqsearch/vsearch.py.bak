@@ -4,13 +4,11 @@ from __future__ import division
 # Built-in modules #
 
 # Internal modules #
-from __future__ import absolute_import
 from seqenv.common.autopaths import FilePath
 from seqenv.fasta import FASTA
 
 # Third party modules #
 import sh
-from six.moves import map
 
 ###############################################################################
 class VSEARCHquery(object):
@@ -36,7 +34,7 @@ class VSEARCHquery(object):
         # Executable #
         if self.executable: cmd = [self.executable.path]
         # Return #
-        return list(map(str, cmd))
+        return map(str, cmd)
 
     def run(self):
         sh.Command(self.command[0])(self.command[1:])

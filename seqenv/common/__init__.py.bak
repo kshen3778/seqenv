@@ -1,5 +1,4 @@
 # Built-in modules #
-from __future__ import absolute_import
 import tempfile, datetime, dateutil, hashlib
 
 # One liners #
@@ -43,7 +42,7 @@ def download_from_url(source, destination, progress=False, uncompress=True):
     # Modules #
     from tqdm import tqdm
     import requests
-    from .autopaths import FilePath
+    from autopaths import FilePath
     # Check destination exists #
     destination = FilePath(destination)
     destination.directory.create_if_not_exists()
