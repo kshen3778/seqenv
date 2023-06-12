@@ -16,6 +16,6 @@ setup(
 
     include_package_data = True,
     scripts          = ['seqenv/seqenv'],
-    install_requires = ['numpy', 'matplotlib', 'biopython', 'sh', 'pandas', 'tqdm', 'biom-format',
-                        'requests', 'pygraphviz', 'networkx', 'Orange-Bioinformatics'],
+    install_requires = ['numpy==1.21.5', 'matplotlib==3.5.1', 'biopython==1.81', 'sh==2.0.4', 'pandas==2.0.2', 'tqdm==4.65.0', 'biom-format==2.1.15',
+                        'requests==2.25.1', 'pygraphviz==1.11', 'networkx==3.1', 'Orange-Bioinformatics==2.6.25'],
 )
