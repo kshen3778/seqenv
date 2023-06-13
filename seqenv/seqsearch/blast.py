@@ -79,7 +79,9 @@ class BLASTquery(object):
         # Use sh #
         result = sh.Command(self.command[0])(self.command[1:])
         # Check for errors #
-        if "BLAST Database error" in result.stderr:
+        if "stderr" in result:
+            # if "BLAST Database error" in result.stderr:
+            #     raise Exception("Sequence search error: '%s'" % result.stderr)
             raise Exception("Sequence search error: '%s'" % result.stderr)
         # Remove logs #
         if os.path.exists("error.log") and os.path.getsize("error.log") == 0: os.remove("error.log")

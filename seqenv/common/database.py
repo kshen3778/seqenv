@@ -154,7 +154,8 @@ class Database(FilePath):
 
     def check_format(self):
         if self.count_bytes == 0: return
-        with open(self.path, 'r') as f: header = f.read(15)
+        with open(self.path, 'rb') as f: 
+            header = f.read(15).decode('utf-8')
         if header != 'SQLite format 3':
             raise Exception("The file '" + self.path + "' is not an SQLite database.")
 

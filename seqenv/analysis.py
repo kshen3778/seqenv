@@ -285,11 +285,13 @@ class Analysis(object):
                 seq_name = hit[0]
                 gi = hit[1].split('|')[1]
                 result[seq_name].append(gi)
-            with open(seq_to_gis, 'w') as handle: pickle.dump(result, handle)
+            with open(seq_to_gis, 'wb') as handle: 
+                pickle.dump(result, handle)
             self.timer.print_elapsed()
             return result
         # Parse the results #
-        with open(seq_to_gis) as handle: return pickle.load(handle)
+        with open(seq_to_gis, 'rb') as handle: 
+            return pickle.load(handle)
 
     @property_cached
     def unique_gis(self):
