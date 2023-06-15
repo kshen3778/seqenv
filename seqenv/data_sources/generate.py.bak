@@ -17,9 +17,7 @@ $ ./generate.py
 """
 
 # Built-in modules #
-from __future__ import absolute_import
-from __future__ import print_function
-import os, time, inspect, six.moves.urllib.request, six.moves.urllib.error, six.moves.urllib.parse, datetime
+import os, time, inspect, urllib2, datetime
 from itertools import islice
 from collections import OrderedDict, defaultdict
 from socket import error as SocketError
@@ -36,8 +34,6 @@ from Bio import Entrez
 from tqdm import tqdm
 from shell_command import shell_output
 from Bio.Entrez.Parser import CorruptedXMLError, ValidationError
-from six.moves import map
-from six.moves import range
 
 # Get the directory of this script #
 filename = inspect.getframeinfo(inspect.currentframe()).filename
@@ -54,15 +50,15 @@ class GenerateGIs(FilePath):
         Then filter out the ones that are too long."""
         temp_file = new_temp_file()
         shell_output("blastdbcmd -db nt -entry all -outfmt '%g %l' > " + temp_file)
-        with_len = (list(map(int,line.strip('\n').split())) for line in temp_file)
+        with_len = (map(int,line.strip('\n').split()) for line in temp_file)
         self.writelines(str(gid) + '\n' for gid, length in with_len if length < self.length_cutoff)
         temp_file.remove()
 
     def check_retrieved(self):
         """Check that we have retrieved the GI numbers, else do it."""
         if self.count_bytes < 1: self.retrieve_from_nt()
-        else: print('-> All GI numbers already found in file "%s", skipping STEP 1.' % self.filename)
-        print('-> Got %i GI numbers.' % len(self))
+        else: print '-> All GI numbers already found in file "%s", skipping STEP 1.' % self.filename
+        print '-> Got %i GI numbers.' % len(self)
 
     def all(self):
         """Iterate over all GI numbers."""
@@ -78,7 +74,7 @@ class GenerateGIs(FilePath):
         generator = self.lines_int
         n = 0
         while True:
-            gi = next(generator)
+            gi = generator.next()
             n += 1
             if gi == last_gi: break
         else:
@@ -119,12 +115,12 @@ class QueryNCBI(object):
         """Download information from NCBI in batch mode.
         Return `isolation_source` and `pubmed_id for an entry if it has an
         isolation_source"""
-        for i in self.progress(range(0, len(gi_nums), self.at_a_time)):
+        for i in self.progress(xrange(0, len(gi_nums), self.at_a_time)):
             self.chunk = tuple(islice(gi_nums, 0, self.at_a_time))
             records    = self.chunk_to_records(self.chunk)
-            sources    = list(map(self.record_to_source, records))
-            pubmed_ids = list(map(self.record_to_pubmed_id, records))
-            has_source = tuple(i for i in range(len(self.chunk)) if sources[i])
+            sources    = map(self.record_to_source, records)
+            pubmed_ids = map(self.record_to_pubmed_id, records)
+            has_source = tuple(i for i in xrange(len(self.chunk)) if sources[i])
             # Generate the result #
             if not has_source: continue
             yield ((self.chunk[i], sources[i], pubmed_ids[i]) for i in has_source)
@@ -138,12 +134,12 @@ class QueryNCBI(object):
         pass
         # The web connection #
         try:
-            response = Entrez.efetch(db="nucleotide", id=list(map(str,chunk)), retmode="xml")
-        except six.moves.urllib.error.HTTPError:
+            response = Entrez.efetch(db="nucleotide", id=map(str,chunk), retmode="xml")
+        except urllib2.HTTPError:
             self.logger.report_error('http', chunk)
             time.sleep(5)
             return self.chunk_to_records(chunk)
-        except six.moves.urllib.error.URLError:
+        except urllib2.URLError:
             self.logger.report_error('url', chunk)
             time.sleep(5)
             return self.chunk_to_records(chunk)
@@ -186,7 +182,7 @@ class QueryNCBI(object):
     def get_all_lengths(self, chunk):
         """Given a list of GIDs return the length of each sequence"""
         gid_to_len = lambda x: Entrez.parse(Entrez.esummary(db="nucleotide", id=x)).next()['Length']
-        return list(map(gid_to_len, chunk))
+        return map(gid_to_len, chunk)
 
 ###############################################################################
 class Logger(FilePath):
@@ -212,7 +208,7 @@ class Logger(FilePath):
         message += "Freak length error: %s\n" % len(self.errors['length'])
         return message
 
-    def print_error_log(self): print(self.message)
+    def print_error_log(self): print self.message
 
 ###############################################################################
 # Objects #
@@ -227,27 +223,27 @@ def run():
     timer = Timer()
     timer.print_start()
     # Get the numbers #
-    print('STEP 1: Get all GIs from the local nt database into a file (about 6h).')
+    print 'STEP 1: Get all GIs from the local nt database into a file (about 6h).'
     gi_generator.check_retrieved()
     timer.print_elapsed()
     # Do it #
-    print('STEP 2: Querying NCBI and writing to database (about 150h)')
+    print 'STEP 2: Querying NCBI and writing to database (about 150h)'
     if sqlite_db.count_bytes < 1:
-        print("-> The database doesn't exist. Creating it.")
+        print "-> The database doesn't exist. Creating it."
         keys = OrderedDict((('id','integer'), ('source','text'), ('pubmed','integer')))
         sqlite_db.create(keys)
         sqlite_db.add_by_steps(ncbi_worker.get(gi_generator.all()))
     else:
-        print('-> The database seems to exist already. Attempting to restart where it was stopped.')
+        print '-> The database seems to exist already. Attempting to restart where it was stopped.'
         last_gi = sqlite_db.last[0]
-        print('-> Last GI number recorded was "%s".' % last_gi)
+        print '-> Last GI number recorded was "%s".' % last_gi
         sqlite_db.add_by_steps(ncbi_worker.get(gi_generator.start_at(last_gi)))
     # Make the index #
-    print('STEP 3: Creating database index.')
+    print 'STEP 3: Creating database index.'
     sqlite_db.index()
     # End messages #
     timer.print_elapsed()
-    print('Done. Results are in "%s"' % sqlite_db)
+    print 'Done. Results are in "%s"' % sqlite_db
     timer.print_end()
     timer.print_total_elapsed()
     ncbi_worker.logger.print_error_log()
@@ -256,7 +252,7 @@ def run():
 def test():
     """Test this script."""
     # Verbose #
-    print('STEP 0: Testing the script and connection')
+    print 'STEP 0: Testing the script and connection'
     # The result we should get #
     template_result = """
     76365841,Everglades wetlands,16907754
@@ -268,7 +264,7 @@ def test():
     template_result = '\n'.join(l.lstrip(' ') for l in template_result.split('\n') if l)
     # The result we got #
     test_ncbi_worker = QueryNCBI(at_a_time=10, progress=False)
-    results = next(test_ncbi_worker.get(test_generate_gis()))
+    results = test_ncbi_worker.get(test_generate_gis()).next()
     # Function #
     def result_to_lines(results):
         for gi, source, pubmed in results:
@@ -276,7 +272,7 @@ def test():
     # Check #
     text_version = ''.join(result_to_lines(results))
     assert text_version.strip('\n') == template_result.strip('\n')
-    print("-> Test OK !")
+    print "-> Test OK !"
 
 ###############################################################################
 def validate():
@@ -285,7 +281,7 @@ def validate():
 
 ###############################################################################
 if __name__ == '__main__':
-    print("*** Generating the GI database (pid %i) ***" % os.getpid())
+    print "*** Generating the GI database (pid %i) ***" % os.getpid()
     test()
     run()
     validate()

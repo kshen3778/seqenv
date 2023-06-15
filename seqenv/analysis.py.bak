@@ -2,11 +2,9 @@
 from __future__ import division
 
 # Built-in modules #
-from __future__ import absolute_import
-from __future__ import print_function
 import os, multiprocessing, warnings, marshal
 from collections import defaultdict
-import six.moves.cPickle as pickle
+import cPickle as pickle
 
 # Internal modules #
 import seqenv
@@ -121,7 +119,7 @@ class Analysis(object):
         message = "The '--restrict' parameter must be an ENVO term, not '%s'."
         if restrict and not restrict[:5] == 'ENVO:': raise Exception(message % restrict)
         message = "The '--restrict' parameter must be a known ENVO term."
-        if restrict and not restrict in list(self.serial_to_concept.values()): raise Exception(message)
+        if restrict and not restrict in self.serial_to_concept.values(): raise Exception(message)
         self.restrict = restrict
         # Search parameters #
         self.search_algo = search_algo
@@ -149,12 +147,12 @@ class Analysis(object):
         """A method to run the whole pipeline. As everything is coded in a functional
         style, we just need to make a call to `outputs.make_all` and everything will be
         generated automatically, in a reverse fashion."""
-        print((version_string + " (pid %i)" % os.getpid()))
-        print("Codebase at: %s" % seqenv)
-        if git_repo: print("The exact version of the codebase is: " + git_repo.short_hash)
+        print(version_string + " (pid %i)" % os.getpid())
+        print "Codebase at: %s" % seqenv
+        if git_repo: print "The exact version of the codebase is: " + git_repo.short_hash
         self.timer.print_start()
         self.outputs.make_all()
-        print("------------\nSuccess. Outputs are in '%s'" % self.out_dir)
+        print "------------\nSuccess. Outputs are in '%s'" % self.out_dir
         self.timer.print_end()
         self.timer.print_total_elapsed()
 
@@ -185,7 +183,7 @@ class Analysis(object):
         with "C1", "C2", "C3" etc. Returns this new FASTA file."""
         renamed_fasta = FASTA(self.out_dir + 'renamed.fasta')
         if renamed_fasta.exists: return renamed_fasta
-        print("--> STEP 1: Parse the input FASTA file.")
+        print "--> STEP 1: Parse the input FASTA file."
         self.input_file.rename_sequences(renamed_fasta, self.orig_names_to_renamed)
         self.timer.print_elapsed()
         return renamed_fasta
@@ -208,8 +206,8 @@ class Analysis(object):
         # Create file #
         only_top_fasta = FASTA(self.out_dir + 'top_seqs.fasta')
         # Print status #
-        print("Using: " + self.renamed_fasta)
-        print("--> STEP 1B: Get the top %i sequences (in terms of their abundances)." % N)
+        print "Using: " + self.renamed_fasta
+        print "--> STEP 1B: Get the top %i sequences (in terms of their abundances)." % N
         # Check the user inputted value #
         if N > self.input_file.count:
             msg = "You asked for the top %i sequences"
@@ -249,12 +247,12 @@ class Analysis(object):
         after filtering."""
         # Check that the search was run #
         if not self.search.out_path.exists:
-            print("Using: " + self.only_top_sequences)
+            print "Using: " + self.only_top_sequences
             message = "--> STEP 2: Similarity search against the '%s' database with %i processes"
-            print(message % (self.search_db, self.num_threads))
+            print message % (self.search_db, self.num_threads)
             self.search.run()
             self.timer.print_elapsed()
-            print("--> STEP 3: Filter out bad hits from the search results")
+            print "--> STEP 3: Filter out bad hits from the search results"
             self.search.filter()
             self.timer.print_elapsed()
             if self.search.out_path.count_bytes == 0:
@@ -279,19 +277,17 @@ class Analysis(object):
         # Check that is was run #
         if not seq_to_gis.exists:
             self.search_results
-            print("--> STEP 4: Parsing the search results")
+            print "--> STEP 4: Parsing the search results"
             result = {seq:[] for seq in self.only_top_sequences.ids}
             for hit in self.search_results:
                 seq_name = hit[0]
                 gi = hit[1].split('|')[1]
                 result[seq_name].append(gi)
-            with open(seq_to_gis, 'wb') as handle: 
-                pickle.dump(result, handle)
+            with open(seq_to_gis, 'w') as handle: pickle.dump(result, handle)
             self.timer.print_elapsed()
             return result
         # Parse the results #
-        with open(seq_to_gis, 'rb') as handle: 
-            return pickle.load(handle)
+        with open(seq_to_gis) as handle: return pickle.load(handle)
 
     @property_cached
     def unique_gis(self):
@@ -321,7 +317,7 @@ class Analysis(object):
         CREATE INDEX "gi_index" on "gi" (id);
         CREATE INDEX "isolation_index" on "isolation" (source);
         """
-        print("--> STEP 5: Setting up the SQLite3 database connection.")
+        print "--> STEP 5: Setting up the SQLite3 database connection."
         path     = module_dir + 'data_sources/gi_db.sqlite3'
         drop_box = "1yxoc1530am6tn0/gi_db.sqlite3.zip"
         retrieve = "https://www.dropbox.com/s/%s?dl=1" % drop_box
@@ -347,9 +343,9 @@ class Analysis(object):
         number is available."""
         # Message #
         msg = "Got %i GI hits and %i of them had one or more EnvO terms associated."
-        print(msg % (len(self.unique_gis), len(self.gis_with_envo)))
+        print msg % (len(self.unique_gis), len(self.gis_with_envo))
         # Step 5 #
-        print("--> STEP 6: Computing EnvO term frequencies.")
+        print "--> STEP 6: Computing EnvO term frequencies."
         results = {}
         # Useful later #
         gi_to_key    = lambda gi: self.db.get("gi","id",gi)[1]

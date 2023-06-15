@@ -1,5 +1,4 @@
 # Built-in modules #
-from __future__ import absolute_import
 import os, sh, glob, shutil, stat
 
 # Internal modules #
@@ -250,7 +249,7 @@ class FilePermissions(object):
     @property
     def number(self):
         """The permission bits as an octal integer"""
-        return os.stat(self.path).st_mode & 0o777
+        return os.stat(self.path).st_mode & 0777
 
     def make_executable(self):
         return os.chmod(self.path, os.stat(self.path).st_mode | stat.S_IEXEC)

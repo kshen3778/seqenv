@@ -23,3 +23,5 @@ MANIFEST
 # Automatic documentation #
 documentation/automatic
 documentation/html
+
+*.egg-info

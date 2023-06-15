@@ -1,9 +1,8 @@
 # Built-in modules #
-from __future__ import absolute_import
 import tempfile
 
 # Internal modules #
-from .autopaths import FilePath
+from autopaths import FilePath
 
 ################################################################################
 def new_temp_path(**kwargs):

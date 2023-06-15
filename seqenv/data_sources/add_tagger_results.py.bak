@@ -12,8 +12,6 @@ $ ./add_tagger_results.py
 """
 
 # Built-in modules #
-from __future__ import absolute_import
-from __future__ import print_function
 import os, inspect, marshal
 
 # Internal modules #
@@ -23,8 +21,6 @@ from seqenv.common.database import Database
 
 # Third party modules #
 from tqdm import trange, tqdm
-from six.moves import map
-from six.moves import range
 
 # Get the directory of this script #
 filename = inspect.getframeinfo(inspect.currentframe()).filename
@@ -72,34 +68,34 @@ def make_test_database(database):
 
 ###############################################################################
 def restore_database(timer):
-    print('-> Restoring database (~5sec).')
+    print '-> Restoring database (~5sec).'
     db_path.remove()
     restore_path.unzip_to(db_path)
     timer.print_elapsed()
 
 ###############################################################################
 def pre_test(database, n=20):
-    print('-'*25 + "PRE TEST" + '-'*25)
+    print '-'*25 + "PRE TEST" + '-'*25
     database.execute('SELECT * from data')
     tagger = Tagger()
     ids = []
     for i in range(n):
-        gi, text, pubmed = next(database.cursor)
+        gi, text, pubmed = database.cursor.next()
         matches = tagger.match(text)
         if not matches: continue
         envos = tuple(int(n[1][5:]) for m in matches for n in m[2])
         msg = 'GI: %s, SOURCE: "%s…", ENVOS: %s'
         msg = msg % (gi, text[:15], envos)
         ids.append(gi)
-        print(msg)
-    print('-'*63)
+        print msg
+    print '-'*63
     return ids
 
 ###############################################################################
 def run(database, timer):
     """Main part."""
     # STEP 1 #
-    print('STEP 1: Adding the isolation table.')
+    print 'STEP 1: Adding the isolation table.'
     query = """
     CREATE TABLE "isolation"
     (
@@ -111,17 +107,17 @@ def run(database, timer):
     timer.print_elapsed()
 
     # STEP 2 #
-    print('STEP 2: Loading all distinct isolation sources in RAM (~1min).')
+    print 'STEP 2: Loading all distinct isolation sources in RAM (~1min).'
     def gen_sources():
         command = 'SELECT DISTINCT "source" FROM "data" order by min(rowid);'
         database.execute(command)
         for x in database.cursor: yield x[0]
     all_sources = list(gen_sources())
     timer.print_elapsed()
-    print("Total sources: %i" % len(all_sources))
+    print "Total sources: %i" % len(all_sources)
 
     # STEP 3 #
-    print('STEP 3: Adding all isolation sources and tags in the new table (~1min).')
+    print 'STEP 3: Adding all isolation sources and tags in the new table (~1min).'
     tagger = Tagger()
     def gen_rows(sources):
         for i in trange(len(sources)):
@@ -134,15 +130,15 @@ def run(database, timer):
     database.add(gen_rows(all_sources), 'isolation', ('source', 'envos'))
     timer.print_elapsed()
     total = database.count_entries('isolation')
-    print("Total sources that had at least one match: %i" % total)
+    print "Total sources that had at least one match: %i" % total
 
     # STEP 4 #
-    print('STEP 4: Indexing on source text in the isolation table.')
+    print 'STEP 4: Indexing on source text in the isolation table.'
     database.index(table='isolation', column='source')
     timer.print_elapsed()
 
     # STEP 5 #
-    print('STEP 5: Uniquifying Gids in the old table. (~1min)')
+    print 'STEP 5: Uniquifying Gids in the old table. (~1min)'
     query = 'DELETE from "data" WHERE rowid not in (select min(rowid) from "data" group by id);'
     database.execute(query)
     timer.print_elapsed()
@@ -156,18 +152,18 @@ def run(database, timer):
       "pubmed"  INTEGER
     );"""
     database.execute(query)
-    print('STEP 6A: Putting the new table in RAM. (~3min)')
+    print 'STEP 6A: Putting the new table in RAM. (~3min)'
     def gen_rows(database):
         for gi, text, pubmed in tqdm(database):
             isolation = database.get_entry(text, 'source', 'isolation')
             if isolation: yield gi, isolation[0], pubmed
     rows = tuple(gen_rows(database))
-    print('STEP 6B: Filling the new table into the database. (~30min)')
+    print 'STEP 6B: Filling the new table into the database. (~30min)'
     database.add(tqdm(rows), 'gi')
     timer.print_elapsed()
 
     # STEP 5 #
-    print('STEP 5: Delete the old table, index and make a view.')
+    print 'STEP 5: Delete the old table, index and make a view.'
     command = 'DROP INDEX "main_index";'
     database.execute(command)
     command = 'DROP TABLE "data";'
@@ -182,29 +178,29 @@ def run(database, timer):
     timer.print_elapsed()
 
     # STEP 6 #
-    print('STEP 6: Rebuild the entire database (vacuuming). (~xmin)')
+    print 'STEP 6: Rebuild the entire database (vacuuming). (~xmin)'
     database.vacuum()
     timer.print_elapsed()
 
     # End messages #
-    print('Done. Results are in "%s"' % database.path)
+    print 'Done. Results are in "%s"' % database.path
     timer.print_end()
     timer.print_total_elapsed()
 
 ###############################################################################
 def post_test_1(database, n=10):
-    print('-'*25 + "POST TEST 1" + '-'*25)
+    print '-'*25 + "POST TEST 1" + '-'*25
     database.execute('SELECT rowid, * from "isolation"')
     for i in range(n):
-        rowid, key, source, envos = next(database.cursor)
+        rowid, key, source, envos = database.cursor.next()
         envos = marshal.loads(envos)
         msg = 'ID: %s, KEY: %s, SOURCE: "%s…", ENVOS: %s'
         msg = msg % (rowid, key, source[:15], envos)
-        print(msg)
+        print msg
 
 ###############################################################################
 def post_test_2(database, ids):
-    print('-'*25 + "POST TEST 2" + '-'*25)
+    print '-'*25 + "POST TEST 2" + '-'*25
     command = """
     SELECT rowid, * from "gi"
     WHERE rowid in (%s)
@@ -217,16 +213,16 @@ def post_test_2(database, ids):
     command = command % (ordered, rowids)
     database.execute(command)
     for i in range(len(ids)):
-        rowid, gi, isokey, pubmed = next(database.cursor)
+        rowid, gi, isokey, pubmed = database.cursor.next()
         key, source, envos = database.get_entry(isokey, 'id', 'isolation')
         envos = marshal.loads(envos)
         msg = 'ID: %s, GI: %s, SOURCE: "%s…", ENVOS: %s'
         msg = msg % (rowid, gi, source[:15], envos)
-        print(msg)
+        print msg
 
 ###############################################################################
 def post_test_3(database, ids):
-    print('-'*25 + "POST TEST 3" + '-'*25)
+    print '-'*25 + "POST TEST 3" + '-'*25
     command = """
     SELECT * from "data"
     WHERE id in (%s)
@@ -241,16 +237,16 @@ def post_test_3(database, ids):
     # ORDER BY instr(',%s,', ',' || id || ',')
     database.execute(command)
     for i in range(len(ids)):
-        gi, source, pubmed, envos = next(database.cursor)
+        gi, source, pubmed, envos = database.cursor.next()
         envos = marshal.loads(envos)
         msg = 'GI: %s, SOURCE: "%s…", ENVOS: %s'
         msg = msg % (gi, source[:15], envos)
-        print(msg)
-    print('-'*63)
+        print msg
+    print '-'*63
 
 ###############################################################################
 if __name__ == '__main__':
-    print("*** Adding tagger results to database (pid %i) ***" % os.getpid())
+    print "*** Adding tagger results to database (pid %i) ***" % os.getpid()
     # Time it #
     timer = Timer()
     timer.print_start()
@@ -264,4 +260,4 @@ if __name__ == '__main__':
         post_test_2(db, ids)
         post_test_3(db, ids)
     # Size #
-    print("Final size is %s" % db_path.size)
+    print "Final size is %s" % db_path.size

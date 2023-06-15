@@ -1,5 +1,4 @@
 # Built-in modules #
-from __future__ import absolute_import
 import warnings, marshal, re
 
 # Internal modules #
@@ -9,7 +8,6 @@ from seqenv.common.autopaths import DirectoryPath
 
 # Third party modules #
 import pandas
-import six
 
 # We don't want the annoying h5py warning #
 with warnings.catch_warnings():
@@ -188,7 +186,7 @@ class OutputGenerator(object):
             counts = {"ENVO:%08d"%k:v for k,v in counts.items()}
             total  = sum(counts.values())
             counts = {k:v/total for k,v in counts.items()}
-            envos  = list(counts.keys())
+            envos  = counts.keys()
             graph  = self.a.ontology.get_subgraph(envos)
             graph  = self.a.ontology.add_weights(graph, counts)
             graph  = self.a.ontology.add_style(graph)
@@ -204,7 +202,7 @@ class OutputGenerator(object):
         directory = DirectoryPath(self.a.out_dir+'per_sample_ontology/')
         directory.create_if_not_exists()
         # Main loop #
-        for i, sample in six.iteritems(self.df_sample_concepts):
+        for i, sample in self.df_sample_concepts.iteritems():
             # File path #
             sanitized_name = "".join([c for c in sample.name if re.match(r'\w', c)])
             dot_path = directory + sanitized_name +'.dot'
@@ -212,7 +210,7 @@ class OutputGenerator(object):
             # Counts #
             counts = sample / sample.sum()
             counts = dict(counts)
-            envos  = list(counts.keys())
+            envos  = counts.keys()
             # Skip sample if it has no counts #
             if sample.sum() == 0: continue
             # Make graph #

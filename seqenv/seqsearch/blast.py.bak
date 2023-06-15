@@ -2,7 +2,6 @@
 from __future__ import division
 
 # Built-in modules #
-from __future__ import absolute_import
 import os, multiprocessing, threading, shutil
 
 # Internal modules #
@@ -12,7 +11,6 @@ from seqenv.common.autopaths import FilePath
 
 # Third party modules #
 import sh
-from six.moves import map
 
 ###############################################################################
 class BLASTquery(object):
@@ -73,15 +71,13 @@ class BLASTquery(object):
         # Options #
         for k,v in self.params.items(): cmd += [k, v]
         # Return #
-        return list(map(str, cmd))
+        return map(str, cmd)
 
     def run(self):
         # Use sh #
         result = sh.Command(self.command[0])(self.command[1:])
         # Check for errors #
-        if "stderr" in result:
-            # if "BLAST Database error" in result.stderr:
-            #     raise Exception("Sequence search error: '%s'" % result.stderr)
+        if "BLAST Database error" in result.stderr:
             raise Exception("Sequence search error: '%s'" % result.stderr)
         # Remove logs #
         if os.path.exists("error.log") and os.path.getsize("error.log") == 0: os.remove("error.log")
